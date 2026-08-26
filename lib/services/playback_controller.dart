@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:rxdart/rxdart.dart';
@@ -21,6 +22,19 @@ class PlaybackController {
 
   VoidCallback? onTrackFinished;
 
+  // ── Streams for the UI (using RxDart Subjects to bypass media_kit's broken native event loop) ──
+  final BehaviorSubject<bool> _playingSubject = BehaviorSubject.seeded(false);
+  final BehaviorSubject<DurationState> _durationStateSubject = BehaviorSubject.seeded(const DurationState(
+    progress: Duration.zero,
+    buffered: Duration.zero,
+    total: Duration.zero,
+  ));
+
+  Stream<bool> get playingStream => _playingSubject.stream;
+  Stream<DurationState> get durationStateStream => _durationStateSubject.stream;
+
+  Timer? _pollingTimer;
+
   PlaybackController() {
     // Log any player errors for debugging
     _player.stream.error.listen((err) {
@@ -32,25 +46,38 @@ class PlaybackController {
         onTrackFinished!();
       }
     });
+
+    // Fallback polling for broken media_kit streams on some 64-bit Android architectures
+    _pollingTimer = Timer.periodic(const Duration(milliseconds: 200), (_) {
+      try {
+        final currentPlaying = _player.state.playing;
+        if (_playingSubject.value != currentPlaying) {
+          _playingSubject.add(currentPlaying);
+        }
+
+        final currentState = currentDurationState;
+        final lastState = _durationStateSubject.value;
+        if (currentState.progress != lastState.progress || 
+            currentState.total != lastState.total || 
+            currentState.buffered != lastState.buffered) {
+          _durationStateSubject.add(currentState);
+          
+          // Fallback completion check
+          if (!currentPlaying && 
+              currentState.total > Duration.zero && 
+              currentState.progress.inSeconds >= currentState.total.inSeconds - 1) {
+            if (onTrackFinished != null) {
+              // Avoid triggering multiple times
+              _player.seek(Duration.zero);
+              onTrackFinished!();
+            }
+          }
+        }
+      } catch (e) {
+        // ignore errors during polling
+      }
+    });
   }
-
-  // ── Streams for the UI ──
-  Stream<bool> get playingStream => _player.stream.playing;
-  Stream<Duration> get positionStream => _player.stream.position;
-  Stream<Duration?> get durationStream =>
-      _player.stream.duration.map((d) => d == Duration.zero ? null : d);
-  Stream<bool> get bufferingStream => _player.stream.buffering;
-
-  Stream<DurationState> get durationStateStream => Rx.combineLatest3<Duration, Duration, Duration, DurationState>(
-        _player.stream.position,
-        _player.stream.buffer,
-        _player.stream.duration,
-        (position, buffer, duration) => DurationState(
-          progress: position,
-          buffered: buffer,
-          total: duration,
-        ),
-      );
 
   bool get isPlaying => _player.state.playing;
   Duration get position => _player.state.position;
@@ -58,8 +85,17 @@ class PlaybackController {
     final d = _player.state.duration;
     return d == Duration.zero ? null : d;
   }
+  
+  DurationState get currentDurationState => DurationState(
+    progress: _player.state.position,
+    buffered: _player.state.buffer,
+    total: _player.state.duration,
+  );
 
   Future<void> playTrack(TrackModel track) async {
+    // Instantly stop the current playing song while we resolve the next one
+    await pause();
+    
     String? videoId = track.videoId;
     if (videoId == null) {
       // Resolve videoId using YouTubeSearchService (Spotube BYOMM pattern)

@@ -36,7 +36,9 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     try {
       List<TrackModel> tracks = [];
       if (widget.playlist.spotifyId != null) {
-        tracks = await _spotifyService.getPlaylistTracks(widget.playlist.spotifyId!);
+        tracks = widget.playlist.isAlbum
+            ? await _spotifyService.getAlbumTracks(widget.playlist.spotifyId!)
+            : await _spotifyService.getPlaylistTracks(widget.playlist.spotifyId!);
       } else if (widget.playlist.query != null) {
         tracks = await _searchService.searchTracks(widget.playlist.query!);
       }

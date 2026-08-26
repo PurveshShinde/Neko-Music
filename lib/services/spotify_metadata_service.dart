@@ -4,7 +4,7 @@ import 'package:hetu_script/values.dart';
 import 'package:http/http.dart' as http;
 import '../models/track_model.dart';
 import '../models/playlist_model.dart';
-import '../state/app_state.dart';
+import '../services/plugin_manager_service.dart';
 import '../services/youtube_search_service.dart';
 
 class SpotifyMetadataService {
@@ -59,18 +59,20 @@ class SpotifyMetadataService {
     try {
       await _ensureAuthenticated(engine);
       
-      // Attempt to invoke plugin's native recommendations if available
+      // Attempt to invoke plugin's native radio if available
       try {
         final metadataPlugin = engine.fetch("metadataPlugin") as HTInstance;
-        final browseEndpoint = metadataPlugin.memberGet("browse") as HTInstance;
-        final raw = await browseEndpoint.invoke(
-          "recommendations",
-          namedArgs: {"seed_tracks": seedTrack.spotifyId, "limit": 10},
-        ) as Map;
-        final items = raw['tracks'] as List? ?? [];
-        return _mapTracks(items.map((t) => {'track': t}).toList());
-      } catch (_) {
-        // Method might not exist on the plugin, fallback to YouTube
+        final trackEndpoint = metadataPlugin.memberGet("track") as HTInstance;
+        final raw = await trackEndpoint.invoke(
+          "radio",
+          positionalArgs: [seedTrack.spotifyId],
+        ) as List?;
+        
+        final items = raw ?? [];
+        return _mapTracks(items.toList());
+      } catch (e) {
+        debugPrint('Radio fetch failed, falling back to YouTube: $e');
+        // Method might not exist or failed, fallback to YouTube
         return ytService.searchTracks('similar to ${seedTrack.title} ${seedTrack.artist}');
       }
     } catch (e) {
@@ -138,6 +140,7 @@ class SpotifyMetadataService {
           imageUrl: (pMap['images'] as List?)?.isNotEmpty == true ? (pMap['images'] as List)[0]['url'] as String? : null,
           colorSeed: 0xFF1DB954,
           spotifyId: pMap['id'] as String?,
+          isAlbum: pMap['type'] == 'album' || (pMap['uri'] as String?)?.contains(':album:') == true,
         );
       }).toList();
 
@@ -223,17 +226,42 @@ class SpotifyMetadataService {
     try {
       await _ensureAuthenticated(engine);
 
+      final cleanId = playlistId.replaceAll('spotify:playlist:', '');
       final metadataPlugin = engine.fetch("metadataPlugin") as HTInstance;
       final playlistEndpoint = metadataPlugin.memberGet("playlist") as HTInstance;
       final raw = await playlistEndpoint.invoke(
         "tracks",
-        positionalArgs: [playlistId],
+        positionalArgs: [cleanId],
         namedArgs: {"limit": 15, "offset": 0},
       ) as Map;
       final items = raw['items'] as List? ?? [];
       return _mapTracks(items);
     } catch (e) {
       debugPrint('Error fetching playlist tracks: $e');
+      return [];
+    }
+  }
+
+  Future<List<TrackModel>> getAlbumTracks(String albumId) async {
+    final engine = pluginManager.getMetadataEngine();
+    if (engine == null) throw Exception('No metadata plugin loaded');
+
+    try {
+      await _ensureAuthenticated(engine);
+
+      final cleanId = albumId.replaceAll('spotify:album:', '');
+      final metadataPlugin = engine.fetch("metadataPlugin") as HTInstance;
+      final albumEndpoint = metadataPlugin.memberGet("album") as HTInstance;
+      final raw = await albumEndpoint.invoke(
+        "tracks",
+        positionalArgs: [cleanId],
+        namedArgs: {"limit": 20, "offset": 0},
+      ) as Map;
+      
+      final items = raw['items'] as List? ?? [];
+      return _mapTracks(items);
+    } catch (e) {
+      debugPrint('Error fetching album tracks: $e');
       return [];
     }
   }

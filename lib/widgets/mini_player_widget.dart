@@ -18,6 +18,7 @@ class MiniPlayerWidget extends StatelessWidget {
 
     return StreamBuilder<bool>(
       stream: state.playbackController.playingStream,
+      initialData: state.playbackController.isPlaying,
       builder: (context, snapshot) {
         final isPlaying = snapshot.data ?? false;
 

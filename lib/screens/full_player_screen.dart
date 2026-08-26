@@ -123,6 +123,7 @@ class FullPlayerScreen extends StatelessWidget {
                 // Seek Bar
                 StreamBuilder<DurationState>(
                   stream: state.playbackController.durationStateStream,
+                  initialData: state.playbackController.currentDurationState,
                   builder: (context, snapshot) {
                     final durationState = snapshot.data;
                     final progress = durationState?.progress ?? Duration.zero;
@@ -151,6 +152,7 @@ class FullPlayerScreen extends StatelessWidget {
                 // Controls
                 StreamBuilder<bool>(
                   stream: state.playbackController.playingStream,
+                  initialData: state.playbackController.isPlaying,
                   builder: (context, snapshot) {
                     final isPlaying = snapshot.data ?? false;
                     return Row(

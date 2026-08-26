@@ -77,10 +77,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return SafeArea(
       bottom: false,
-      child: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          // ── Header ──
+      child: RefreshIndicator(
+        color: SlothifyColors.accent,
+        onRefresh: _loadDashboardData,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          slivers: [
+            // ── Header ──
           SliverToBoxAdapter(child: _buildHeader(context)),
           const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
@@ -265,8 +268,9 @@ class _HomeScreenState extends State<HomeScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
