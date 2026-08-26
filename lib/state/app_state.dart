@@ -4,6 +4,8 @@ import '../services/playback_controller.dart';
 import '../services/plugin_manager_service.dart';
 import '../services/spotify_metadata_service.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 /// Lightweight inherited-widget state management for the app.
 ///
 /// Holds global reactive values:
@@ -13,11 +15,33 @@ import '../services/spotify_metadata_service.dart';
 /// - [isPlaying]              — play / pause state.
 /// - [selectedMoodIndex]      — active mood/genre chip.
 class AppState extends ChangeNotifier {
+  final SharedPreferences _prefs;
   final PluginManagerService pluginManager = PluginManagerService();
+  late final SpotifyMetadataService spotifyService;
+  
+  AppState(this._prefs) {
+    _isAmoledThemeEnabled = _prefs.getBool('isAmoledThemeEnabled') ?? false;
+    spotifyService = SpotifyMetadataService(pluginManager);
+    playbackController.onTrackFinished = () {
+      playNext();
+    };
+  }
   
   void notifyPluginLoaded() {
     notifyListeners();
   }
+  
+  // ── AMOLED Theme ──
+  bool _isAmoledThemeEnabled = false;
+  bool get isAmoledThemeEnabled => _isAmoledThemeEnabled;
+  set isAmoledThemeEnabled(bool v) {
+    if (_isAmoledThemeEnabled != v) {
+      _isAmoledThemeEnabled = v;
+      _prefs.setBool('isAmoledThemeEnabled', v);
+      notifyListeners();
+    }
+  }
+
   // ── Glassmorphism toggles ──
   bool _isGlassmorphismEnabled = false; // Master switch
   bool get isGlassmorphismEnabled => _isGlassmorphismEnabled;
@@ -107,17 +131,26 @@ class AppState extends ChangeNotifier {
     return null;
   }
 
-  AppState() {
-    playbackController.onTrackFinished = () {
-      playNext();
-    };
-  }
+
 
   Future<void> playTrack(TrackModel track) async {
     _queue = [track];
     _queueIndex = 0;
     notifyListeners();
-    await playbackController.playTrack(track);
+    
+    // Start playback
+    final playFuture = playbackController.playTrack(track);
+    
+    // In the background, fetch similar tracks to create an autoplay "Radio" queue
+    spotifyService.getSimilarTracks(track).then((recommendations) {
+      // Only append if the queue is still just this single song
+      if (recommendations.isNotEmpty && _queue.length == 1 && _queue[0].title == track.title) {
+        _queue.addAll(recommendations);
+        notifyListeners();
+      }
+    });
+    
+    await playFuture;
   }
 
   Future<void> playQueue(List<TrackModel> tracks, {int startIndex = 0}) async {
@@ -194,7 +227,8 @@ class AppState extends ChangeNotifier {
 
 /// InheritedWidget + StatefulWidget wrapper so descendants can access [AppState].
 class AppStateProvider extends StatefulWidget {
-  const AppStateProvider({super.key, required this.child});
+  final SharedPreferences prefs;
+  const AppStateProvider({super.key, required this.child, required this.prefs});
   final Widget child;
 
   static AppState of(BuildContext context) {
@@ -208,11 +242,12 @@ class AppStateProvider extends StatefulWidget {
 }
 
 class _AppStateProviderState extends State<AppStateProvider> {
-  final AppState _state = AppState();
+  late final AppState _state;
 
   @override
   void initState() {
     super.initState();
+    _state = AppState(widget.prefs);
     _state.addListener(_onChanged);
     _state.pluginManager.bootstrapPlugins().then((_) {
       _state.notifyPluginLoaded();

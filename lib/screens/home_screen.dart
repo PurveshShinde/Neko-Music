@@ -10,6 +10,7 @@ import '../widgets/hero_carousel.dart';
 import '../widgets/speed_dial_grid.dart';
 import '../widgets/playlist_row.dart';
 import '../widgets/profile_bottom_sheet.dart';
+import '../widgets/shimmer_box.dart';
 import 'history_screen.dart';
 import 'listen_together_screen.dart';
 import 'stats_screen.dart';
@@ -50,13 +51,35 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadDashboardData() async {
-    _spotifyService.getRecommendations().then((v) {
-      if (mounted) setState(() => speedDialTracks = v);
-    }).catchError((_) {});
+    _spotifyService.clearCache();
+    
+    if (mounted) {
+      setState(() {
+        speedDialTracks = null;
+        _homeSections = [];
+      });
+    }
 
-    _spotifyService.getHomeSections().then((v) {
-      if (mounted) setState(() => _homeSections = v);
-    }).catchError((_) {});
+    try {
+      final results = await Future.wait([
+        _spotifyService.getRecommendations(),
+        _spotifyService.getHomeSections(),
+      ]);
+      
+      if (mounted) {
+        setState(() {
+          speedDialTracks = results[0] as List<TrackModel>?;
+          _homeSections = results[1] as List<Map<String, dynamic>>;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          speedDialTracks = [];
+          _homeSections = [];
+        });
+      }
+    }
   }
 
   @override
@@ -83,58 +106,8 @@ class _HomeScreenState extends State<HomeScreen> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           slivers: [
-            // ── Header ──
+          // ── Header ──
           SliverToBoxAdapter(child: _buildHeader(context)),
-          const SliverToBoxAdapter(child: SizedBox(height: 16)),
-
-          // ── Mood / Genre Chips ──
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 42,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                physics: const BouncingScrollPhysics(),
-                itemCount: moods.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final isSelected = state.selectedMoodIndex == index;
-                  return GestureDetector(
-                    onTap: () => state.selectedMoodIndex = index,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 260),
-                      curve: Curves.easeOutCubic,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 18, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? SlothifyColors.accent
-                            : SlothifyColors.surfaceVariant,
-                        borderRadius: BorderRadius.circular(24),
-                        border: isSelected
-                            ? null
-                            : Border.all(
-                                color: SlothifyColors.border, width: 1),
-                      ),
-                      child: Center(
-                        child: Text(
-                          moods[index],
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
-                            color: isSelected
-                                ? Colors.white
-                                : SlothifyColors.textSecondary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
           // ── Hero Carousel or Plugin Warning ──
@@ -199,7 +172,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
 
           // ── Speed Dial Section ──
-          if (speedDialTracks != null && speedDialTracks!.isNotEmpty) ...[
+          if (speedDialTracks == null && _pluginLoaded) ...[
+            const SliverToBoxAdapter(
+              child: SectionHeader(title: 'Good afternoon'),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+            SliverToBoxAdapter(child: _buildSpeedDialSkeleton()),
+            const SliverToBoxAdapter(child: SizedBox(height: 28)),
+          ] else if (speedDialTracks != null && speedDialTracks!.isNotEmpty) ...[
             const SliverToBoxAdapter(
               child: SectionHeader(title: 'Good afternoon'), // Or dynamic greeting
             ),
@@ -209,7 +189,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
 
           // ── Dynamic Spotify Sections ──
-          if (_homeSections.isNotEmpty)
+          if (_homeSections.isEmpty && _pluginLoaded && speedDialTracks == null)
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => _buildSectionSkeleton(),
+                childCount: 3,
+              ),
+            )
+          else if (_homeSections.isNotEmpty)
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
@@ -325,6 +312,83 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSpeedDialSkeleton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisExtent: 56,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+        ),
+        itemCount: 6,
+        itemBuilder: (context, index) {
+          return Container(
+            decoration: BoxDecoration(
+              color: SlothifyColors.surfaceVariant.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Row(
+              children: [
+                const ShimmerBox(width: 56, height: 56, borderRadius: BorderRadius.horizontal(left: Radius.circular(4))),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ShimmerBox(width: 80, height: 12, borderRadius: BorderRadius.circular(2)),
+                      const SizedBox(height: 8),
+                      ShimmerBox(width: 40, height: 10, borderRadius: BorderRadius.circular(2)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSectionSkeleton() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: ShimmerBox(width: 150, height: 24, borderRadius: BorderRadius.circular(4)),
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 200,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: 4,
+            separatorBuilder: (_, __) => const SizedBox(width: 16),
+            itemBuilder: (context, index) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const ShimmerBox(width: 140, height: 140, borderRadius: BorderRadius.all(Radius.circular(8))),
+                  const SizedBox(height: 12),
+                  ShimmerBox(width: 100, height: 14, borderRadius: BorderRadius.circular(2)),
+                  const SizedBox(height: 8),
+                  ShimmerBox(width: 120, height: 12, borderRadius: BorderRadius.circular(2)),
+                ],
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 32),
+      ],
     );
   }
 }

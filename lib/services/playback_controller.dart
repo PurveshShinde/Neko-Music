@@ -96,6 +96,13 @@ class PlaybackController {
     // Instantly stop the current playing song while we resolve the next one
     await pause();
     
+    // Reset the duration state so the UI immediately shows 0:00 instead of the old song's timestamp
+    _durationStateSubject.add(const DurationState(
+      progress: Duration.zero,
+      buffered: Duration.zero,
+      total: Duration.zero,
+    ));
+    
     String? videoId = track.videoId;
     if (videoId == null) {
       // Resolve videoId using YouTubeSearchService (Spotube BYOMM pattern)

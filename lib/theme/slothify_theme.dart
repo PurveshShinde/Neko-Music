@@ -41,20 +41,30 @@ class SlothifyTheme {
     return GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme);
   }
 
-  static ThemeData get darkTheme {
+  static ThemeData getTheme(bool isAmoled) {
     final baseTextTheme = _outfitTextTheme;
+
+    final bgColor = isAmoled ? Colors.black : SlothifyColors.background;
+    final surfaceColor = isAmoled ? Colors.black : SlothifyColors.surface;
+    final surfaceVariantColor = isAmoled ? const Color(0xFF111111) : SlothifyColors.surfaceVariant;
+    final cardColor = isAmoled ? Colors.black : SlothifyColors.cardDark;
+    
+    // Reduce contrast slightly on AMOLED to prevent halation
+    final primaryTextColor = isAmoled ? const Color(0xFFE0E0E0) : SlothifyColors.textPrimary;
+    final secondaryTextColor = isAmoled ? const Color(0xFF8A8A8A) : SlothifyColors.textSecondary;
 
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: SlothifyColors.background,
+      applyElevationOverlayColor: !isAmoled,
+      scaffoldBackgroundColor: bgColor,
       colorScheme: ColorScheme.dark(
-        surface: SlothifyColors.surface,
+        surface: surfaceColor,
         primary: SlothifyColors.accent,
         secondary: SlothifyColors.accentLight,
         error: SlothifyColors.error,
         onPrimary: Colors.white,
-        onSurface: SlothifyColors.textPrimary,
+        onSurface: primaryTextColor,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -63,13 +73,13 @@ class SlothifyTheme {
         titleTextStyle: GoogleFonts.outfit(
           fontSize: 26,
           fontWeight: FontWeight.w800,
-          color: SlothifyColors.textPrimary,
+          color: primaryTextColor,
           letterSpacing: -0.5,
         ),
-        iconTheme: const IconThemeData(color: SlothifyColors.textSecondary),
+        iconTheme: IconThemeData(color: secondaryTextColor),
       ),
       cardTheme: CardThemeData(
-        color: SlothifyColors.cardDark,
+        color: cardColor,
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
@@ -77,12 +87,12 @@ class SlothifyTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: SlothifyColors.surfaceVariant,
+        backgroundColor: surfaceVariantColor,
         selectedColor: SlothifyColors.accent,
         labelStyle: GoogleFonts.outfit(
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: SlothifyColors.textPrimary,
+          color: primaryTextColor,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -92,11 +102,11 @@ class SlothifyTheme {
       ),
       iconButtonTheme: IconButtonThemeData(
         style: IconButton.styleFrom(
-          foregroundColor: SlothifyColors.textSecondary,
+          foregroundColor: secondaryTextColor,
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: SlothifyColors.surface,
+        backgroundColor: surfaceColor,
         indicatorColor: SlothifyColors.accent.withValues(alpha: 0.18),
         labelTextStyle: WidgetStatePropertyAll(
           GoogleFonts.outfit(
@@ -113,38 +123,38 @@ class SlothifyTheme {
         headlineLarge: GoogleFonts.outfit(
           fontSize: 28,
           fontWeight: FontWeight.w800,
-          color: SlothifyColors.textPrimary,
+          color: primaryTextColor,
           letterSpacing: -0.5,
         ),
         headlineMedium: GoogleFonts.outfit(
           fontSize: 22,
           fontWeight: FontWeight.w700,
-          color: SlothifyColors.textPrimary,
+          color: primaryTextColor,
         ),
         titleLarge: GoogleFonts.outfit(
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: SlothifyColors.textPrimary,
+          color: primaryTextColor,
         ),
         titleMedium: GoogleFonts.outfit(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: SlothifyColors.textPrimary,
+          color: primaryTextColor,
         ),
         titleSmall: GoogleFonts.outfit(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: SlothifyColors.textSecondary,
+          color: primaryTextColor,
         ),
         bodyLarge: GoogleFonts.outfit(
           fontSize: 15,
           fontWeight: FontWeight.w400,
-          color: SlothifyColors.textPrimary,
+          color: primaryTextColor,
         ),
         bodyMedium: GoogleFonts.outfit(
           fontSize: 13,
           fontWeight: FontWeight.w400,
-          color: SlothifyColors.textSecondary,
+          color: secondaryTextColor,
         ),
         bodySmall: GoogleFonts.outfit(
           fontSize: 11,
@@ -154,7 +164,7 @@ class SlothifyTheme {
         labelLarge: GoogleFonts.outfit(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: SlothifyColors.textPrimary,
+          color: primaryTextColor,
         ),
       ),
     );

@@ -52,19 +52,19 @@ class MiniPlayerWidget extends StatelessWidget {
               },
               child: isGlass
                   ? GlassMiniPlayer(
-                      key: const ValueKey('glass'),
+                      key: ValueKey('glass_${track.spotifyId ?? track.title}'),
                       title: track.title,
                       artist: track.artist,
                       emoji: track.albumArt,
                       colorSeed: track.colorSeed,
                       imageUrl: track.imageUrl,
                       isPlaying: isPlaying,
-                      onPlayPause: () => state.togglePlayPause(),
+                      onPlayPause: () => isPlaying ? state.playbackController.pause() : state.playbackController.play(),
                       onNext: () => state.skipNext(0),
                       onPrevious: () => state.skipPrevious(0),
                     )
                   : StandardMiniPlayer(
-                      key: const ValueKey('standard'),
+                      key: ValueKey('standard_${track.spotifyId ?? track.title}'),
                       title: track.title,
                       artist: track.artist,
                       emoji: track.albumArt,

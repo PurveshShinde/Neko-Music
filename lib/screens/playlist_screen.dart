@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:palette_generator/palette_generator.dart';
 import '../models/playlist_model.dart';
 import '../models/track_model.dart';
 import '../services/youtube_search_service.dart';
@@ -22,6 +23,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   final YouTubeSearchService _searchService = YouTubeSearchService();
   late final SpotifyMetadataService _spotifyService;
   List<TrackModel>? _tracks;
+  Color? _dynamicColor;
 
   @override
   void initState() {
@@ -29,7 +31,23 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _spotifyService = SpotifyMetadataService(AppStateProvider.of(context).pluginManager);
       _loadTracks();
+      _extractDominantColor();
     });
+  }
+
+  Future<void> _extractDominantColor() async {
+    if (widget.playlist.imageUrl == null) return;
+    try {
+      final imageProvider = NetworkImage(widget.playlist.imageUrl!);
+      final palette = await PaletteGenerator.fromImageProvider(imageProvider);
+      if (palette.dominantColor != null && mounted) {
+        setState(() {
+          _dynamicColor = palette.dominantColor!.color;
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to extract color: $e');
+    }
   }
 
   Future<void> _loadTracks() async {
@@ -50,12 +68,14 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Color(widget.playlist.colorSeed);
+    final baseColor = _dynamicColor ?? Color(widget.playlist.colorSeed);
     final isLoaded = _tracks != null;
     final state = AppStateProvider.of(context);
     
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+    
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: scaffoldBg,
       body: Stack(
         children: [
           CustomScrollView(
@@ -88,23 +108,24 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                             end: Alignment.bottomCenter,
                             colors: [
                               Colors.transparent,
-                              Colors.black.withValues(alpha: 0.9),
+                              HSLColor.fromColor(baseColor).withLightness(0.05).toColor().withValues(alpha: 0.8),
+                              scaffoldBg,
                             ],
-                            stops: const [0.4, 1.0],
+                            stops: const [0.3, 0.7, 1.0],
                           ),
                         ),
                       ),
                       // The playlist cover image (if any) or just a big centered initial
                       Center(
                         child: Container(
-                          width: 180,
-                          height: 180,
+                          width: 150,
+                          height: 150,
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.5),
-                                blurRadius: 24,
-                                offset: const Offset(0, 10),
+                                color: Colors.black.withValues(alpha: 0.6),
+                                blurRadius: 32,
+                                offset: const Offset(0, 16),
                               ),
                             ],
                           ),
@@ -115,7 +136,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                                   child: Center(
                                     child: Text(
                                       widget.playlist.title[0],
-                                      style: const TextStyle(fontSize: 80, color: Colors.white),
+                                      style: const TextStyle(fontSize: 64, color: Colors.white),
                                     ),
                                   ),
                                 ),
@@ -135,23 +156,26 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
               // Actions row (Play, Shuffle, etc)
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     children: [
-                      const Icon(Icons.favorite_border, color: Colors.white70, size: 28),
+                      const Icon(Icons.favorite_border, color: SlothifyColors.textSecondary, size: 28),
                       const SizedBox(width: 24),
-                      const Icon(Icons.download_for_offline_outlined, color: Colors.white70, size: 28),
+                      const Icon(Icons.download_for_offline_outlined, color: SlothifyColors.textSecondary, size: 28),
+                      const SizedBox(width: 24),
+                      const Icon(Icons.more_vert, color: SlothifyColors.textSecondary, size: 28),
                       const Spacer(),
-                      const Icon(Icons.shuffle, color: Colors.white70, size: 28),
+                      const Icon(Icons.shuffle, color: SlothifyColors.textSecondary, size: 28),
                       const SizedBox(width: 24),
                       FloatingActionButton(
-                        backgroundColor: SlothifyColors.accent,
+                        backgroundColor: baseColor,
                         onPressed: () {
                           if (isLoaded && _tracks!.isNotEmpty) {
                             state.playQueue(_tracks!, startIndex: 0);
                           }
                         },
-                        child: const Icon(Icons.play_arrow, size: 32, color: Colors.white),
+                        child: Icon(Icons.play_arrow, size: 36, color: baseColor.computeLuminance() > 0.5 ? Colors.black : Colors.white),
+                        shape: const CircleBorder(),
                       ),
                     ],
                   ),
@@ -191,17 +215,17 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                         ),
                         title: Text(
                           track.title,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         subtitle: Text(
                           track.artist,
-                          style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+                          style: Theme.of(context).textTheme.bodyMedium,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        trailing: const Icon(Icons.more_vert, color: Colors.white70),
+                        trailing: const Icon(Icons.more_vert, color: SlothifyColors.textSecondary),
                         onTap: () {
                           state.playQueue(_tracks!, startIndex: index);
                         },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:flutter_new_pipe_extractor/flutter_new_pipe_extractor.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'app.dart';
 
 Future<void> main() async {
@@ -12,5 +13,7 @@ Future<void> main() async {
   // Initialize NewPipe Extractor (fixes NullPointerException: downloader is null)
   await NewPipeExtractor.init();
   
-  runApp(const SlothifyApp());
+  final prefs = await SharedPreferences.getInstance();
+  
+  runApp(SlothifyApp(prefs: prefs));
 }

@@ -56,6 +56,16 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               subtitle: 'Customize your app theme',
             ),
             _buildDivider(),
+            _buildSwitchTile(
+              icon: Icons.dark_mode_outlined,
+              title: 'AMOLED Black Mode',
+              subtitle: 'Use pure black for backgrounds to save battery on OLED screens',
+              value: AppStateProvider.of(context).isAmoledThemeEnabled,
+              onChanged: (val) {
+                AppStateProvider.of(context).isAmoledThemeEnabled = val;
+              },
+            ),
+            _buildDivider(),
             _buildActionTile(
               icon: Icons.palette_outlined,
               title: 'Liquid Glass (Beta)',

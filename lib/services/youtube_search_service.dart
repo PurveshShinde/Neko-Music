@@ -7,6 +7,7 @@ import 'package:flutter_new_pipe_extractor/flutter_new_pipe_extractor.dart'
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../models/track_model.dart';
+import '../models/playlist_model.dart';
 
 // ── Isolate worker for YoutubeExplode ──
 // Only plain types (String, int, List, Map, SendPort) can cross Isolate boundaries.
@@ -29,6 +30,24 @@ Future<void> _ytExplodeIsolateEntry(SendPort mainPort) async {
         case 'search':
           final results = await yt.search.search(args[0] as String);
           result = results
+              .map((v) => {
+                    'id': v.id.value,
+                    'title': v.title,
+                    'author': v.author,
+                    'thumbnail': v.thumbnails.highResUrl,
+                    'duration': v.duration?.inSeconds,
+                  })
+              .toList();
+          break;
+
+        case 'related':
+          final video = await yt.videos.get(args[0] as String);
+          final relatedList = await yt.videos.getRelatedVideos(video);
+          if (relatedList == null) {
+            result = <Map<String, dynamic>>[];
+            break;
+          }
+          result = relatedList
               .map((v) => {
                     'id': v.id.value,
                     'title': v.title,
@@ -117,16 +136,147 @@ class YouTubeSearchService {
   /// Search using NewPipe on Android (native Java extractor, no 403s),
   /// falls back to YoutubeExplode Isolate on other platforms.
   Future<List<TrackModel>> searchTracks(String query) async {
-    return _searchYTExplode(query);
+    return _searchNewPipe(query);
+  }
+
+  Future<List<dynamic>> searchCategorized(String query, String category) async {
+    try {
+      SearchContentFilters filter;
+      String backendQuery = query;
+
+      switch (category.toLowerCase()) {
+        case 'songs':
+          filter = SearchContentFilters.videos;
+          backendQuery = '$query official audio';
+          break;
+        case 'albums':
+          filter = SearchContentFilters.playlists;
+          backendQuery = '$query album';
+          break;
+        case 'playlists':
+          filter = SearchContentFilters.playlists;
+          break;
+        case 'all':
+        default:
+          filter = SearchContentFilters.all;
+          break;
+      }
+
+      final results = await NewPipeExtractor.search(
+        backendQuery,
+        contentFilters: [filter],
+      );
+
+      final List<dynamic> parsedResults = [];
+
+      for (var item in results) {
+        if (item is VideoSearchResultItem) {
+          final id = Uri.parse(item.url).queryParameters['v'] ?? '';
+          
+          final track = TrackModel(
+            title: item.name,
+            artist: item.uploaderName,
+            albumArt: '🎵',
+            colorSeed: 0xFF1DB954,
+            imageUrl: 'https://img.youtube.com/vi/$id/hqdefault.jpg',
+            duration: item.duration > 0
+                ? Duration(seconds: item.duration).toString().split('.').first.replaceFirst('0:', '')
+                : null,
+            videoId: id,
+          );
+          
+          parsedResults.add(track);
+        } else if (item is PlaylistSearchResultItem) {
+          final id = Uri.parse(item.url).queryParameters['list'] ?? '';
+          if (id.isEmpty) continue;
+          
+          final playlist = PlaylistModel(
+            title: item.name,
+            subtitle: (filter == SearchContentFilters.musicAlbums || item.playlistType.toString().contains('ALBUM'))
+                ? 'Album • ${item.uploaderName}'
+                : 'Playlist • ${item.uploaderName}',
+            imageUrl: item.thumbnails.isNotEmpty ? item.thumbnails.first.url : null,
+            colorSeed: 0xFF1DB954,
+            query: id, // Use query field to store YT Playlist ID
+            isAlbum: filter == SearchContentFilters.musicAlbums,
+          );
+          
+          parsedResults.add(playlist);
+        }
+      }
+
+      // If category is Songs, run aggressive deduplication
+      if (category.toLowerCase() == 'songs') {
+        return _deduplicateTracks(parsedResults.whereType<TrackModel>().toList());
+      }
+
+      return parsedResults;
+    } catch (e) {
+      debugPrint('[Categorized search failed]: $e');
+      return [];
+    }
+  }
+
+  List<TrackModel> _deduplicateTracks(List<TrackModel> rawTracks) {
+    final seenTitles = <String>[];
+    final uniqueTracks = <TrackModel>[];
+
+    for (var track in rawTracks) {
+      if (track.duration != null) {
+        final parts = track.duration!.split(':');
+        int totalSeconds = 0;
+        if (parts.length == 2) {
+          totalSeconds = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+        } else if (parts.length == 3) {
+          totalSeconds = int.parse(parts[0]) * 3600 + int.parse(parts[1]) * 60 + int.parse(parts[2]);
+        }
+
+        // Only apply strict duration filtering if a duration exists
+        if (totalSeconds > 0 && (totalSeconds < 60 || totalSeconds > 900)) continue;
+      }
+
+      // Normalize title aggressively
+      String coreTitle = track.title.toLowerCase().split(RegExp(r'[-|,|\|]')).first.trim();
+      coreTitle = coreTitle
+          .replaceAll(RegExp(r'\(.*?\)'), '')
+          .replaceAll(RegExp(r'\[.*?\]'), '')
+          .replaceAll(RegExp(r'\b(official|video|lyric|lyrics|audio|full|song|track|music)\b'), '')
+          .replaceAll(RegExp(r'[^a-z0-9]'), '')
+          .trim();
+          
+      if (coreTitle.isEmpty) {
+        coreTitle = track.title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+      }
+
+      bool isDuplicate = false;
+      for (var existing in seenTitles) {
+        if (existing.isNotEmpty && coreTitle.isNotEmpty) {
+          if (existing.contains(coreTitle) || coreTitle.contains(existing)) {
+            isDuplicate = true;
+            break;
+          }
+        }
+      }
+
+      if (!isDuplicate) {
+        seenTitles.add(coreTitle);
+        uniqueTracks.add(track);
+      }
+    }
+    
+    return uniqueTracks;
   }
 
   Future<List<TrackModel>> _searchNewPipe(String query) async {
     try {
+      // 1. Smart Search Modifier
+      final backendQuery = '$query official audio';
       final results = await NewPipeExtractor.search(
-        query,
+        backendQuery,
         contentFilters: [SearchContentFilters.videos],
       );
-      return results.whereType<VideoSearchResultItem>().map((item) {
+
+      final rawTracks = results.whereType<VideoSearchResultItem>().map((item) {
         final id = Uri.parse(item.url).queryParameters['v'] ?? '';
         return TrackModel(
           title: item.name,
@@ -144,6 +294,55 @@ class YouTubeSearchService {
           videoId: id,
         );
       }).toList();
+
+      // 2. Strict Duration Filtering & 3. Deduplication
+      final seenTitles = <String>[];
+      final uniqueTracks = <TrackModel>[];
+
+      for (var track in rawTracks) {
+        if (track.duration == null) continue;
+        
+        final parts = track.duration!.split(':');
+        int totalSeconds = 0;
+        if (parts.length == 2) {
+          totalSeconds = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+        } else if (parts.length == 3) {
+          totalSeconds = int.parse(parts[0]) * 3600 + int.parse(parts[1]) * 60 + int.parse(parts[2]);
+        }
+
+        // Filter: > 1:30 and < 10:00
+        if (totalSeconds < 90 || totalSeconds > 600) continue;
+
+        // Normalize title aggressively
+        String coreTitle = track.title.toLowerCase().split(RegExp(r'[-|,|\|]')).first.trim();
+        coreTitle = coreTitle
+            .replaceAll(RegExp(r'\(.*?\)'), '')
+            .replaceAll(RegExp(r'\[.*?\]'), '')
+            .replaceAll(RegExp(r'\b(official|video|lyric|lyrics|audio|full|song|track|music)\b'), '')
+            .replaceAll(RegExp(r'[^a-z0-9]'), '')
+            .trim();
+            
+        if (coreTitle.isEmpty) {
+          coreTitle = track.title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
+        }
+
+        bool isDuplicate = false;
+        for (var existing in seenTitles) {
+          if (existing.isNotEmpty && coreTitle.isNotEmpty) {
+            if (existing.contains(coreTitle) || coreTitle.contains(existing)) {
+              isDuplicate = true;
+              break;
+            }
+          }
+        }
+
+        if (!isDuplicate) {
+          seenTitles.add(coreTitle);
+          uniqueTracks.add(track);
+        }
+      }
+
+      return uniqueTracks;
     } catch (e) {
       debugPrint('[NewPipe search failed, falling back to YT Explode]: $e');
       return _searchYTExplode(query);
@@ -170,6 +369,33 @@ class YouTubeSearchService {
         videoId: v['id'] as String,
       );
     }).toList();
+  }
+
+  Future<List<TrackModel>> getRelatedTracks(String videoId) async {
+    try {
+      final isolate = await _IsolatedYoutubeExplode.get();
+      final results = await isolate.call<List<dynamic>>('related', [videoId]);
+      return results.map((v) {
+        return TrackModel(
+          title: v['title'] as String,
+          artist: v['author'] as String,
+          albumArt: '🎵',
+          colorSeed: 0xFF1DB954,
+          imageUrl: v['thumbnail'] as String?,
+          duration: v['duration'] != null
+              ? Duration(seconds: v['duration'] as int)
+                  .toString()
+                  .split('.')
+                  .first
+                  .replaceFirst('0:', '')
+              : null,
+          videoId: v['id'] as String,
+        );
+      }).toList();
+    } catch (e) {
+      debugPrint('[YTExplode getRelatedTracks failed]: $e');
+      return [];
+    }
   }
 
   /// Get a direct, playable audio stream URL.

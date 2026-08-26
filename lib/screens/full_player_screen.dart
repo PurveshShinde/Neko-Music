@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import '../models/track_model.dart';
@@ -6,8 +7,46 @@ import '../state/app_state.dart';
 import '../theme/slothify_theme.dart';
 import '../widgets/album_art_tile.dart';
 
-class FullPlayerScreen extends StatelessWidget {
+class FullPlayerScreen extends StatefulWidget {
   const FullPlayerScreen({super.key});
+
+  @override
+  State<FullPlayerScreen> createState() => _FullPlayerScreenState();
+}
+
+class _FullPlayerScreenState extends State<FullPlayerScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _rotationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _rotationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    );
+    
+    // Start animation if we are already playing on load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final isPlaying = AppStateProvider.of(context).playbackController.isPlaying;
+      if (isPlaying) {
+        _rotationController.repeat();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
+
+  void _updateRotation(bool isPlaying) {
+    if (isPlaying && !_rotationController.isAnimating) {
+      _rotationController.repeat();
+    } else if (!isPlaying && _rotationController.isAnimating) {
+      _rotationController.stop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +61,11 @@ class FullPlayerScreen extends StatelessWidget {
     }
 
     final baseColor = Color(track.colorSeed);
-    final darkColor = HSLColor.fromColor(baseColor).withLightness(0.15).toColor();
+    final darkColor = HSLColor.fromColor(baseColor).withLightness(0.2).toColor();
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
 
     return Scaffold(
+      backgroundColor: scaffoldBg,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -32,9 +73,10 @@ class FullPlayerScreen extends StatelessWidget {
             end: Alignment.bottomCenter,
             colors: [
               darkColor,
-              Colors.black,
+              HSLColor.fromColor(baseColor).withLightness(0.08).toColor(),
+              scaffoldBg,
             ],
-            stops: const [0.0, 0.7],
+            stops: const [0.0, 0.4, 1.0],
           ),
         ),
         child: SafeArea(
@@ -42,7 +84,7 @@ class FullPlayerScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               children: [
-                // Top Bar
+                // ── Top Bar ──
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -50,9 +92,12 @@ class FullPlayerScreen extends StatelessWidget {
                       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 32),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    const Text(
-                      'Now Playing',
-                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                    Text(
+                      'NOW PLAYING',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        letterSpacing: 2.0,
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.more_vert, color: Colors.white),
@@ -60,29 +105,101 @@ class FullPlayerScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 48),
 
-                // Album Art
+                // ── Vinyl Record Art ──
                 Expanded(
                   child: Center(
                     child: Hero(
                       tag: 'album_art_${track.videoId}',
                       child: AspectRatio(
                         aspectRatio: 1,
-                        child: AlbumArtTile(
-                          emoji: track.albumArt,
-                          colorSeed: track.colorSeed,
-                          imageUrl: track.imageUrl,
-                          size: double.infinity,
-                          borderRadius: 16,
+                        child: AnimatedBuilder(
+                          animation: _rotationController,
+                          builder: (context, child) {
+                            return Transform.rotate(
+                              angle: _rotationController.value * 2 * pi,
+                              child: child,
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xFF111111), // Vinyl black
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.8),
+                                  blurRadius: 40,
+                                  offset: const Offset(0, 20),
+                                ),
+                                // Inner highlight for vinyl grooves
+                                BoxShadow(
+                                  color: Colors.white.withValues(alpha: 0.05),
+                                  blurRadius: 2,
+                                  spreadRadius: -2,
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                // Grooves
+                                Container(
+                                  margin: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.03), width: 1),
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.all(32),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.05), width: 1),
+                                  ),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.all(52),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.03), width: 1),
+                                  ),
+                                ),
+                                // Album Art Label
+                                ClipOval(
+                                  child: SizedBox(
+                                    width: 140,
+                                    height: 140,
+                                    child: AlbumArtTile(
+                                      emoji: track.albumArt,
+                                      colorSeed: track.colorSeed,
+                                      imageUrl: track.imageUrl,
+                                      size: 140,
+                                      borderRadius: 0,
+                                    ),
+                                  ),
+                                ),
+                                // Spindle Hole
+                                Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    color: scaffoldBg,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.black.withValues(alpha: 0.5), width: 2),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 48),
 
-                // Track Info
+                // ── Track Info ──
                 Row(
                   children: [
                     Expanded(
@@ -91,10 +208,9 @@ class FullPlayerScreen extends StatelessWidget {
                         children: [
                           Text(
                             track.title,
-                            style: const TextStyle(
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                               color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w800,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -102,9 +218,8 @@ class FullPlayerScreen extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             track.artist,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.7),
-                              fontSize: 16,
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.6),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -118,9 +233,9 @@ class FullPlayerScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
-                // Seek Bar
+                // ── Seek Bar ──
                 StreamBuilder<DurationState>(
                   stream: state.playbackController.durationStateStream,
                   initialData: state.playbackController.currentDurationState,
@@ -135,31 +250,41 @@ class FullPlayerScreen extends StatelessWidget {
                       buffered: buffered,
                       total: total,
                       progressBarColor: Colors.white,
-                      baseBarColor: Colors.white.withValues(alpha: 0.24),
-                      bufferedBarColor: Colors.white.withValues(alpha: 0.24),
+                      baseBarColor: Colors.white.withValues(alpha: 0.2),
+                      bufferedBarColor: Colors.white.withValues(alpha: 0.2),
                       thumbColor: Colors.white,
                       barHeight: 4.0,
                       thumbRadius: 6.0,
-                      timeLabelTextStyle: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12),
+                      timeLabelTextStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.0,
+                      ),
                       onSeek: (duration) {
                         state.playbackController.seek(duration);
                       },
                     );
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-                // Controls
+                // ── Controls ──
                 StreamBuilder<bool>(
                   stream: state.playbackController.playingStream,
                   initialData: state.playbackController.isPlaying,
                   builder: (context, snapshot) {
                     final isPlaying = snapshot.data ?? false;
+                    
+                    // Side effect to update rotation
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      if (mounted) _updateRotation(isPlaying);
+                    });
+                    
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.shuffle, color: Colors.white),
+                          icon: Icon(Icons.shuffle, color: Colors.white.withValues(alpha: 0.7)),
                           onPressed: () {},
                         ),
                         IconButton(
@@ -178,7 +303,7 @@ class FullPlayerScreen extends StatelessWidget {
                             child: Icon(
                               isPlaying ? Icons.pause : Icons.play_arrow,
                               color: Colors.black,
-                              size: 40,
+                              size: 36,
                             ),
                           ),
                         ),
@@ -187,7 +312,7 @@ class FullPlayerScreen extends StatelessWidget {
                           onPressed: () => state.skipNext(0),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.repeat, color: Colors.white),
+                          icon: Icon(Icons.repeat, color: Colors.white.withValues(alpha: 0.7)),
                           onPressed: () {},
                         ),
                       ],
@@ -196,16 +321,16 @@ class FullPlayerScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 
-                // Bottom actions
+                // ── Bottom actions ──
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.devices, color: Colors.white70),
+                      icon: Icon(Icons.devices, color: Colors.white.withValues(alpha: 0.5)),
                       onPressed: () {},
                     ),
                     IconButton(
-                      icon: const Icon(Icons.share, color: Colors.white70),
+                      icon: Icon(Icons.share, color: Colors.white.withValues(alpha: 0.5)),
                       onPressed: () {},
                     ),
                   ],

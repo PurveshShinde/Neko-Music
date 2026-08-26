@@ -14,6 +14,11 @@ class SpotifyMetadataService {
   List<dynamic>? _cachedSections;
   DateTime? _lastFetch;
 
+  void clearCache() {
+    _cachedSections = null;
+    _lastFetch = null;
+  }
+
   /// Ensure the Spotify token is valid. If expired, refresh it automatically.
   Future<void> _ensureAuthenticated(dynamic engine) async {
     try {
@@ -53,6 +58,9 @@ class SpotifyMetadataService {
 
     if (seedTrack.spotifyId == null || engine == null) {
       // Fallback to searching YouTube for similar tracks
+      if (seedTrack.videoId != null) {
+        return ytService.getRelatedTracks(seedTrack.videoId!);
+      }
       return ytService.searchTracks('similar to ${seedTrack.title} ${seedTrack.artist}');
     }
 
@@ -72,7 +80,9 @@ class SpotifyMetadataService {
         return _mapTracks(items.toList());
       } catch (e) {
         debugPrint('Radio fetch failed, falling back to YouTube: $e');
-        // Method might not exist or failed, fallback to YouTube
+        if (seedTrack.videoId != null) {
+          return ytService.getRelatedTracks(seedTrack.videoId!);
+        }
         return ytService.searchTracks('similar to ${seedTrack.title} ${seedTrack.artist}');
       }
     } catch (e) {
@@ -132,15 +142,32 @@ class SpotifyMetadataService {
       final validItems = items.where((i) => i is Map && i['id'] != null).toList();
       if (validItems.isEmpty) continue;
 
+      final isSectionAlbum = title.toLowerCase().contains('album');
+      
       final playlists = validItems.map((p) {
         final pMap = p as Map;
+        
+        final isAlbumCheck = isSectionAlbum ||
+                   pMap['type']?.toString().toLowerCase() == 'album' || 
+                   (pMap['uri'] as String?)?.contains(':album:') == true ||
+                   (pMap['id'] as String?)?.contains(':album:') == true ||
+                   pMap.containsKey('artists');
+                   
+        if (!isAlbumCheck) {
+          debugPrint('[SpotifyMetadataService] Item is NOT an album: ${pMap.toString()}');
+        } else {
+          debugPrint('[SpotifyMetadataService] Item IS an album: ${pMap.toString()}');
+        }
+
         return PlaylistModel(
           title: pMap['name'] as String? ?? 'Unknown',
-          subtitle: pMap['description'] as String? ?? (pMap['owner'] != null ? 'By ${(pMap['owner'] as Map)['name']}' : 'Spotify Playlist'),
+          subtitle: pMap['description'] as String? ?? 
+                    (pMap['owner'] != null ? 'By ${(pMap['owner'] as Map)['name']}' : 
+                     (pMap.containsKey('artists') && (pMap['artists'] as List).isNotEmpty ? 'Album by ${(pMap['artists'] as List)[0]['name']}' : 'Spotify Playlist')),
           imageUrl: (pMap['images'] as List?)?.isNotEmpty == true ? (pMap['images'] as List)[0]['url'] as String? : null,
           colorSeed: 0xFF1DB954,
           spotifyId: pMap['id'] as String?,
-          isAlbum: pMap['type'] == 'album' || (pMap['uri'] as String?)?.contains(':album:') == true,
+          isAlbum: isAlbumCheck,
         );
       }).toList();
 
