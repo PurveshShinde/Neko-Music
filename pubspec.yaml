@@ -1,0 +1,59 @@
+name: slothify
+description: A sleek dark-mode music streaming app.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  google_fonts: ^6.2.1
+  # ── Audio Playback (Spotube-style: media_kit + libmpv) ──
+  media_kit: ^1.1.10
+  media_kit_libs_android_audio: ^1.3.4  # Android audio-only native libs
+  media_kit_native_event_loop: ^1.0.9   # Isolate-safe event loop
+  # ── Background / OS media controls ──
+  audio_service: ^0.18.13
+  # ── YouTube extraction ──
+  youtube_explode_dart: ^3.1.0
+  flutter_new_pipe_extractor:
+    git:
+      url: https://github.com/KRTirtho/flutter_new_pipe_extractor
+  
+  # ── Plugin System (Spotube) ──
+  archive: ^4.0.7
+  hetu_script: ^0.4.2+1
+  hetu_std:
+    git:
+      url: https://github.com/hetu-community/hetu_std.git
+      ref: main
+  hetu_otp_util:
+    git:
+      url: https://github.com/hetu-community/hetu_otp_util.git
+      ref: main
+  hetu_spotube_plugin:
+    git:
+      url: https://github.com/KRTirtho/hetu_spotube_plugin.git
+      ref: main
+  # ── Utilities ──
+  rxdart: ^0.28.0
+  http: ^1.6.0
+  http_parser: ^4.1.2
+  audio_video_progress_bar: ^2.0.3
+  shared_preferences: ^2.5.5
+  path_provider: ^2.1.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - packages/hetu_std/assets/bytecode/std.out
+    - packages/hetu_otp_util/assets/bytecode/otp_util.out
+    - packages/hetu_spotube_plugin/assets/bytecode/spotube_plugin.out
