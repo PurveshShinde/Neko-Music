@@ -4,9 +4,11 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_window
+  file_selector_windows
   flutter_inappwebview_windows
   flutter_new_pipe_extractor
   flutter_timezone
+  permission_handler_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/track_model.dart';
 import '../state/app_state.dart';
 import '../screens/full_player_screen.dart';
 import 'standard_mini_player.dart';
@@ -23,7 +22,7 @@ class MiniPlayerWidget extends StatelessWidget {
         final isPlaying = snapshot.data ?? false;
 
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 400),
             switchInCurve: Curves.easeOutCubic,
@@ -49,6 +48,16 @@ class MiniPlayerWidget extends StatelessWidget {
                   useSafeArea: true,
                   builder: (context) => const FullPlayerScreen(),
                 );
+              },
+              onHorizontalDragEnd: (details) {
+                if (details.primaryVelocity == null) return;
+                if (details.primaryVelocity! < -300) {
+                  // Swiped left - Next Track
+                  state.skipNext(0);
+                } else if (details.primaryVelocity! > 300) {
+                  // Swiped right - Previous Track
+                  state.skipPrevious(0);
+                }
               },
               child: isGlass
                   ? GlassMiniPlayer(

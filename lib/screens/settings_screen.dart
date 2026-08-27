@@ -3,6 +3,8 @@ import 'account_screen.dart';
 import 'appearance_screen.dart';
 import 'player_audio_settings_screen.dart';
 import 'plugins_screen.dart';
+import 'content_settings_screen.dart';
+import 'download_settings_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -10,12 +12,12 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -23,15 +25,15 @@ class SettingsScreen extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(20, 0, 20, MediaQuery.of(context).padding.bottom),
         physics: const BouncingScrollPhysics(),
         children: [
-          const Text(
+          Text(
             'Settings',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 32,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           
           // ── Search Bar ──
           Container(
@@ -40,21 +42,21 @@ class SettingsScreen extends StatelessWidget {
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
             child: Row(
               children: [
-                Icon(Icons.search, color: Colors.white.withValues(alpha: 0.7), size: 22),
-                const SizedBox(width: 12),
+                Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 22),
+                SizedBox(width: 12),
                 Expanded(
                   child: TextFormField(
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16),
                     decoration: InputDecoration(
                       hintText: 'Search',
                       hintStyle: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                       ),
                       border: InputBorder.none,
                       isDense: true,
@@ -65,12 +67,12 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
 
           // ── Contiguous Settings Block ──
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1F29),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
             ),
             child: Column(
@@ -82,14 +84,8 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: 'Manage login and integrations',
                   destination: const AccountScreen(),
                 ),
-                _buildDivider(),
-                _buildActionTile(
-                  context,
-                  iconWidget: _buildAiIcon(),
-                  title: 'AI Hub',
-                  subtitle: 'AI-powered lyrics and translations',
-                ),
-                _buildDivider(),
+                _buildDivider(context),
+
                 _buildActionTile(
                   context,
                   icon: Icons.palette_outlined,
@@ -97,7 +93,7 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: 'Themes, colors, and UI layout',
                   destination: const AppearanceScreen(),
                 ),
-                _buildDivider(),
+                _buildDivider(context),
                 _buildActionTile(
                   context,
                   icon: Icons.play_arrow_outlined,
@@ -105,28 +101,37 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: 'Playback, quality, and equalizer',
                   destination: const PlayerAudioSettingsScreen(),
                 ),
-                _buildDivider(),
+                _buildDivider(context),
                 _buildActionTile(
                   context,
                   icon: Icons.people_outline_rounded,
                   title: 'Listen Together',
                   subtitle: 'Sync playback with friends',
                 ),
-                _buildDivider(),
+                _buildDivider(context),
                 _buildActionTile(
                   context,
                   icon: Icons.language_rounded,
                   title: 'Content',
                   subtitle: 'Language, region, and providers',
+                  destination: const ContentSettingsScreen(),
                 ),
-                _buildDivider(),
+                _buildDivider(context),
+                _buildActionTile(
+                  context,
+                  icon: Icons.download_rounded,
+                  title: 'Downloads',
+                  subtitle: 'Quality and location preferences',
+                  destination: const DownloadSettingsScreen(),
+                ),
+                _buildDivider(context),
                 _buildActionTile(
                   context,
                   icon: Icons.shield_outlined,
                   title: 'Privacy',
                   subtitle: 'History and tracking',
                 ),
-                _buildDivider(),
+                _buildDivider(context),
                 _buildActionTile(
                   context,
                   icon: Icons.extension_outlined,
@@ -138,18 +143,18 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
           
-          const SizedBox(height: 120), // Bottom padding
+          SizedBox(height: 120), // Bottom padding
         ],
       ),
     );
   }
 
-  Widget _buildAiIcon() {
+  Widget _buildAiIcon(BuildContext context) {
     return Center(
       child: Text(
         'Ai',
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.7),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           fontSize: 14,
           fontWeight: FontWeight.bold,
         ),
@@ -157,9 +162,9 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Divider(
-      color: Colors.black.withValues(alpha: 0.3),
+      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
       height: 1,
       thickness: 1,
       indent: 0,
@@ -194,36 +199,36 @@ class SettingsScreen extends StatelessWidget {
               height: 44,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: iconWidget ??
                   Icon(
                     icon,
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     size: 24,
                   ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       fontSize: 14,
                     ),
                   ),

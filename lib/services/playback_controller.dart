@@ -22,6 +22,8 @@ class PlaybackController {
 
   VoidCallback? onTrackFinished;
 
+  Player get player => _player;
+
   // ── Streams for the UI (using RxDart Subjects to bypass media_kit's broken native event loop) ──
   final BehaviorSubject<bool> _playingSubject = BehaviorSubject.seeded(false);
   final BehaviorSubject<DurationState> _durationStateSubject = BehaviorSubject.seeded(const DurationState(
@@ -147,6 +149,9 @@ class PlaybackController {
   Future<void> seek(Duration position) => _player.seek(position);
 
   void dispose() {
+    _pollingTimer?.cancel();
+    _playingSubject.close();
+    _durationStateSubject.close();
     _player.dispose();
     _ytService.dispose();
   }

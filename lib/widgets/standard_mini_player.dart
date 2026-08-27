@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../theme/slothify_theme.dart';
+import '../theme/neko_theme.dart';
+import '../state/app_state.dart';
 import 'album_art_tile.dart';
 
-/// Style A: Solid dark elevated mini-player.
+/// Style A: Solid elevated mini-player (Light Vintage or AMOLED Dark).
 class StandardMiniPlayer extends StatelessWidget {
   const StandardMiniPlayer({
     super.key,
@@ -29,24 +30,28 @@ class StandardMiniPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = Color(colorSeed);
+    final state = AppStateProvider.of(context);
+    final isAmoled = state.isAmoledThemeEnabled;
+    final accentColor = NekoColors.accent;
+
+    final bgColor = isAmoled ? const Color(0xFF1E1E1E) : NekoColors.lightSurface;
+    final primaryTextColor = isAmoled ? NekoColors.amoledTextPrimary : NekoColors.lightTextPrimary;
+    final secondaryTextColor = isAmoled ? NekoColors.amoledTextSecondary : NekoColors.lightTextSecondary;
 
     return Container(
       height: 68,
       decoration: BoxDecoration(
-        color: SlothifyColors.miniPlayerBg,
+        color: bgColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: SlothifyColors.border, width: 0.5),
+        border: Border.all(
+          color: isAmoled ? Colors.transparent : const Color(0x15000000), 
+          width: 1
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
+            color: isAmoled ? Colors.black.withValues(alpha: 0.8) : const Color(0x15000000),
             blurRadius: 20,
             offset: const Offset(0, 6),
-          ),
-          BoxShadow(
-            color: accentColor.withValues(alpha: 0.08),
-            blurRadius: 30,
-            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -72,10 +77,10 @@ class StandardMiniPlayer extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: SlothifyColors.textPrimary,
+                      color: primaryTextColor,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -83,10 +88,10 @@ class StandardMiniPlayer extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     artist,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      color: SlothifyColors.textTertiary,
+                      color: secondaryTextColor,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -98,39 +103,21 @@ class StandardMiniPlayer extends StatelessWidget {
             // Controls
             _ControlButton(
               icon: Icons.skip_previous_rounded,
+              color: secondaryTextColor,
               onTap: onPrevious,
               size: 22,
             ),
             const SizedBox(width: 2),
-            // Play / Pause – accent circle
-            GestureDetector(
+            _ControlButton(
+              icon: isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+              color: primaryTextColor,
               onTap: onPlayPause,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: SlothifyColors.accent,
-                  boxShadow: [
-                    BoxShadow(
-                      color: SlothifyColors.accent.withValues(alpha: 0.35),
-                      blurRadius: 12,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  isPlaying
-                      ? Icons.pause_rounded
-                      : Icons.play_arrow_rounded,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
+              size: 28,
             ),
             const SizedBox(width: 2),
             _ControlButton(
               icon: Icons.skip_next_rounded,
+              color: secondaryTextColor,
               onTap: onNext,
               size: 22,
             ),
@@ -145,16 +132,18 @@ class _ControlButton extends StatelessWidget {
   const _ControlButton({
     required this.icon,
     required this.onTap,
+    required this.color,
     this.size = 24,
   });
   final IconData icon;
   final VoidCallback onTap;
+  final Color color;
   final double size;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(icon, size: size, color: SlothifyColors.textSecondary),
+      icon: Icon(icon, size: size, color: color),
       onPressed: onTap,
       splashRadius: 20,
       padding: const EdgeInsets.all(8),

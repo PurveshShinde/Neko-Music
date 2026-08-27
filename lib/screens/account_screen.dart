@@ -16,18 +16,18 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Account',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -42,7 +42,7 @@ class _AccountScreenState extends State<AccountScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1F29),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
@@ -58,7 +58,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
                 const Expanded(
                   child: Text(
                     'Nick Wilde',
@@ -77,19 +77,19 @@ class _AccountScreenState extends State<AccountScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                       ),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Log out',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
 
           // ── Login with token ──
           _buildSectionHeader('Login with token'),
@@ -99,7 +99,7 @@ class _AccountScreenState extends State<AccountScreen> {
               title: 'Tap to show token',
             ),
           ]),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
 
           // ── Player & Content ──
           _buildSectionHeader('Player & Content'),
@@ -111,7 +111,7 @@ class _AccountScreenState extends State<AccountScreen> {
               value: _moreContent,
               onChanged: (val) => setState(() => _moreContent = val),
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSwitchTile(
               icon: Icons.sync_rounded,
               title: 'Auto sync with account',
@@ -120,7 +120,7 @@ class _AccountScreenState extends State<AccountScreen> {
               onChanged: (val) => setState(() => _autoSync = val),
             ),
           ]),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
 
           // ── Integrations ──
           _buildSectionHeader('Integrations'),
@@ -130,13 +130,13 @@ class _AccountScreenState extends State<AccountScreen> {
               title: 'Discord Integration',
               subtitle: 'Manage Discord Integration settings',
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildActionTile(
               icon: Icons.headset, // Placeholder for last.fm
               title: 'Last.fm Integration',
               subtitle: 'Manage Last.fm Integration settings',
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSwitchTile(
               icon: Icons.library_music_outlined, // Placeholder for LB
               title: 'ListenBrainz scrobbling',
@@ -144,13 +144,13 @@ class _AccountScreenState extends State<AccountScreen> {
               value: _listenBrainz,
               onChanged: (val) => setState(() => _listenBrainz = val),
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildActionTile(
               icon: Icons.edit_outlined,
               title: 'Set ListenBrainz Token',
             ),
           ]),
-          const SizedBox(height: 40),
+          SizedBox(height: 40),
         ],
       ),
     );
@@ -161,7 +161,7 @@ class _AccountScreenState extends State<AccountScreen> {
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           color: Color(0xFFA5B4FC), // Light blue from screenshots
           fontSize: 13,
           fontWeight: FontWeight.w600,
@@ -173,7 +173,7 @@ class _AccountScreenState extends State<AccountScreen> {
   Widget _buildTileGroup(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1F29),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -182,9 +182,9 @@ class _AccountScreenState extends State<AccountScreen> {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Divider(
-      color: Colors.black.withValues(alpha: 0.3),
+      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
       height: 1,
       thickness: 1,
       indent: 64, // past icon
@@ -209,36 +209,36 @@ class _AccountScreenState extends State<AccountScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 size: 24,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (subtitle == null) const SizedBox(height: 10),
+                  if (subtitle == null) SizedBox(height: 10),
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   if (subtitle != null) ...[
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         fontSize: 14,
                         height: 1.3,
                       ),
@@ -247,7 +247,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 ],
               ),
             ),
-            if (subtitle == null) const SizedBox(height: 44),
+            if (subtitle == null) SizedBox(height: 44),
           ],
         ),
       ),
@@ -269,33 +269,33 @@ class _AccountScreenState extends State<AccountScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               size: 24,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 14,
                     height: 1.3,
                   ),
@@ -303,11 +303,11 @@ class _AccountScreenState extends State<AccountScreen> {
               ],
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           CupertinoSwitch(
             value: value,
-            activeColor: const Color(0xFF1E3A8A), // Bright blue
-            trackColor: Colors.white.withValues(alpha: 0.1),
+            activeTrackColor: const Color(0xFF1E3A8A), // Bright blue
+            inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
             onChanged: onChanged,
           ),
         ],

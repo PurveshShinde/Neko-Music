@@ -1,6 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../state/app_state.dart';
+import '../theme/neko_theme.dart';
+import 'liquid_glass_container.dart';
 
 /// Floating capsule-style bottom navigation bar that supports both solid and glass modes.
 class BottomNavCapsule extends StatelessWidget {
@@ -16,16 +17,16 @@ class BottomNavCapsule extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = AppStateProvider.of(context);
-    // Use master toggle to disable all, otherwise use individual toggle
     final isGlass = state.isGlassmorphismEnabled && state.isGlassNavigationBarEnabled;
     final isFloating = state.isFloatingNavigationBarEnabled;
+    final isAmoled = state.isAmoledThemeEnabled;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
-        isFloating ? 20 : 0,
+        isFloating ? 16 : 0,
         0,
-        isFloating ? 20 : 0,
-        isFloating ? 24 : 0,
+        isFloating ? 16 : 0,
+        isFloating ? 12 : 0,
       ),
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
@@ -40,6 +41,7 @@ class BottomNavCapsule extends StatelessWidget {
                 key: const ValueKey('solid'),
                 currentIndex: currentIndex,
                 isFloating: isFloating,
+                isAmoled: isAmoled,
                 onTap: onTap,
               ),
       ),
@@ -52,81 +54,79 @@ class _SolidBottomNav extends StatelessWidget {
     super.key,
     required this.currentIndex,
     required this.isFloating,
+    required this.isAmoled,
     required this.onTap,
   });
 
   final int currentIndex;
   final bool isFloating;
+  final bool isAmoled;
   final ValueChanged<int> onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        // Left Main Capsule
-        Expanded(
-          child: Container(
-            height: 64,
-            decoration: BoxDecoration(
-              color: const Color(0xFF000000), // Solid black
-              borderRadius: BorderRadius.circular(isFloating ? 32 : 0),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.1),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _NavIconItem(
-                  icon: Icons.home_filled,
-                  isActive: currentIndex == 0,
-                  onTap: () => onTap(0),
-                ),
-                _NavIconItem(
-                  icon: Icons.search_rounded,
-                  isActive: currentIndex == 1,
-                  onTap: () => onTap(1),
-                ),
-                _NavIconItem(
-                  icon: Icons.mic_none_rounded,
-                  isActive: false,
-                  onTap: () {},
-                ),
-                _NavIconItem(
-                  icon: Icons.library_music_outlined,
-                  isActive: currentIndex == 2,
-                  onTap: () => onTap(2),
-                ),
-              ],
-            ),
+    // Theme colors
+    final capsuleColor = isAmoled ? const Color(0xFF1A1A1A) : NekoColors.lightSurface;
+    final activeIconColor = isAmoled ? NekoColors.amoledTextPrimary : NekoColors.lightTextPrimary;
+    final inactiveIconColor = isAmoled ? NekoColors.amoledTextSecondary : NekoColors.lightTextSecondary;
+    final searchBgColor = isAmoled ? const Color(0xFF2A2A2A) : const Color(0xFFEBE5D8);
+
+    return Container(
+      height: 64,
+      decoration: BoxDecoration(
+        color: capsuleColor,
+        borderRadius: BorderRadius.circular(isFloating ? 32 : 0),
+        boxShadow: isFloating
+            ? [
+                BoxShadow(
+                  color: isAmoled ? Colors.black : const Color(0x15000000),
+                  blurRadius: 10,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 4),
+                )
+              ]
+            : null,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _NavIconItem(
+            icon: Icons.home_filled,
+            isActive: currentIndex == 0,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(0),
           ),
-        ),
-        const SizedBox(width: 12),
-        // Right Options Button
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              shape: isFloating ? BoxShape.circle : BoxShape.rectangle,
-              color: const Color(0xFF1E3A8A), // Blue color from screenshot
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.1),
-                width: 1,
-              ),
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.more_horiz_rounded,
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
+          _NavIconItem(
+            icon: Icons.grid_view_rounded,
+            isActive: currentIndex == 1,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(1),
           ),
-        ),
-      ],
+          _NavIconItem(
+            icon: Icons.search_rounded,
+            isActive: currentIndex == 2,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(2),
+          ),
+          _NavIconItem(
+            icon: Icons.library_music_outlined,
+            isActive: currentIndex == 3,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(3),
+          ),
+          _NavIconItem(
+            icon: Icons.settings_outlined,
+            isActive: currentIndex == 4,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(4),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -145,110 +145,54 @@ class _GlassBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        // Left Capsule (Home & Library)
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(isFloating ? 32 : 0),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
-                height: 64,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF281111).withValues(alpha: 0.5), // Glass tinted dark reddish
-                  borderRadius: BorderRadius.circular(isFloating ? 32 : 0),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    width: 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _NavPillItem(
-                        icon: Icons.home_filled,
-                        label: 'Home',
-                        isActive: currentIndex == 0,
-                        onTap: () => onTap(0),
-                      ),
-                    ),
-                    Expanded(
-                      child: _NavPillItem(
-                        icon: Icons.library_music_outlined,
-                        label: 'Library',
-                        isActive: currentIndex == 2,
-                        onTap: () => onTap(2),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+    // Glass icons are crisp off-white for AMOLED
+    const activeIconColor = NekoColors.amoledTextPrimary;
+    const inactiveIconColor = NekoColors.amoledTextSecondary;
+
+    return LiquidGlassContainer(
+      height: 64,
+      shape: BoxShape.rectangle,
+      borderRadius: BorderRadius.circular(isFloating ? 32 : 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _NavIconItem(
+            icon: Icons.home_filled,
+            isActive: currentIndex == 0,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(0),
           ),
-        ),
-        const SizedBox(width: 12),
-        // Right Capsule (Search)
-        GestureDetector(
-          onTap: () => onTap(1),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(isFloating ? 32 : 0),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-              child: Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  shape: isFloating ? BoxShape.circle : BoxShape.rectangle,
-                  color: const Color(0xFF2A2B3D).withValues(alpha: 0.5), // Glass dark blueish
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    width: 1,
-                  ),
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Icon(
-                      Icons.search_rounded,
-                      color: currentIndex == 1
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.5),
-                      size: 28,
-                    ),
-                    // Decorative dots
-                    Positioned(
-                      top: 14,
-                      right: 14,
-                      child: Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 12,
-                      left: 20,
-                      child: Container(
-                        width: 4,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.6),
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          _NavIconItem(
+            icon: Icons.grid_view_rounded,
+            isActive: currentIndex == 1,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(1),
           ),
-        ),
-      ],
+          _NavIconItem(
+            icon: Icons.search_rounded,
+            isActive: currentIndex == 2,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(2),
+          ),
+          _NavIconItem(
+            icon: Icons.library_music_outlined,
+            isActive: currentIndex == 3,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(3),
+          ),
+          _NavIconItem(
+            icon: Icons.settings_outlined,
+            isActive: currentIndex == 4,
+            activeColor: activeIconColor,
+            inactiveColor: inactiveIconColor,
+            onTap: () => onTap(4),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -257,11 +201,15 @@ class _NavIconItem extends StatelessWidget {
   const _NavIconItem({
     required this.icon,
     required this.isActive,
+    required this.activeColor,
+    required this.inactiveColor,
     required this.onTap,
   });
 
   final IconData icon;
   final bool isActive;
+  final Color activeColor;
+  final Color inactiveColor;
   final VoidCallback onTap;
 
   @override
@@ -272,62 +220,14 @@ class _NavIconItem extends StatelessWidget {
       child: Container(
         width: 48,
         height: 48,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isActive ? const Color(0xFF2A2A2A) : Colors.transparent,
-        ),
+        color: Colors.transparent,
         child: Center(
           child: Icon(
             icon,
             size: 26,
-            color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.5),
+            color: isActive ? activeColor : inactiveColor,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _NavPillItem extends StatelessWidget {
-  const _NavPillItem({
-    required this.icon,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            size: 24,
-            color: isActive
-                ? Colors.white
-                : Colors.white.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-              color: isActive
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.5),
-            ),
-          ),
-        ],
       ),
     );
   }

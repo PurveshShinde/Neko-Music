@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/slothify_theme.dart';
+import '../theme/neko_theme.dart';
 
 class Skeleton extends StatefulWidget {
   final double width;
@@ -52,6 +52,9 @@ class _SkeletonState extends State<Skeleton>
 
   @override
   Widget build(BuildContext context) {
+    final isAmoled = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isAmoled ? NekoColors.surfaceVariant : const Color(0xFFE5E0D5);
+
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
@@ -59,7 +62,7 @@ class _SkeletonState extends State<Skeleton>
           width: widget.width,
           height: widget.height,
           decoration: BoxDecoration(
-            color: SlothifyColors.surfaceVariant.withOpacity(_animation.value),
+            color: baseColor.withValues(alpha: _animation.value),
             shape: widget.shape,
             borderRadius: widget.shape == BoxShape.rectangle
                 ? BorderRadius.circular(widget.borderRadius)
@@ -109,9 +112,12 @@ class SkeletonSpeedDialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAmoled = Theme.of(context).brightness == Brightness.dark;
+    final baseColor = isAmoled ? NekoColors.surfaceVariant : const Color(0xFFE5E0D5);
+
     return Container(
       decoration: BoxDecoration(
-        color: SlothifyColors.surfaceVariant.withOpacity(0.3),
+        color: baseColor.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(

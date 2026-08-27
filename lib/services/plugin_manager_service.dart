@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:hetu_script/hetu_script.dart';
 import 'package:hetu_spotube_plugin/hetu_spotube_plugin.dart' as spotube_plugin;
@@ -118,6 +119,53 @@ class PluginManagerService {
     }
   }
 
+  Future<String> resolvePluginUrl(String url) async {
+    if (url.endsWith('.smplug')) return url;
+    
+    // Assume it's a Github repo URL
+    try {
+      final parsedUri = Uri.parse(url);
+      final apiUri = parsedUri.replace(
+        host: "api.github.com",
+        pathSegments: [
+          "repos",
+          ...parsedUri.pathSegments,
+          "releases",
+        ],
+        queryParameters: {
+          "per_page": "1",
+          "page": "1",
+        },
+      );
+      
+      final res = await http.get(apiUri);
+      if (res.statusCode == 200) {
+        final releases = jsonDecode(res.body) as List;
+        if (releases.isNotEmpty) {
+          final latestRelease = releases.first;
+          final assets = latestRelease["assets"] as List;
+          final smplugAsset = assets.firstWhere((asset) => (asset["name"] as String).endsWith(".smplug"), orElse: () => null);
+          if (smplugAsset != null) {
+            return smplugAsset["browser_download_url"];
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error resolving plugin URL: $e');
+    }
+    return url;
+  }
+
+  Future<void> installFromUrl(String url) async {
+    final resolvedUrl = await resolvePluginUrl(url);
+    final response = await http.get(Uri.parse(resolvedUrl));
+    if (response.statusCode == 200) {
+      await loadPluginFromSmplug(response.bodyBytes);
+    } else {
+      throw Exception('Failed to download plugin: ${response.statusCode}');
+    }
+  }
+
   Future<void> loadPluginFromSmplug(Uint8List smplugBytes, {bool saveToDisk = true}) async {
     if (!_isInitialized) await init();
     
@@ -170,9 +218,9 @@ class PluginManagerService {
     HetuStdLoader.loadBindings(pluginHetu);
     spotube_plugin.HetuSpotubePluginLoader.loadBindings(
       pluginHetu,
-      localStorageImpl: SharedPreferencesLocalStorage(prefs, 'slothify_plugin_$pluginId'),
+      localStorageImpl: SharedPreferencesLocalStorage(prefs, 'neko_plugin_$pluginId'),
       onNavigatorPush: (route) {
-        if (navigatorKey.currentState != null && route is Widget) {
+        if (navigatorKey.currentState != null) {
           return navigatorKey.currentState!.push(
             MaterialPageRoute(
               builder: (context) => Scaffold(

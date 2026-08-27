@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../state/app_state.dart';
-import '../screens/settings_screen.dart';
 
 /// Modal bottom sheet for Profile and Settings
 class ProfileBottomSheet extends StatefulWidget {
@@ -17,10 +15,12 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final textColor = Theme.of(context).colorScheme.onSurface;
+    
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF1E1F29), // Dark blueish-grey background
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
         child: SingleChildScrollView(
@@ -33,18 +33,18 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
+                  color: textColor.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
               const SizedBox(height: 16),
               // Title
-              const Text(
-                'slothify',
+              Text(
+                'neko',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: textColor,
                 ),
               ),
               const SizedBox(height: 24),
@@ -67,29 +67,6 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              _buildListTile(
-                iconWidget: Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Ai',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                title: 'AI Hub',
-                subtitle: 'AI-powered lyrics and translations',
-              ),
 
               const SizedBox(height: 24),
               // ── Preferences Section ──
@@ -99,7 +76,7 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
                 title: 'Use Account for Browsing',
                 trailing: CupertinoSwitch(
                   value: _useAccountBrowsing,
-                  activeColor: const Color(0xFF1E3A8A), // Match the blue from nav
+                  activeTrackColor: const Color(0xFF1E3A8A), // Match the blue from nav
                   onChanged: (val) => setState(() => _useAccountBrowsing = val),
                 ),
               ),
@@ -109,27 +86,14 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
                 title: 'YouTube Music Sync',
                 trailing: CupertinoSwitch(
                   value: _youtubeSync,
-                  activeColor: const Color(0xFF1E3A8A),
+                  activeTrackColor: const Color(0xFF1E3A8A),
                   onChanged: (val) => setState(() => _youtubeSync = val),
                 ),
               ),
 
               const SizedBox(height: 24),
               // ── App Section ──
-              _buildSectionHeader('App'),
-              _buildListTile(
-                icon: Icons.settings_outlined,
-                title: 'Settings',
-                subtitle: 'App preferences and configurations',
-                onTap: () {
-                  final navigator = Navigator.of(context);
-                  navigator.pop();
-                  navigator.push(
-                    MaterialPageRoute(builder: (context) => const SettingsScreen()),
-                  );
-                },
-              ),
-              const SizedBox(height: 8),
+
               _buildListTile(
                 icon: Icons.info_outline_rounded,
                 title: 'About',
@@ -137,7 +101,7 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
                   '5.2.89',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: textColor.withValues(alpha: 0.5),
                   ),
                 ),
               ),
@@ -148,7 +112,7 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
                 'Privacy Policy  •  Terms of Service',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: textColor.withValues(alpha: 0.5),
                 ),
               ),
               const SizedBox(height: 24),
@@ -166,10 +130,10 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
         alignment: Alignment.centerLeft,
         child: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF8B95A5), // Light grey-blue
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ),
@@ -187,7 +151,7 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
       ),
       child: ListTile(
@@ -196,15 +160,15 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
         leading: iconWidget ??
             Icon(
               icon,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               size: 26,
             ),
         title: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         subtitle: subtitle != null
@@ -214,7 +178,7 @@ class _ProfileBottomSheetState extends State<ProfileBottomSheet> {
                   subtitle,
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                 ),
               )

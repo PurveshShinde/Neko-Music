@@ -8,6 +8,8 @@ import Foundation
 import audio_service
 import audio_session
 import desktop_webview_window
+import file_picker_darwin
+import file_selector_macos
 import flutter_inappwebview_macos
 import flutter_new_pipe_extractor
 import flutter_timezone
@@ -18,6 +20,8 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   AudioServicePlugin.register(with: registry.registrar(forPlugin: "AudioServicePlugin"))
   AudioSessionPlugin.register(with: registry.registrar(forPlugin: "AudioSessionPlugin"))
   DesktopWebviewWindowPlugin.register(with: registry.registrar(forPlugin: "DesktopWebviewWindowPlugin"))
+  FilePickerPlugin.register(with: registry.registrar(forPlugin: "FilePickerPlugin"))
+  FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
   InAppWebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "InAppWebViewFlutterPlugin"))
   FlutterNewPipeExtractorPlugin.register(with: registry.registrar(forPlugin: "FlutterNewPipeExtractorPlugin"))
   FlutterTimezonePlugin.register(with: registry.registrar(forPlugin: "FlutterTimezonePlugin"))

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/playlist_model.dart';
 import '../screens/playlist_screen.dart';
-import 'skeleton_ui.dart';
 
 /// Horizontal scrollable row of playlist cards.
 class PlaylistRow extends StatelessWidget {
@@ -34,15 +33,19 @@ class _PlaylistCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Color(playlist.colorSeed);
-    final darkColor = HSLColor.fromColor(baseColor)
-        .withLightness(0.15)
-        .withSaturation(0.5)
-        .toColor();
-    final lightColor = HSLColor.fromColor(baseColor)
-        .withLightness(0.30)
-        .withSaturation(0.45)
-        .toColor();
+    final isAmoled = Theme.of(context).brightness == Brightness.dark;
+    Color baseColor = Color(playlist.colorSeed);
+    Color darkColor;
+    Color lightColor;
+
+    if (isAmoled) {
+      darkColor = HSLColor.fromColor(baseColor).withLightness(0.15).withSaturation(0.5).toColor();
+      lightColor = HSLColor.fromColor(baseColor).withLightness(0.30).withSaturation(0.45).toColor();
+    } else {
+      baseColor = HSLColor.fromColor(baseColor).withLightness(0.85).withSaturation(0.3).toColor();
+      darkColor = HSLColor.fromColor(baseColor).withLightness(0.80).withSaturation(0.3).toColor();
+      lightColor = HSLColor.fromColor(baseColor).withLightness(0.90).withSaturation(0.25).toColor();
+    }
 
     return GestureDetector(
       onTap: () {
@@ -118,8 +121,11 @@ class _PlaylistCard extends StatelessWidget {
                         // Icon
                         Center(
                           child: Text(
-                            playlist.title[0],
-                            style: const TextStyle(fontSize: 40, color: Colors.white),
+                            playlist.title.isNotEmpty ? playlist.title[0] : '?',
+                            style: TextStyle(
+                              fontSize: 40,
+                              color: isAmoled ? Colors.white : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
                           ),
                         ),
                       ],

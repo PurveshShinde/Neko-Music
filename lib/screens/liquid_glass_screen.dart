@@ -10,18 +10,18 @@ class LiquidGlassScreen extends StatelessWidget {
     final state = AppStateProvider.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Liquid Glass (Beta)',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -32,9 +32,10 @@ class LiquidGlassScreen extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         children: [
           // ── Navigation Bar Style ──
-          _buildSectionHeader('Navigation Bar Style'),
-          _buildTileGroup([
+          _buildSectionHeader(context, 'Navigation Bar Style'),
+          _buildTileGroup(context, [
             _buildSwitchTile(
+              context: context,
               icon: Icons.horizontal_split_rounded,
               title: 'Floating navigation bar',
               subtitle: 'iOS-style floating tab bar that shrinks while scrolling',
@@ -45,9 +46,10 @@ class LiquidGlassScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Liquid Glass (Beta) ──
-          _buildSectionHeader('Liquid Glass (Beta)'),
-          _buildTileGroup([
+          _buildSectionHeader(context, 'Liquid Glass (Beta)'),
+          _buildTileGroup(context, [
             _buildSwitchTile(
+              context: context,
               icon: Icons.check_rounded,
               title: 'Enable Liquid Glass',
               subtitle:
@@ -59,41 +61,47 @@ class LiquidGlassScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Effects ──
-          _buildSectionHeader('Effects'),
-          _buildTileGroup([
+          _buildSectionHeader(context, 'Effects'),
+          _buildTileGroup(context, [
             _buildActionTile(
+              context: context,
               icon: Icons.tune_rounded,
               title: 'Vibrancy',
               subtitle: 'Boost the saturation of the glass backdrop',
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildActionTile(
+              context: context,
               icon: Icons.tune_rounded,
               title: 'Blur Radius',
               subtitle: 'Amount of blur on the glass surface',
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildActionTile(
+              context: context,
               icon: Icons.tune_rounded,
               title: 'Lens Refraction Height',
               subtitle: 'Manage Lens Refraction Height settings',
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildActionTile(
+              context: context,
               icon: Icons.tune_rounded,
               title: 'Lens Refraction Amount',
               subtitle: 'Manage Lens Refraction Amount settings',
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSwitchTile(
+              context: context,
               icon: Icons.tune_rounded,
               title: 'Chromatic Aberration',
               subtitle: 'Manage Chromatic Aberration settings',
               value: state.isChromaticAberrationEnabled,
               onChanged: (val) => state.isChromaticAberrationEnabled = val,
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSwitchTile(
+              context: context,
               icon: Icons.tune_rounded,
               title: 'Depth Effect',
               subtitle: 'Manage Depth Effect settings',
@@ -104,21 +112,24 @@ class LiquidGlassScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Appearance ──
-          _buildSectionHeader('Appearance'),
-          _buildTileGroup([
+          _buildSectionHeader(context, 'Appearance'),
+          _buildTileGroup(context, [
             _buildActionTile(
+              context: context,
               icon: Icons.palette_outlined,
               title: 'Surface Tint',
               subtitle: 'Tint colour applied to the glass surface',
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildActionTile(
+              context: context,
               icon: Icons.tune_rounded,
               title: 'Surface Opacity',
               subtitle: 'Opacity of the glass tint overlay for readability',
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildActionTile(
+              context: context,
               icon: Icons.palette_outlined,
               title: 'Glass Text Colour',
               subtitle: 'Text colour used on glass surfaces',
@@ -127,25 +138,28 @@ class LiquidGlassScreen extends StatelessWidget {
           const SizedBox(height: 24),
 
           // ── Per Component ──
-          _buildSectionHeader('Per Component'),
-          _buildTileGroup([
+          _buildSectionHeader(context, 'Per Component'),
+          _buildTileGroup(context, [
             _buildSwitchTile(
+              context: context,
               icon: Icons.music_note_rounded,
               title: 'Glass Player',
               subtitle: 'Manage Glass Player settings',
               value: state.isGlassPlayerEnabled,
               onChanged: (val) => state.isGlassPlayerEnabled = val,
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSwitchTile(
+              context: context,
               icon: Icons.music_note_rounded,
               title: 'Glass Mini Player',
               subtitle: 'Manage Glass Mini Player settings',
               value: state.isGlassMiniPlayerEnabled,
               onChanged: (val) => state.isGlassMiniPlayerEnabled = val,
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSwitchTile(
+              context: context,
               icon: Icons.horizontal_split_rounded,
               title: 'Glass Navigation Bar',
               subtitle: 'Manage Glass Navigation Bar settings',
@@ -159,13 +173,13 @@ class LiquidGlassScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         title,
-        style: const TextStyle(
-          color: Color(0xFFA5B4FC), // Light blue
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary, // Replaced 0xFFA5B4FC
           fontSize: 13,
           fontWeight: FontWeight.w600,
         ),
@@ -173,10 +187,10 @@ class LiquidGlassScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTileGroup(List<Widget> children) {
+  Widget _buildTileGroup(BuildContext context, List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1F29),
+        color: Theme.of(context).cardTheme.color, // Replaced 0xFF1E1F29
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -185,9 +199,9 @@ class LiquidGlassScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Divider(
-      color: Colors.black.withValues(alpha: 0.3),
+      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
       height: 1,
       thickness: 1,
       indent: 64, // past icon
@@ -196,6 +210,7 @@ class LiquidGlassScreen extends StatelessWidget {
   }
 
   Widget _buildActionTile({
+    required BuildContext context,
     required IconData icon,
     required String title,
     String? subtitle,
@@ -215,12 +230,12 @@ class LiquidGlassScreen extends StatelessWidget {
               height: 44,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 size: 24,
               ),
             ),
@@ -233,8 +248,8 @@ class LiquidGlassScreen extends StatelessWidget {
                   if (subtitle == null) const SizedBox(height: 10),
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -244,7 +259,7 @@ class LiquidGlassScreen extends StatelessWidget {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         fontSize: 14,
                         height: 1.3,
                       ),
@@ -261,6 +276,7 @@ class LiquidGlassScreen extends StatelessWidget {
   }
 
   Widget _buildSwitchTile({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -277,12 +293,12 @@ class LiquidGlassScreen extends StatelessWidget {
             height: 44,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
-              color: Colors.white.withValues(alpha: 0.7),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               size: 24,
             ),
           ),
@@ -293,8 +309,8 @@ class LiquidGlassScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -303,7 +319,7 @@ class LiquidGlassScreen extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 14,
                     height: 1.3,
                   ),
@@ -314,8 +330,8 @@ class LiquidGlassScreen extends StatelessWidget {
           const SizedBox(width: 16),
           CupertinoSwitch(
             value: value,
-            activeColor: const Color(0xFF1E3A8A), // Bright blue
-            trackColor: Colors.white.withValues(alpha: 0.1),
+            activeTrackColor: Theme.of(context).colorScheme.primary, // Replaced 0xFF1E3A8A Bright blue
+            inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
             onChanged: onChanged,
           ),
         ],

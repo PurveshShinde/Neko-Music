@@ -8,6 +8,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import '../models/track_model.dart';
 import '../models/playlist_model.dart';
+import '../theme/neko_theme.dart';
 
 // ── Isolate worker for YoutubeExplode ──
 // Only plain types (String, int, List, Map, SendPort) can cross Isolate boundaries.
@@ -141,31 +142,36 @@ class YouTubeSearchService {
 
   Future<List<dynamic>> searchCategorized(String query, String category) async {
     try {
-      SearchContentFilters filter;
+      SearchContentFilters filter = SearchContentFilters.all;
       String backendQuery = query;
+      List<dynamic> results = [];
 
-      switch (category.toLowerCase()) {
-        case 'songs':
-          filter = SearchContentFilters.videos;
-          backendQuery = '$query official audio';
-          break;
-        case 'albums':
-          filter = SearchContentFilters.playlists;
-          backendQuery = '$query album';
-          break;
-        case 'playlists':
-          filter = SearchContentFilters.playlists;
-          break;
-        case 'all':
-        default:
-          filter = SearchContentFilters.all;
-          break;
+      if (category.toLowerCase() == 'all') {
+        // Run concurrent searches for 'All' to ensure robust results
+        final futures = await Future.wait([
+          NewPipeExtractor.search('$query official audio', contentFilters: [SearchContentFilters.videos]).catchError((_) => <dynamic>[]),
+          NewPipeExtractor.search(query, contentFilters: [SearchContentFilters.playlists]).catchError((_) => <dynamic>[]),
+        ]);
+        results = [...futures[0], ...futures[1]];
+      } else {
+        switch (category.toLowerCase()) {
+          case 'songs':
+            filter = SearchContentFilters.videos;
+            backendQuery = '$query official audio';
+            break;
+          case 'albums':
+            filter = SearchContentFilters.playlists;
+            backendQuery = '$query album';
+            break;
+          case 'playlists':
+            filter = SearchContentFilters.playlists;
+            break;
+        }
+        results = await NewPipeExtractor.search(
+          backendQuery,
+          contentFilters: [filter],
+        );
       }
-
-      final results = await NewPipeExtractor.search(
-        backendQuery,
-        contentFilters: [filter],
-      );
 
       final List<dynamic> parsedResults = [];
 
@@ -177,7 +183,7 @@ class YouTubeSearchService {
             title: item.name,
             artist: item.uploaderName,
             albumArt: '🎵',
-            colorSeed: 0xFF1DB954,
+            colorSeed: NekoColors.colorFromTitle(item.name).value,
             imageUrl: 'https://img.youtube.com/vi/$id/hqdefault.jpg',
             duration: item.duration > 0
                 ? Duration(seconds: item.duration).toString().split('.').first.replaceFirst('0:', '')
@@ -191,12 +197,13 @@ class YouTubeSearchService {
           if (id.isEmpty) continue;
           
           final playlist = PlaylistModel(
+            id: id,
             title: item.name,
             subtitle: (filter == SearchContentFilters.musicAlbums || item.playlistType.toString().contains('ALBUM'))
                 ? 'Album • ${item.uploaderName}'
                 : 'Playlist • ${item.uploaderName}',
             imageUrl: item.thumbnails.isNotEmpty ? item.thumbnails.first.url : null,
-            colorSeed: 0xFF1DB954,
+            colorSeed: NekoColors.colorFromTitle(item.name).value,
             query: id, // Use query field to store YT Playlist ID
             isAlbum: filter == SearchContentFilters.musicAlbums,
           );
@@ -205,12 +212,18 @@ class YouTubeSearchService {
         }
       }
 
-      // If category is Songs, run aggressive deduplication
+      // Run aggressive deduplication on tracks regardless of category
       if (category.toLowerCase() == 'songs') {
         return _deduplicateTracks(parsedResults.whereType<TrackModel>().toList());
       }
 
-      return parsedResults;
+      // For 'All' or other categories, we might have mixed items (TrackModel, PlaylistModel).
+      // We should deduplicate the tracks, but keep the playlists/albums intact.
+      final tracks = parsedResults.whereType<TrackModel>().toList();
+      final otherItems = parsedResults.where((item) => item is! TrackModel).toList();
+      
+      final deduplicatedTracks = _deduplicateTracks(tracks);
+      return [...deduplicatedTracks, ...otherItems];
     } catch (e) {
       debugPrint('[Categorized search failed]: $e');
       return [];
@@ -235,13 +248,18 @@ class YouTubeSearchService {
         if (totalSeconds > 0 && (totalSeconds < 60 || totalSeconds > 900)) continue;
       }
 
-      // Normalize title aggressively
-      String coreTitle = track.title.toLowerCase().split(RegExp(r'[-|,|\|]')).first.trim();
-      coreTitle = coreTitle
+      // Normalize title aggressively, but safely handle "Artist - Title" formats
+      String normalizedTitle = track.title.toLowerCase();
+      // If it looks like "Artist - Title", grab the Title part
+      if (normalizedTitle.contains(' - ')) {
+        normalizedTitle = normalizedTitle.split(' - ').last;
+      }
+      
+      String coreTitle = normalizedTitle
           .replaceAll(RegExp(r'\(.*?\)'), '')
           .replaceAll(RegExp(r'\[.*?\]'), '')
           .replaceAll(RegExp(r'\b(official|video|lyric|lyrics|audio|full|song|track|music)\b'), '')
-          .replaceAll(RegExp(r'[^a-z0-9]'), '')
+          .replaceAll(RegExp(r'[^a-z0-9\s]'), '')
           .trim();
           
       if (coreTitle.isEmpty) {
@@ -251,7 +269,10 @@ class YouTubeSearchService {
       bool isDuplicate = false;
       for (var existing in seenTitles) {
         if (existing.isNotEmpty && coreTitle.isNotEmpty) {
-          if (existing.contains(coreTitle) || coreTitle.contains(existing)) {
+          // Require at least 5 characters to do substring match, else do exact match
+          if (existing == coreTitle || 
+              (coreTitle.length > 5 && existing.length > 5 && 
+                (existing.contains(coreTitle) || coreTitle.contains(existing)))) {
             isDuplicate = true;
             break;
           }
@@ -282,7 +303,7 @@ class YouTubeSearchService {
           title: item.name,
           artist: item.uploaderName,
           albumArt: '🎵',
-          colorSeed: 0xFF1DB954,
+          colorSeed: NekoColors.colorFromTitle(item.name).value,
           imageUrl: 'https://img.youtube.com/vi/$id/hqdefault.jpg',
           duration: item.duration > 0
               ? Duration(seconds: item.duration)
@@ -313,13 +334,17 @@ class YouTubeSearchService {
         // Filter: > 1:30 and < 10:00
         if (totalSeconds < 90 || totalSeconds > 600) continue;
 
-        // Normalize title aggressively
-        String coreTitle = track.title.toLowerCase().split(RegExp(r'[-|,|\|]')).first.trim();
-        coreTitle = coreTitle
+        // Normalize title aggressively, but safely handle "Artist - Title" formats
+        String normalizedTitle = track.title.toLowerCase();
+        if (normalizedTitle.contains(' - ')) {
+          normalizedTitle = normalizedTitle.split(' - ').last;
+        }
+        
+        String coreTitle = normalizedTitle
             .replaceAll(RegExp(r'\(.*?\)'), '')
             .replaceAll(RegExp(r'\[.*?\]'), '')
             .replaceAll(RegExp(r'\b(official|video|lyric|lyrics|audio|full|song|track|music)\b'), '')
-            .replaceAll(RegExp(r'[^a-z0-9]'), '')
+            .replaceAll(RegExp(r'[^a-z0-9\s]'), '')
             .trim();
             
         if (coreTitle.isEmpty) {
@@ -329,7 +354,9 @@ class YouTubeSearchService {
         bool isDuplicate = false;
         for (var existing in seenTitles) {
           if (existing.isNotEmpty && coreTitle.isNotEmpty) {
-            if (existing.contains(coreTitle) || coreTitle.contains(existing)) {
+            if (existing == coreTitle || 
+                (coreTitle.length > 5 && existing.length > 5 && 
+                  (existing.contains(coreTitle) || coreTitle.contains(existing)))) {
               isDuplicate = true;
               break;
             }
@@ -357,7 +384,7 @@ class YouTubeSearchService {
         title: v['title'] as String,
         artist: v['author'] as String,
         albumArt: '🎵',
-        colorSeed: 0xFF1DB954,
+        colorSeed: NekoColors.colorFromTitle(v['title'] as String).value,
         imageUrl: v['thumbnail'] as String?,
         duration: v['duration'] != null
             ? Duration(seconds: v['duration'] as int)
@@ -380,7 +407,7 @@ class YouTubeSearchService {
           title: v['title'] as String,
           artist: v['author'] as String,
           albumArt: '🎵',
-          colorSeed: 0xFF1DB954,
+          colorSeed: NekoColors.colorFromTitle(v['title'] as String).value,
           imageUrl: v['thumbnail'] as String?,
           duration: v['duration'] != null
               ? Duration(seconds: v['duration'] as int)

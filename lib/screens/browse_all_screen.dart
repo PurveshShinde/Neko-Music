@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/playlist_model.dart';
-import '../theme/slothify_theme.dart';
+import '../theme/neko_theme.dart';
 import 'playlist_screen.dart';
 
 class BrowseAllScreen extends StatelessWidget {
@@ -16,11 +16,12 @@ class BrowseAllScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
       ),
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
@@ -56,9 +57,12 @@ class BrowseAllScreen extends StatelessWidget {
                             fit: BoxFit.cover,
                           )
                         : Container(
-                            color: Color(playlist.colorSeed),
-                            child: const Center(
-                              child: Icon(Icons.music_note, color: Colors.white, size: 48),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Color(playlist.colorSeed)
+                                : Color(playlist.colorSeed).toCalmColor(),
+                            child: Center(
+                              child: Icon(Icons.music_note,
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), size: 48),
                             ),
                           ),
                   ),
@@ -66,8 +70,8 @@ class BrowseAllScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   playlist.title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
@@ -78,7 +82,7 @@ class BrowseAllScreen extends StatelessWidget {
                 Text(
                   playlist.subtitle,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     fontSize: 12,
                   ),
                   maxLines: 2,

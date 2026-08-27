@@ -1,11 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:hetu_script/values.dart';
-import 'package:http/http.dart' as http;
 import '../models/track_model.dart';
 import '../models/playlist_model.dart';
 import '../services/plugin_manager_service.dart';
 import '../services/youtube_search_service.dart';
+import '../theme/neko_theme.dart';
 
 class SpotifyMetadataService {
   final PluginManagerService pluginManager;
@@ -118,10 +117,11 @@ class SpotifyMetadataService {
     return allPlaylists.map((p) {
       final pMap = p as Map;
       return PlaylistModel(
+        id: pMap['id'] as String? ?? pMap['name'] as String? ?? 'playlist',
         title: pMap['name'] as String? ?? 'Playlist',
         subtitle: pMap['description'] as String? ?? 'Spotify Playlist',
         imageUrl: (pMap['images'] as List?)?.isNotEmpty == true ? (pMap['images'] as List)[0]['url'] as String? : null,
-        colorSeed: 0xFF1DB954,
+        colorSeed: NekoColors.colorFromTitle(pMap['name'] as String? ?? 'Playlist').toARGB32(),
         spotifyId: pMap['id'] as String?,
       );
     }).toList();
@@ -159,13 +159,24 @@ class SpotifyMetadataService {
           debugPrint('[SpotifyMetadataService] Item IS an album: ${pMap.toString()}');
         }
 
+        String? img;
+        final images = pMap['images'] as List? ?? pMap['icons'] as List?;
+        if (images != null && images.isNotEmpty) {
+          img = images[0]['url'] as String?;
+        } else if (pMap['cover'] is String) {
+          img = pMap['cover'] as String?;
+        } else if (pMap['album'] is Map && (pMap['album'] as Map)['images'] is List && ((pMap['album'] as Map)['images'] as List).isNotEmpty) {
+          img = ((pMap['album'] as Map)['images'] as List)[0]['url'] as String?;
+        }
+
         return PlaylistModel(
+          id: pMap['id'] as String? ?? pMap['name'] as String? ?? 'playlist',
           title: pMap['name'] as String? ?? 'Unknown',
           subtitle: pMap['description'] as String? ?? 
                     (pMap['owner'] != null ? 'By ${(pMap['owner'] as Map)['name']}' : 
                      (pMap.containsKey('artists') && (pMap['artists'] as List).isNotEmpty ? 'Album by ${(pMap['artists'] as List)[0]['name']}' : 'Spotify Playlist')),
-          imageUrl: (pMap['images'] as List?)?.isNotEmpty == true ? (pMap['images'] as List)[0]['url'] as String? : null,
-          colorSeed: 0xFF1DB954,
+          imageUrl: img,
+          colorSeed: NekoColors.colorFromTitle(pMap['name'] as String? ?? 'Unknown').toARGB32(),
           spotifyId: pMap['id'] as String?,
           isAlbum: isAlbumCheck,
         );
@@ -256,10 +267,16 @@ class SpotifyMetadataService {
       final cleanId = playlistId.replaceAll('spotify:playlist:', '');
       final metadataPlugin = engine.fetch("metadataPlugin") as HTInstance;
       final playlistEndpoint = metadataPlugin.memberGet("playlist") as HTInstance;
+      try {
+        final token = engine.eval("metadataPlugin.auth.token");
+        debugPrint('SPOTIFY TOKEN: $token');
+      } catch (e) {
+        debugPrint('SPOTIFY TOKEN ERROR: $e');
+      }
       final raw = await playlistEndpoint.invoke(
         "tracks",
         positionalArgs: [cleanId],
-        namedArgs: {"limit": 15, "offset": 0},
+        namedArgs: {"limit": 100, "offset": 0},
       ) as Map;
       final items = raw['items'] as List? ?? [];
       return _mapTracks(items);
@@ -282,7 +299,7 @@ class SpotifyMetadataService {
       final raw = await albumEndpoint.invoke(
         "tracks",
         positionalArgs: [cleanId],
-        namedArgs: {"limit": 20, "offset": 0},
+        namedArgs: {"limit": 50, "offset": 0},
       ) as Map;
       
       final items = raw['items'] as List? ?? [];
@@ -297,9 +314,17 @@ class SpotifyMetadataService {
     return tracks.where((t) => t != null && t is Map).map((t) {
       final item = t as Map;
       final track = (item.containsKey('track') ? item['track'] : item) as Map;
-      final durationMs = track['durationMs'] as int? ?? 0;
+      debugPrint('TRACK ITEM KEYS: ${track.keys.toList()}');
+      if (track.containsKey('duration_ms')) debugPrint('duration_ms: ${track['duration_ms']}');
+      if (track.containsKey('durationMs')) debugPrint('durationMs: ${track['durationMs']}');
+      if (track.containsKey('duration')) debugPrint('duration: ${track['duration']}');
+      
+      final durationMs = (track['duration_ms'] as int?) ?? (track['durationMs'] as int?) ?? 0;
       final durationSecs = durationMs ~/ 1000;
-      final duration = Duration(seconds: durationSecs).toString().split('.').first.replaceFirst('0:', '');
+      String duration = Duration(seconds: durationSecs).toString().split('.').first;
+      if (duration.startsWith('0:')) {
+        duration = duration.substring(2);
+      }
       
       final artists = track['artists'] as List? ?? [];
       final artistName = artists.isNotEmpty ? (artists[0] as Map)['name'] as String? ?? 'Unknown' : 'Unknown';
@@ -313,7 +338,7 @@ class SpotifyMetadataService {
         title: track['name'] as String? ?? 'Unknown',
         artist: artistName,
         albumArt: '🎵',
-        colorSeed: 0xFF1DB954,
+        colorSeed: NekoColors.colorFromTitle(track['name'] as String? ?? 'Unknown').toARGB32(),
         imageUrl: imageUrl,
         duration: duration,
         spotifyId: track['id'] as String?,

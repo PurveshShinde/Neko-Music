@@ -18,18 +18,18 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Appearance',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.w600,
           ),
@@ -49,13 +49,13 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               value: _legacyIcon,
               onChanged: (val) => setState(() => _legacyIcon = val),
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildActionTile(
               icon: Icons.palette_outlined,
               title: 'Theme',
               subtitle: 'Customize your app theme',
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSwitchTile(
               icon: Icons.dark_mode_outlined,
               title: 'AMOLED Black Mode',
@@ -65,7 +65,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                 AppStateProvider.of(context).isAmoledThemeEnabled = val;
               },
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildActionTile(
               icon: Icons.palette_outlined,
               title: 'Liquid Glass (Beta)',
@@ -77,7 +77,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                 );
               },
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSwitchTile(
               icon: Icons.speed_rounded,
               title: 'Enable high refresh rate',
@@ -85,7 +85,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               value: _highRefreshRate,
               onChanged: (val) => setState(() => _highRefreshRate = val),
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSwitchTile(
               icon: Icons.palette_outlined,
               title: 'Enable dynamic theme',
@@ -94,7 +94,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               onChanged: (val) => setState(() => _dynamicTheme = val),
             ),
           ]),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
 
           // ── Mini-player ──
           _buildSectionHeader('Mini-player'),
@@ -105,7 +105,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               subtitle: 'Follow theme',
             ),
           ]),
-          const SizedBox(height: 40),
+          SizedBox(height: 40),
         ],
       ),
     );
@@ -118,7 +118,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
       decoration: BoxDecoration(
         color: Colors.black,
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface, width: 2),
       ),
       child: Center(
         child: Container(
@@ -127,7 +127,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
           decoration: BoxDecoration(
             color: Colors.transparent,
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2),
+            border: Border.all(color: Theme.of(context).colorScheme.onSurface, width: 2),
           ),
         ),
       ),
@@ -139,7 +139,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           color: Color(0xFFA5B4FC),
           fontSize: 13,
           fontWeight: FontWeight.w600,
@@ -151,7 +151,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
   Widget _buildTileGroup(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1F29),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
@@ -160,9 +160,9 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Divider(
-      color: Colors.black.withValues(alpha: 0.3),
+      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
       height: 1,
       thickness: 1,
       indent: 64, // past icon
@@ -190,36 +190,36 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               height: 44,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: Colors.white.withValues(alpha: 0.7),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 size: 24,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (subtitle == null) const SizedBox(height: 10),
+                  if (subtitle == null) SizedBox(height: 10),
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   if (subtitle != null) ...[
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         fontSize: 14,
                         height: 1.3,
                       ),
@@ -228,7 +228,7 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
                 ],
               ),
             ),
-            if (subtitle == null) const SizedBox(height: 44),
+            if (subtitle == null) SizedBox(height: 44),
           ],
         ),
       ),
@@ -253,34 +253,34 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
             height: 44,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: iconWidget ??
                 Icon(
                   icon,
-                  color: Colors.white.withValues(alpha: 0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   size: 24,
                 ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 14,
                     height: 1.3,
                   ),
@@ -288,11 +288,11 @@ class _AppearanceScreenState extends State<AppearanceScreen> {
               ],
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           CupertinoSwitch(
             value: value,
-            activeColor: const Color(0xFF1E3A8A), // Bright blue
-            trackColor: Colors.white.withValues(alpha: 0.1),
+            activeTrackColor: const Color(0xFF1E3A8A), // Bright blue
+            inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
             onChanged: onChanged,
           ),
         ],

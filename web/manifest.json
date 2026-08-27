@@ -1,6 +1,6 @@
 {
-    "name": "slothify",
-    "short_name": "slothify",
+    "name": "neko",
+    "short_name": "neko",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
