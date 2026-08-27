@@ -37,7 +37,7 @@ class AppState extends ChangeNotifier {
     _isGlassNavigationBarEnabled = _prefs.getBool('isGlassNavigationBarEnabled') ?? true;
     _isChromaticAberrationEnabled = _prefs.getBool('isChromaticAberrationEnabled') ?? true;
     _isDepthEffectEnabled = _prefs.getBool('isDepthEffectEnabled') ?? true;
-    _isDepthEffectEnabled = _prefs.getBool('isDepthEffectEnabled') ?? true;
+    _isAmoledThemeEnabled = _prefs.getBool('isAmoledThemeEnabled') ?? false;
     _useSpotifyRecommendations = _prefs.getBool('useSpotifyRecommendations') ?? false;
 
     pluginManager = PluginManagerService();

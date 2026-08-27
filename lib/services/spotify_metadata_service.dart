@@ -13,6 +13,74 @@ class SpotifyMetadataService {
   List<dynamic>? _cachedSections;
   DateTime? _lastFetch;
 
+  bool get hasCredentials {
+    final engine = pluginManager.getMetadataEngine();
+    if (engine == null) return false;
+    try {
+      return engine.eval("metadataPlugin.auth.isAuthenticated()") as bool;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<List<TrackModel>> searchTracks(String query) async {
+    final engine = pluginManager.getMetadataEngine();
+    if (engine == null) return [];
+    try {
+      await _ensureAuthenticated(engine);
+      final metadataPlugin = engine.fetch("metadataPlugin") as HTInstance;
+      final searchEndpoint = metadataPlugin.memberGet("search") as HTInstance;
+      final raw = await searchEndpoint.invoke(
+        "search",
+        positionalArgs: [query],
+        namedArgs: {"type": "track", "limit": 20, "offset": 0},
+      );
+      final rawMap = raw as Map;
+      final items = (rawMap['tracks'] as Map?)?['items'] as List? ?? [];
+      return _mapTracks(items);
+    } catch (e) {
+      debugPrint('Error searching tracks: $e');
+      return [];
+    }
+  }
+
+  Future<List<PlaylistModel>> searchPlaylists(String query) async {
+    final engine = pluginManager.getMetadataEngine();
+    if (engine == null) return [];
+    try {
+      await _ensureAuthenticated(engine);
+      final metadataPlugin = engine.fetch("metadataPlugin") as HTInstance;
+      final searchEndpoint = metadataPlugin.memberGet("search") as HTInstance;
+      final raw = await searchEndpoint.invoke(
+        "search",
+        positionalArgs: [query],
+        namedArgs: {"type": "playlist", "limit": 20, "offset": 0},
+      );
+      final rawMap = raw as Map;
+      final items = (rawMap['playlists'] as Map?)?['items'] as List? ?? [];
+      return items.where((i) => i is Map).map((p) {
+        final pMap = p as Map;
+        String? img;
+        final images = pMap['images'] as List?;
+        if (images != null && images.isNotEmpty) {
+          img = images[0]['url'] as String?;
+        }
+        return PlaylistModel(
+          id: pMap['id'] as String? ?? pMap['name'] as String? ?? 'playlist',
+          title: pMap['name'] as String? ?? 'Unknown',
+          subtitle: pMap['description'] as String? ?? 'Spotify Playlist',
+          imageUrl: img,
+          colorSeed: NekoColors.colorFromTitle(pMap['name'] as String? ?? 'Unknown').toARGB32(),
+          spotifyId: pMap['id'] as String?,
+          isAlbum: false,
+        );
+      }).toList();
+    } catch (e) {
+      debugPrint('Error searching playlists: $e');
+      return [];
+    }
+  }
+
   void clearCache() {
     _cachedSections = null;
     _lastFetch = null;

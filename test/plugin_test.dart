@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:neko/services/plugin_manager_service.dart';
-
+import 'package:hetu_script/values.dart';
 void main() {
   testWidgets('Test Spotube Plugin Search', (WidgetTester tester) async {
     final pm = PluginManagerService();

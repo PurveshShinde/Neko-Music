@@ -59,6 +59,21 @@ Future<void> _ytExplodeIsolateEntry(SendPort mainPort) async {
               .toList();
           break;
 
+        case 'playlist_tracks':
+          final playlistId = args[0] as String;
+          final playlist = await yt.playlists.get(playlistId);
+          final videos = await yt.playlists.getVideos(playlist.id).toList();
+          result = videos
+              .map((v) => {
+                    'id': v.id.value,
+                    'title': v.title,
+                    'author': v.author,
+                    'thumbnail': v.thumbnails.highResUrl,
+                    'duration': v.duration?.inSeconds,
+                  })
+              .toList();
+          break;
+
         case 'manifest':
           final videoId = args[0] as String;
           // Use the most permissive clients — ios client avoids PO token issues
@@ -138,6 +153,36 @@ class YouTubeSearchService {
   /// falls back to YoutubeExplode Isolate on other platforms.
   Future<List<TrackModel>> searchTracks(String query) async {
     return _searchNewPipe(query);
+  }
+
+  Future<List<TrackModel>> getPlaylistTracks(String playlistId) async {
+    debugPrint('[getPlaylistTracks] Requesting tracks for ID: $playlistId');
+    try {
+      final isolate = await _IsolatedYoutubeExplode.get();
+      final results = await isolate.call<List<dynamic>>('playlist_tracks', [playlistId]);
+      
+      debugPrint('[getPlaylistTracks] Isolate returned \${results.length} items');
+      
+      final tracks = <TrackModel>[];
+      for (var v in results) {
+        final id = v['id'] as String;
+        tracks.add(TrackModel(
+          title: v['title'] as String,
+          artist: v['author'] as String,
+          albumArt: '🎵',
+          colorSeed: NekoColors.colorFromTitle(v['title'] as String).toARGB32(),
+          imageUrl: v['thumbnail'] as String,
+          duration: v['duration'] != null 
+              ? Duration(seconds: v['duration'] as int).toString().split('.').first.replaceFirst('0:', '') 
+              : null,
+          videoId: id,
+        ));
+      }
+      return _deduplicateTracks(tracks);
+    } catch (e, st) {
+      debugPrint('[getPlaylistTracks] failed: $e\\n$st');
+      return [];
+    }
   }
 
   Future<List<dynamic>> searchCategorized(String query, String category) async {

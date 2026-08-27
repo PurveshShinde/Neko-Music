@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _spotifyService = SpotifyMetadataService(AppStateProvider.of(context).pluginManager);
+      _spotifyService = AppStateProvider.of(context).spotifyService;
       _checkPluginAndLoad();
     });
   }
@@ -46,8 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // Fallback section removed, handled by RecommendationEngine now
 
   Future<void> _loadDashboardData() async {
-    _spotifyService.clearCache();
-    
     if (mounted) {
       setState(() {
         _isLoading = true;
@@ -60,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final state = AppStateProvider.of(context);
     
     try {
-      if (state.pluginManager.isPluginActive && state.useSpotifyRecommendations) {
+      if (state.spotifyService.hasCredentials && state.useSpotifyRecommendations) {
         final results = await Future.wait([
           _spotifyService.getNewReleases(),
           _spotifyService.getRecommendations(),

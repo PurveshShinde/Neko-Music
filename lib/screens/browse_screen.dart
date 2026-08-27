@@ -9,18 +9,18 @@ class BrowseScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAmoled = Theme.of(context).brightness == Brightness.dark;
     final categories = [
-      {'title': 'Pop', 'query': 'Pop hits playlist 2024', 'color': 0xFFE13300, 'image': 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80'},
-      {'title': 'Hip-Hop', 'query': 'Hip hop rap playlist', 'color': 0xFF1E3264, 'image': 'https://images.unsplash.com/photo-1601643157091-ce5c665179ab?w=400&q=80'},
-      {'title': 'Rock', 'query': 'Classic rock playlist', 'color': 0xFFE91429, 'image': 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=400&q=80'},
-      {'title': 'Latin', 'query': 'Latin hits playlist', 'color': 0xFFE1118C, 'image': 'https://images.unsplash.com/photo-1493225457124-a1a2b5349e58?w=400&q=80'},
-      {'title': 'Dance/Electronic', 'query': 'EDM dance playlist', 'color': 0xFFD84000, 'image': 'https://images.unsplash.com/photo-1470229722913-7c092db62220?w=400&q=80'},
-      {'title': 'Indie', 'query': 'Indie mix playlist', 'color': 0xFFE13300, 'image': 'https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=400&q=80'},
-      {'title': 'Mood', 'query': 'Mood playlist', 'color': 0xFF8D67AB, 'image': 'https://images.unsplash.com/photo-1458560871784-56d23406c091?w=400&q=80'},
-      {'title': 'Workout', 'query': 'Workout mix playlist', 'color': 0xFF777777, 'image': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80'},
-      {'title': 'K-Pop', 'query': 'Kpop playlist', 'color': 0xFF148A08, 'image': 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&q=80'},
-      {'title': 'Chill', 'query': 'Chill lofi playlist', 'color': 0xFF477D95, 'image': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80'},
-      {'title': 'R&B', 'query': 'RnB hits playlist', 'color': 0xFFDC148C, 'image': 'https://images.unsplash.com/photo-1499415479124-43c32433a620?w=400&q=80'},
-      {'title': 'Sleep', 'query': 'Sleep ambient playlist', 'color': 0xFF1E3264, 'image': 'https://images.unsplash.com/photo-1515894203077-94ada3902daf?w=400&q=80'},
+      {'title': 'Pop', 'spotifyId': '37i9dQZF1DXcBWIGoYBM5M', 'color': 0xFFE13300, 'image': 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80'},
+      {'title': 'Hip-Hop', 'spotifyId': '37i9dQZF1DX0XUsuxWHRQd', 'color': 0xFF1E3264, 'image': 'https://images.unsplash.com/photo-1601643157091-ce5c665179ab?w=400&q=80'},
+      {'title': 'Rock', 'spotifyId': '37i9dQZF1DWXRqgorJj26U', 'color': 0xFFE91429, 'image': 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=400&q=80'},
+      {'title': 'Latin', 'spotifyId': '37i9dQZF1DX10zKzsJ2jva', 'color': 0xFFE1118C, 'image': 'https://images.unsplash.com/photo-1543627063-e38029c15858?w=400&q=80'},
+      {'title': 'Dance/Electronic', 'spotifyId': '37i9dQZF1DX4dyzvuaRJ0n', 'color': 0xFFD84000, 'image': 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&q=80'},
+      {'title': 'Indie', 'spotifyId': '37i9dQZF1DXdwmD5Q7Gxah', 'color': 0xFFE13300, 'image': 'https://images.unsplash.com/photo-1525362081669-2b476bb628c3?w=400&q=80'},
+      {'title': 'Mood', 'spotifyId': '37i9dQZF1DX3rxVfibe1L0', 'color': 0xFF8D67AB, 'image': 'https://images.unsplash.com/photo-1458560871784-56d23406c091?w=400&q=80'},
+      {'title': 'Workout', 'spotifyId': '37i9dQZF1DX76Wlfdnj7AP', 'color': 0xFF777777, 'image': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80'},
+      {'title': 'K-Pop', 'spotifyId': '37i9dQZF1DX9tPFwDMOaN1', 'color': 0xFF148A08, 'image': 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=400&q=80'},
+      {'title': 'Chill', 'spotifyId': '37i9dQZF1DWWQRwui0ExPn', 'color': 0xFF477D95, 'image': 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&q=80'},
+      {'title': 'R&B', 'spotifyId': '37i9dQZF1DX4SBhb3jqBDD', 'color': 0xFFDC148C, 'image': 'https://images.unsplash.com/photo-1499415479124-43c32433a620?w=400&q=80'},
+      {'title': 'Sleep', 'spotifyId': '37i9dQZF1DWZd79rJ6a7cD', 'color': 0xFF1E3264, 'image': 'https://images.unsplash.com/photo-1515894203077-94ada3902daf?w=400&q=80'},
     ];
 
     return SafeArea(
@@ -55,11 +55,11 @@ class BrowseScreen extends StatelessWidget {
                   return GestureDetector(
                     onTap: () {
                       final playlist = PlaylistModel(
-                        id: cat['title'] as String,
+                        id: cat['spotifyId'] as String,
                         title: '${cat['title']} Mix',
                         subtitle: 'Curated for you',
                         colorSeed: cat['color'] as int,
-                        query: cat['query'] as String,
+                        spotifyId: cat['spotifyId'] as String,
                         imageUrl: cat['image'] as String,
                       );
                       Navigator.push(

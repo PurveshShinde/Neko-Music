@@ -41,7 +41,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     super.initState();
     _currentPlaylist = widget.playlist;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _spotifyService = SpotifyMetadataService(AppStateProvider.of(context).pluginManager);
+      _spotifyService = AppStateProvider.of(context).spotifyService;
       _loadTracks();
       _extractDominantColor();
     });
@@ -79,12 +79,25 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     try {
       List<TrackModel> tracks = [];
       if (widget.playlist.spotifyId != null && widget.playlist.spotifyId != 'liked_songs' && widget.playlist.spotifyId != 'downloaded_songs') {
+        debugPrint('[PlaylistScreen] Fetching Spotify playlist/album tracks');
         tracks = widget.playlist.isAlbum
             ? await _spotifyService.getAlbumTracks(_currentPlaylist.spotifyId!)
             : await _spotifyService.getPlaylistTracks(_currentPlaylist.spotifyId!);
+        debugPrint('[PlaylistScreen] Spotify returned ${tracks.length} tracks');
       } else if (_currentPlaylist.query != null) {
-        final results = await _searchService.searchCategorized(_currentPlaylist.query!, 'songs');
-        tracks = results.whereType<TrackModel>().toList();
+        final query = _currentPlaylist.query!;
+        debugPrint('[PlaylistScreen] Fetching YT Playlist tracks for query/ID: $query');
+        tracks = await _searchService.getPlaylistTracks(query);
+        
+        // Fallback: youtube_explode_dart currently has a bug where it fails to parse 
+        // YouTube playlists. If it returns 0 tracks, we fallback to searching for tracks
+        // using the playlist's title via NewPipe extractor.
+        if (tracks.isEmpty && _currentPlaylist.title.isNotEmpty) {
+           debugPrint('[PlaylistScreen] YT extraction failed. Fallback to searching title: ${_currentPlaylist.title}');
+           tracks = await _searchService.searchTracks(_currentPlaylist.title);
+        }
+        
+        debugPrint('[PlaylistScreen] YT returned ${tracks.length} tracks');
       } else {
         // Local playlist
         final localLibrary = AppStateProvider.of(context).localLibrary;

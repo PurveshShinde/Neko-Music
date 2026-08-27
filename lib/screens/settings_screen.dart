@@ -96,6 +96,14 @@ class SettingsScreen extends StatelessWidget {
                 _buildDivider(context),
                 _buildActionTile(
                   context,
+                  icon: Icons.extension_outlined,
+                  title: 'Plugins',
+                  subtitle: 'Manage audio and metadata plugins',
+                  destination: const PluginsScreen(),
+                ),
+                _buildDivider(context),
+                _buildActionTile(
+                  context,
                   icon: Icons.play_arrow_outlined,
                   title: 'Player and audio',
                   subtitle: 'Playback, quality, and equalizer',
@@ -134,10 +142,9 @@ class SettingsScreen extends StatelessWidget {
                 _buildDivider(context),
                 _buildActionTile(
                   context,
-                  icon: Icons.extension_outlined,
-                  title: 'Spotube Plugins',
-                  subtitle: 'Manage metadata and API integrations',
-                  destination: const PluginsScreen(),
+                  icon: Icons.music_note,
+                  title: 'Spotify Integration',
+                  subtitle: 'Connect Spotify API for high-res covers',
                 ),
               ],
             ),

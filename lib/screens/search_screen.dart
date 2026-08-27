@@ -32,7 +32,7 @@ class _SearchScreenState extends State<SearchScreen> {
   List<String> _history = [];
   SharedPreferences? _prefs;
 
-  final List<String> _categories = ['All', 'Songs', 'Albums', 'Playlists'];
+  final List<String> _categories = ['All', 'Tracks', 'Albums', 'Artists', 'Playlists'];
 
   @override
   void initState() {
@@ -112,7 +112,31 @@ class _SearchScreenState extends State<SearchScreen> {
     }
 
     try {
-      final results = await _searchService.searchCategorized(query, _selectedCategory);
+      final spotify = AppStateProvider.of(context).spotifyService;
+      List<dynamic> results = [];
+      
+      if (_selectedCategory == 'Playlists') {
+         results = await spotify.searchPlaylists(query);
+         if (results.isEmpty) {
+           results = await _searchService.searchCategorized(query, 'Playlists');
+         }
+      } else if (_selectedCategory == 'Tracks' || _selectedCategory == 'Songs') {
+         results = await spotify.searchTracks(query);
+         if (results.isEmpty) {
+           results = await _searchService.searchCategorized(query, 'Songs');
+         }
+      } else {
+         // Default to tracks and fallback playlists if 'All'
+         final tracks = await spotify.searchTracks(query);
+         if (tracks.isEmpty) {
+           results = await _searchService.searchCategorized(query, 'All');
+         } else {
+           results.addAll(tracks);
+           final playlists = await spotify.searchPlaylists(query);
+           if (playlists.isNotEmpty) results.addAll(playlists.take(5));
+         }
+      }
+      
       if (mounted) {
         setState(() {
           _results = results;
