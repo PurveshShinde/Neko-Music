@@ -92,11 +92,9 @@ Contributions, issues, and feature requests are welcome!
 
 ### Contributors
 
-<a href="https://github.com/PurveshShinde/Neko-Music/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=PurveshShinde/Neko-Music" alt="Contributors" />
+<a href="https://github.com/PurveshShinde">
+  <img src="https://github.com/PurveshShinde.png" width="40" height="40" alt="Purvesh Shinde" style="border-radius: 50%;" />
 </a>
-
-*Made with [contrib.rocks](https://contrib.rocks).*
 
 ## 📝 License
 
