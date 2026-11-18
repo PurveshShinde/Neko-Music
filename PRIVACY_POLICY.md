@@ -2,40 +2,62 @@
 
 **Last Updated:** November 2026
 
-Neko Music is designed with privacy and user autonomy as core principles. This policy explains how data is handled by the application.
+**Neko Music** is built upon the foundational principles of privacy, autonomy, and transparency. This document details how data is handled across the application.
 
 ---
 
-## 1. Zero Telemetry and Tracking
+## 1. Zero Telemetry & Tracking Guarantee
 
-- Neko Music does not collect, store, or transmit any personal telemetry, usage metrics, device identifiers, or analytics data.
-- The application does not contain third-party ad networks, trackers, or commercial telemetry SDKs.
+- **No Analytics or Trackers**: Neko Music contains zero tracking libraries, advertisement SDKs, usage analytics, or commercial telemetry frameworks.
+- **No User Profiling**: We do not record your listening habits, search history, IP addresses, or device identifiers.
+- **No Account Required**: The app operates fully without requiring user accounts or registration.
 
-## 2. Network Requests
+---
 
-To provide search, metadata, and audio streaming capabilities, Neko Music communicates directly with external services:
-- **Spotify Public Endpoints / Scrapers**: Used to fetch track, album, and playlist metadata.
-- **YouTube Audio Streams**: Used to stream and download audio tracks via local extractors (`youtube_explode_dart` and `flutter_new_pipe_extractor`).
+## 2. Network Activity & External Requests
 
-All network requests are made directly from your device to the respective endpoints. No intermediary servers operated by Neko Music intercept or log your streaming activity.
+Neko Music communicates directly with external web services solely to fulfill user-initiated playback and discovery actions:
 
-## 3. Local Storage
+- **YouTube Music (InnerTube API)**: Streams audio data, fetches search results, playlists, albums, and artist metadata directly from public endpoints.
+- **Lyrics Providers**: Queries public community endpoints (such as LRCLIB, KuGou, BetterLyrics, and SimpMusic) to fetch synchronized and plain-text lyrics for active tracks.
+- **ShazamKit Audio Recognition**: When you tap the microphone button to identify a playing song, an audio fingerprint is computed locally on your device and queried against Shazam's recognition service. No ambient audio recordings are ever stored or retained.
+- **Listen Together Sessions**: Real-time group listening sessions transmit synchronization state (current track, timestamp, play/pause) over encrypted WebSockets to the selected Listen Together server.
+- **AI Translation (Optional)**: If you configure a third-party AI translation provider (e.g., OpenRouter, DeepL, Mistral), lyric translation prompts are sent directly to that provider using your personal API key.
 
-The following data is stored strictly on your local device:
-- Application preferences and settings (e.g., audio quality, theme selection).
-- Locally cached search queries and playlists.
-- Audio files downloaded to your device storage via the download service.
+> [!NOTE]
+> All network requests originate directly from your device to the respective service. Neko Music maintains no intermediate proxy servers that intercept, log, or inspect your traffic.
 
-This data never leaves your device unless you explicitly export or back up your local files.
+---
 
-## 4. Permissions
+## 3. Local Storage & Device Data
 
-Neko Music requests only the permissions necessary for media playback and optional local file downloads:
-- **Internet**: Required to stream music and resolve metadata.
-- **Foreground Service & Notification**: Required to maintain background playback and show media controls.
-- **Storage**: Required only if you choose to download tracks to your device storage.
+All persistent application data is stored strictly within the app's secure private sandbox on your local device:
 
-## 5. Contact
+- **SQLite Database (`InternalDatabase`)**: Stores local playlists, favorite tracks, cached search history, and listening history.
+- **Preferences DataStore**: Stores your personalized UI settings, equalizer presets, and audio configuration.
+- **ExoPlayer Media Cache**: Stores cached audio segments to enable smooth playback and reduce repetitive network bandwidth.
+- **Downloaded Audio Files**: Files you explicitly download are saved to your device's local audio directory.
 
-If you have questions regarding this Privacy Policy, please open an issue or reach out via [GitHub](https://github.com/PurveshShinde/Neko-Music).
+This data never leaves your device unless you explicitly initiate a database backup export.
 
+---
+
+## 4. Permissions Requested
+
+Neko Music requests only the minimum Android runtime permissions essential for music playback:
+
+| Permission | Justification |
+| :--- | :--- |
+| `INTERNET` | Required to stream music, download album art, and fetch synchronized lyrics. |
+| `ACCESS_NETWORK_STATE` | Detects network availability (Wi-Fi vs. cellular) to honor your configured audio quality settings. |
+| `FOREGROUND_SERVICE` & `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Required by Android to continue playing audio when the screen is turned off or when switching apps. |
+| `POST_NOTIFICATIONS` | Displays the system media player notification with playback controls and track details. |
+| `RECORD_AUDIO` *(Optional)* | Used strictly when you trigger the "Identify Song" (Shazam) feature. Granted at runtime on demand. |
+| `BLUETOOTH_CONNECT` *(Optional)* | Used to detect connected Bluetooth headsets and DACs to apply device-specific equalizer profiles. |
+
+---
+
+## 5. Contact & Questions
+
+If you have questions, concerns, or feedback regarding this Privacy Policy, please open an issue or start a discussion on our official repository:
+[https://github.com/PurveshShinde/Neko-Music](https://github.com/PurveshShinde/Neko-Music)

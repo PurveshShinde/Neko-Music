@@ -1,51 +1,88 @@
-# Design Architecture and Guidelines
+# Design Guidelines & Architecture
 
-This document outlines the visual language, theme architecture, and UI design principles implemented across Neko Music.
+This document describes the visual identity, UI architecture, and design patterns implemented in **Neko Music**.
 
 ---
 
 ## Design Principles
 
-1. **AMOLED-First Aesthetics**:
-   The primary visual foundation is pure pitch black (`#000000`). This conserves battery on OLED/AMOLED displays and produces maximum visual contrast for album artwork.
+### 1. Pure AMOLED First
+The foundational canvas color is pitch black (`#000000`). This accomplishes two critical goals:
+- **Maximum Power Efficiency**: Pixels on OLED/AMOLED displays are completely powered off, providing notable battery savings during long playback sessions.
+- **Infinite Contrast**: Album artwork and dynamic accent glows pop vibrantly against an unlit backdrop.
 
-2. **Liquid Glass & Glassmorphism**:
-   Secondary layers (such as mini-players, bottom sheets, navigation capsules, and speed-dial grids) utilize subtle glassmorphic blur effects (`BackdropFilter`) combined with semi-transparent dark tints.
+### 2. Liquid Glass & Frosted Surfaces
+Instead of opaque flat panels, secondary and floating layers utilize **liquid glass aesthetics**:
+- Semi-transparent dark surfaces (`Color(0xCC1A1A1A)`) combined with subtle background blurs (`Modifier.blur`).
+- Applied across bottom navigation capsules, bottom sheets, mini-player docks, and dialog overlays.
 
-3. **Artwork-Driven Dynamic Accentuation**:
-   Color accents dynamically adapt to the currently playing track. Album artwork is analyzed at runtime using `palette_generator` to extract dominant and vibrant colors that tint playback controls, progress bars, and glowing background ambiences.
+### 3. Real-Time Dynamic Color Adaptation
+Colors adapt dynamically to the music currently playing:
+- The active track's cover art is sampled at runtime to extract dominant, vibrant, and muted color swatches.
+- These extracted hues dynamically tint the now-playing background glow, progress slider, volume controls, and active playback buttons.
 
-4. **Clutter-Free Minimalism**:
-   Every visual component serves an immediate playback or navigation function. Distracting animations and unnecessary chrome are omitted to maintain focus on the audio experience.
+### 4. Fluid Geometry & Squircles
+- Rather than sharp standard rounded rectangles, prominent cards and dialogs utilize continuous-curvature squircles (`AbsoluteSmoothCornerShape`) with 60% smoothness parameters.
+- Creates an organic, tactile aesthetic consistent with modern expressive mobile interfaces.
 
 ---
 
-## Color System
+## Jetpack Compose Color System
 
-| Token | Hex Value | Usage |
+Neko Music utilizes a custom Material 3 color scheme tuned for pitch-black AMOLED displays:
+
+| Color Token | Default Hex | Compose Usage |
 | :--- | :--- | :--- |
-| `background` | `#000000` | Primary scaffold background across all screens |
-| `surface` | `#121212` | Card backgrounds, elevated sheets, and dialogs |
-| `surfaceContainer` | `#1A1A1A` | Secondary container layers and input fields |
-| `textPrimary` | `#FFFFFF` | Track titles, headers, and primary actions |
-| `textSecondary` | `#A0A0A0` | Artist names, durations, and secondary labels |
-| `accentDefault` | `#1DB954` | Default accent color prior to dynamic artwork tinting |
+| `background` | `#000000` | Scaffold root background across all screens |
+| `surface` | `#0C0C0C` | Slightly elevated container surfaces and cards |
+| `surfaceVariant` | `#161616` | Sheet backgrounds, menu items, search bars |
+| `surfaceContainerLow` | `#121212` | Nested dialog card containers |
+| `primary` | `#1DB954` *(adaptive)* | Active playback controls, track progress, key actions |
+| `onPrimary` | `#000000` | Icons and typography rendered on top of primary buttons |
+| `onSurface` | `#FFFFFF` | Primary headers, track names, and prominent typography |
+| `onSurfaceVariant` | `#A0A0A0` | Subtitles, artist names, secondary metadata, and timestamps |
 
 ---
 
 ## Typography
 
-Neko Music utilizes clean sans-serif typography via `google_fonts` configured in `lib/theme/neko_theme.dart`:
-- **Headings**: Medium to bold weights with tight letter spacing for modern presentation.
-- **Body & Subtitles**: Regular weight with high legibility across varied device densities.
-- **Player Timers**: Monospaced tabular numerals to prevent layout shifting during track progression.
+Typography is powered by Google Fonts loaded dynamically through Compose's `FontFamily`:
+- **Display & Headlines**: Bold, modern sans-serif with tight letter-spacing for artist profiles and screen headers.
+- **Body & Captions**: Highly legible weights optimized for varying ambient light levels.
+- **Time Indicators**: Configured with monospaced tabular figures (`FontFeature("tnum")`) to eliminate layout jitter as seconds elapse during track playback.
 
 ---
 
 ## Key UI Components
 
-- **Bottom Navigation Capsule**: A floating, pill-shaped navigation container with frosted glass blur (`lib/widgets/bottom_nav_capsule.dart`).
-- **Liquid Glass Mini Player**: Persistent audio control bar positioned above the navigation capsule with smooth transition animations into the full player (`lib/widgets/liquid_glass_container.dart`).
-- **Dynamic Background Ambience**: Subtle radial blur gradients derived from active track artwork (`lib/widgets/dynamic_app_background.dart`).
-- **Vintage Noise Overlay**: Optional tactile film grain overlay for nostalgic visual texture (`lib/widgets/vintage_noise_overlay.dart`).
+```mermaid
+graph TD
+    Root["Root Scaffold (AMOLED #000000)"]
+    Root --> TopBar["Transparent Top Bar (Search & Quick Settings)"]
+    Root --> BodyContent["Scrollable Content (LazyColumn / Grid)"]
+    Root --> FloatingUI["Floating Layer (Liquid Glass)"]
+    FloatingUI --> MiniPlayer["Expandable Mini Player Dock"]
+    FloatingUI --> NavCapsule["Floating Navigation Toolbar"]
+```
 
+### 1. Floating Navigation Toolbar
+- Floating pill-shaped bar positioned above the bottom system inset.
+- Features frosted glass transparency, smooth tab transitions, and an integrated quick-access microphone button for instant Shazam song recognition.
+
+### 2. Expandable Mini Player
+- Sits seamlessly above the navigation capsule when media is active.
+- Displays album art, track title, artist name, and a quick play/pause button.
+- Tapping or swiping upward triggers a smooth Shared Element transition into the full-screen player.
+
+### 3. Full-Screen Now-Playing Experience
+- **Looping Video Canvas**: For supported tracks, fetches and renders Apple Music or Canvas short looping video backgrounds (`AppleMusicCanvasProvider`).
+- **Synchronized Lyrics**: Fluid, word-by-word and syllable-by-syllable synchronized lyrics display with auto-scroll and jump-to-timestamp capabilities.
+- **Waveform & Scrubbing**: Interactive waveform scrub bar with precise seek feedback.
+
+### 4. Interactive Home Screen Widgets
+Neko Music ships with multiple home screen widget styles designed in Jetpack Glance:
+- **Modern Flow (4x2)**: Full media controls, cover art, and progress indicator.
+- **Vintage Vinyl Turntable (4x2 / 2x2)**: Nostalgic animated turntable aesthetic.
+- **Compact Glow (2x2)**: Minimalist square widget with artwork-tinted halo glow.
+- **Slim Pill Strip (4x1)**: Low-profile single-row playback controls.
+- **Music Recognizer Widget**: One-tap quick audio fingerprinting from the home screen.

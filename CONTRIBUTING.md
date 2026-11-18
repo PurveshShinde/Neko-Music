@@ -1,66 +1,87 @@
 # Contributing to Neko Music
 
-Thank you for considering contributing to Neko Music. This project is open-source and welcomes pull requests, bug reports, and enhancements.
+Thank you for your interest in contributing to **Neko Music**! We welcome contributions from developers of all experience levels—whether fixing bugs, improving documentation, designing UI components, or optimizing audio pipelines.
 
 ---
 
 ## Code of Conduct
 
-All contributors and participants are expected to adhere to the standards outlined in [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+All contributors, maintainers, and community participants are expected to adhere to our [Code of Conduct](CODE_OF_CONDUCT.md). Please treat everyone with respect and empathy.
 
 ---
 
 ## Development Workflow
 
-1. **Check Existing Issues**
+### 1. Check Existing Issues
+Before beginning work on a new feature or substantial bugfix, check the [Issues](https://github.com/PurveshShinde/Neko-Music/issues) tab to verify if the topic is already being discussed or actively worked on. If not, consider opening an issue first to discuss your proposal.
 
-   Before beginning work, check the issue tracker to ensure the feature or bug is not already being addressed.
+### 2. Fork and Branch
+Fork the repository and create a dedicated branch from `main`:
 
-2. **Fork and Branch**
+```bash
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/issue-description
+```
 
-   Fork the repository and create a dedicated branch from `main`:
+### 3. Setup Your Environment
+Follow the setup guide in [SETUP.md](SETUP.md) to configure your Android SDK, NDK, and `local.properties`.
 
-   ```bash
-   git checkout -b feature/your-feature-name
-   # or
-   git checkout -b fix/issue-description
-   ```
+### 4. Coding Standards
 
-3. **Follow Local Setup Steps**
+#### Kotlin & Jetpack Compose Guidelines
+- **Modern Kotlin**: Write idiomatic Kotlin (favor immutable `val`, coroutine flows, and Kotlin serialization).
+- **Compose Best Practices**:
+  - Keep Composables stateless where feasible; hoist state into ViewModels.
+  - Use `remember` and `derivedStateOf` appropriately to prevent unnecessary recompositions.
+  - Follow Compose naming conventions (PascalCase for `@Composable` functions returning `Unit`).
+- **Clean Architecture & Separation of Concerns**:
+  - UI logic belongs in `:app`.
+  - Audio playback pipelines belong in `:playback`.
+  - Database entities and DAO migrations belong in `:core`.
+  - Pure domain contracts belong in `:domain`.
+  - Native audio drivers belong in `:usbaudio` and `:audio-dsp`.
 
-   Refer to [SETUP.md](SETUP.md) for environment configuration, dependency installation, and code generation commands.
+### 5. Formatting & Verification
 
-4. **Code Quality and Formatting**
+Before committing, verify that your code compiles cleanly and passes all test suites:
 
-   Ensure your code conforms to the project lint rules defined in `analysis_options.yaml`:
+```bash
+# 1. Run unit tests across all modules
+./gradlew test
 
-   ```bash
-   flutter analyze
-   ```
+# 2. Run Android lint checks
+./gradlew lint
 
-   Format your Dart files before committing:
+# 3. Assemble debug APK to verify full compilation
+./gradlew assembleArm64FossDebug
 
-   ```bash
-   dart format .
-   ```
+# (On Windows PowerShell, use .\gradlew.bat)
+```
 
-5. **Commit Message Guidelines**
+In Android Studio, format your code with **Code $\rightarrow$ Reformat Code** (`Ctrl + Alt + L` / `Cmd + Option + L`).
 
-   Write clear, concise commit messages following standard conventions:
-   - `feat: add custom equalizer preset storage`
-   - `fix: resolve playback pause on incoming phone call`
-   - `docs: update setup instructions for Android 14`
-   - `refactor: optimize track metadata caching layer`
+### 6. Commit Message Conventions
 
-6. **Submitting a Pull Request**
-
-   - Push your branch to your fork.
-   - Open a Pull Request targeting the `main` branch.
-   - Provide a clear summary of changes, rationale, and any manual verification performed.
+Write clear, descriptive commit messages adhering to standard semantic commit conventions:
+- `feat: add custom EQ band preset export`
+- `fix: resolve Bit-Perfect USB audio buffer underrun`
+- `docs: update setup guide for NDK 28`
+- `refactor: optimize lyrics synchronizer scroll performance`
 
 ---
 
-## License Agreement
+## Submitting a Pull Request (PR)
 
-By contributing to Neko Music, you agree that your contributions will be licensed under the project's [MIT License](LICENSE).
+1. Push your branch to your GitHub fork:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+2. Open a Pull Request targeting the `main` branch.
+3. Provide a clear description of:
+   - What changed and why.
+   - Screenshots or screen recordings for UI-related changes.
+   - Any manual testing steps performed.
+4. Respond to feedback or requested changes during the code review process.
 
+Thank you for helping make Neko Music better for everyone! 🎧

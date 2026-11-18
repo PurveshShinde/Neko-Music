@@ -1,0 +1,9 @@
+package neko.music.app.playback
+
+import neko.music.app.models.MediaMetadata
+
+data class LyricsWithProvider(val lyrics: String?, val providerName: String)
+
+interface ILyricsHelper {
+  suspend fun getLyrics(mediaMetadata: MediaMetadata): LyricsWithProvider
+}
