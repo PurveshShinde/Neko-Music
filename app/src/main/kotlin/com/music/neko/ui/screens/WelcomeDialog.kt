@@ -58,12 +58,22 @@ fun WelcomeDialog(onDismissRequest: () -> Unit) {
         // Main Header
         WelcomeAppCard()
 
+        // Developer & Project Cards
         WelcomeSectionCard(title = "Developer") {
           WelcomeActionRow(
             icon = painterResource(R.drawable.github),
-            title = "GitHub",
+            title = "Developer Profile",
             subtitle = "@PurveshShinde",
-            onClick = { uriHandler.openUri("https://github.com/PurveshShinde") }
+            onClick = { uriHandler.openUri(neko.music.app.config.NekoUpdateConfig.DEVELOPER_GITHUB_PROFILE_URL) }
+          )
+        }
+
+        WelcomeSectionCard(title = "Project") {
+          WelcomeActionRow(
+            icon = painterResource(R.drawable.github),
+            title = "Neko Music Repository",
+            subtitle = "PurveshShinde/Neko-Music",
+            onClick = { uriHandler.openUri(neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL) }
           )
         }
 
@@ -88,7 +98,7 @@ fun WelcomeDialog(onDismissRequest: () -> Unit) {
               modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Star the Repo", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Text("Star Neko Music", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
           }
         }
 

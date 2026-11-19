@@ -58,34 +58,6 @@ fun AboutScreen(
   highlightKey: String? = null
 ) {
   val uriHandler = LocalUriHandler.current
-
-  data class Contributor(val login: String, val avatarUrl: String, val htmlUrl: String)
-  var contributors by remember { mutableStateOf<List<Contributor>>(emptyList()) }
-
-  LaunchedEffect(Unit) {
-    if (!neko.music.app.config.NekoUpdateConfig.isConfigured) return@LaunchedEffect
-    withContext(Dispatchers.IO) {
-      try {
-        val url = java.net.URL("https://api.github.com/repos/${neko.music.app.config.NekoUpdateConfig.GITHUB_OWNER}/${neko.music.app.config.NekoUpdateConfig.GITHUB_REPO}/contributors")
-        val json = url.openStream().bufferedReader().use { it.readText() }
-        val array = JSONArray(json)
-        val list = mutableListOf<Contributor>()
-        for (i in 0 until array.length()) {
-          val obj = array.getJSONObject(i)
-          list.add(
-            Contributor(
-              obj.getString("login"),
-              obj.getString("avatar_url"),
-              obj.getString("html_url")
-            )
-          )
-        }
-        contributors = list
-      } catch (e: Exception) {
-        e.printStackTrace()
-      }
-    }
-  }
   val context = LocalContext.current
 
   Scaffold(
@@ -142,30 +114,7 @@ fun AboutScreen(
     ) {
       item { AboutAppCard() }
 
-      if (contributors.isNotEmpty()) {
-        item {
-          Column(modifier = Modifier.fillMaxWidth()) {
-            neko.music.app.ui.component.PreferenceGroupTitle(title = "Contributors")
-            Row(
-              modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-              horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-              contributors.forEach { contributor ->
-                coil3.compose.AsyncImage(
-                  model = contributor.avatarUrl,
-                  contentDescription = contributor.login,
-                  modifier =
-                    Modifier.size(48.dp).clip(CircleShape).clickable {
-                      uriHandler.openUri(contributor.htmlUrl)
-                    },
-                  contentScale = androidx.compose.ui.layout.ContentScale.Crop
-                )
-              }
-            }
-          }
-        }
-      }
-
+      // 1. DEVELOPER
       item {
         Material3SettingsGroup(
           title = "Developer",
@@ -173,9 +122,69 @@ fun AboutScreen(
             listOf(
               Material3SettingsItem(
                 icon = painterResource(R.drawable.github),
-                title = { Text("GitHub") },
+                title = { Text("GitHub Profile") },
                 description = { Text("@PurveshShinde") },
-                onClick = { uriHandler.openUri("https://github.com/PurveshShinde") }
+                onClick = { uriHandler.openUri(neko.music.app.config.NekoUpdateConfig.DEVELOPER_GITHUB_PROFILE_URL) }
+              ),
+              Material3SettingsItem(
+                icon = painterResource(R.drawable.website),
+                title = { Text("Developer Website") },
+                description = { Text("purveshshinde.vercel.app") },
+                onClick = { uriHandler.openUri(neko.music.app.config.NekoUpdateConfig.DEVELOPER_WEBSITE_URL) }
+              )
+            )
+        )
+      }
+
+      // 2. PROJECT
+      item {
+        Material3SettingsGroup(
+          title = "Project",
+          items =
+            listOf(
+              Material3SettingsItem(
+                icon = painterResource(R.drawable.github),
+                title = { Text("GitHub Repository") },
+                description = { Text("PurveshShinde/Neko-Music") },
+                onClick = { uriHandler.openUri(neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL) }
+              ),
+              Material3SettingsItem(
+                icon = painterResource(R.drawable.star),
+                title = { Text("Star Neko Music") },
+                description = { Text("Support the development of Neko Music by starring the repository.") },
+                onClick = { uriHandler.openUri(neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL) }
+              )
+            )
+        )
+      }
+
+      // 3. SUPPORT
+      item {
+        Material3SettingsGroup(
+          title = "Support",
+          items =
+            listOf(
+              Material3SettingsItem(
+                icon = painterResource(R.drawable.favorite),
+                title = { Text("Coming Soon") },
+                description = { Text("Support options will be available soon") },
+                onClick = null
+              )
+            )
+        )
+      }
+
+      // 4. COMMUNITY
+      item {
+        Material3SettingsGroup(
+          title = "Community",
+          items =
+            listOf(
+              Material3SettingsItem(
+                icon = painterResource(R.drawable.group),
+                title = { Text("Coming Soon") },
+                description = { Text("Community channels will be announced soon") },
+                onClick = null
               )
             )
         )
@@ -235,7 +244,7 @@ private fun AboutAppCard() {
     ) {
       if (rotation <= 90f) {
         Image(
-          painter = painterResource(R.drawable.icon),
+          painter = painterResource(R.drawable.ic_launcher_nobg),
           contentDescription = null,
           modifier = Modifier.fillMaxSize()
         )

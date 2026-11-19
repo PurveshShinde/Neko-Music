@@ -56,17 +56,6 @@ android {
     buildConfigField("String", "GH_CLIENT_ID", "\"$githubClientId\"")
     buildConfigField("String", "GH_CLIENT_SECRET", "\"$githubClientSecret\"")
 
-    buildConfigField(
-      "String",
-      "FLOW_NEURO_BASE_URL",
-      project.findProperty("FLOW_NEURO_BASE_URL")?.toString()?.let { "\"$it\"" }
-        ?: "\"https://api.flowneuroengine.com\""
-    )
-    buildConfigField(
-      "String",
-      "FLOW_NEURO_API_KEY",
-      project.findProperty("FLOW_NEURO_API_KEY")?.toString()?.let { "\"$it\"" } ?: "\"\""
-    )
 
     // add nightly build label support
     val isNightly = project.hasProperty("nightly") && project.property("nightly") == "true"

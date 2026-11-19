@@ -10,8 +10,11 @@ package neko.music.app.config
  *    and optionally a "changelog.json".
  */
 object NekoUpdateConfig {
-  const val GITHUB_OWNER = "NEKO_USERNAME"
-  const val GITHUB_REPO = "NEKO_REPOSITORY"
+  const val GITHUB_OWNER = "PurveshShinde"
+  const val GITHUB_REPO = "Neko-Music"
+
+  const val DEVELOPER_GITHUB_PROFILE_URL = "https://github.com/PurveshShinde"
+  const val DEVELOPER_WEBSITE_URL = "https://purveshshinde.vercel.app/"
 
   /**
    * Evaluates true only when valid user/repo coordinates are provided.

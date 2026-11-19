@@ -437,7 +437,7 @@
     <string name="restore_failed">Error al restaurar la copia de seguridad</string>
 
     <string name="discord_integration">Integración con Discord</string>
-    <string name="discord_information">echomusic utiliza la biblioteca KizzyRPC para actualizar el estado de tu cuenta de Discord. Esto implica conectarse a Discord Gateway, lo cual podría considerarse una infracción de los Términos de Servicio de Discord. Sin embargo, no se conocen casos de cuentas suspendidas por este motivo. Úsalo bajo tu propia responsabilidad.\n\nechomusic solo extraerá tu token y todo lo demás se guarda localmente.</string>
+    <string name="discord_information">Neko Music utiliza la biblioteca KizzyRPC para actualizar el estado de tu cuenta de Discord. Esto implica conectarse a Discord Gateway, lo cual podría considerarse una infracción de los Términos de Servicio de Discord. Sin embargo, no se conocen casos de cuentas suspendidas por este motivo. Úsalo bajo tu propia responsabilidad.\n\nechomusic solo extraerá tu token y todo lo demás se guarda localmente.</string>
     <string name="dismiss">Descartar</string>
     <string name="options">Opciones</string>
     <string name="preview">Vista previa</string>
