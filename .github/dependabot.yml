@@ -10,9 +10,20 @@ updates:
       gradle-dependencies:
         patterns:
           - "*"
-    labels:
-      - "dependencies"
-      
+        exclude-patterns:
+          - "org.jetbrains.kotlin:*"
+          - "org.jetbrains.kotlin.plugin.compose"
+          - "org.jetbrains.kotlin.plugin.serialization"
+          - "com.google.devtools.ksp"
+          - "gradle-wrapper"
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      - dependency-name: "com.google.android.gms:play-services-cronet"
+        versions:
+          - "18.1.1"
+
   # Enable updates for GitHub Actions workflows
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -22,6 +33,3 @@ updates:
       actions:
         patterns:
           - "*"
-    labels:
-      - "dependencies"
-      - "github_actions"

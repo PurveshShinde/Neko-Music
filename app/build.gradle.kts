@@ -308,7 +308,6 @@ dependencies {
   // GMS Location Services for high-accuracy weather AI context
   "gmsImplementation"(libs.play.services.location)
 
-  implementation(libs.haze)
   implementation(libs.guava)
   implementation(libs.coroutines.guava)
   implementation(libs.concurrent.futures)
