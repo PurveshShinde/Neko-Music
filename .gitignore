@@ -26,6 +26,13 @@ lastfm/build/
 lastfm-empty/build/
 */build/
 
+# Release artifacts
+release/
+
+# Keystores & Signing credentials
+*.jks
+*.keystore
+release-keystore/
 # Gradle
 .gradle/
 

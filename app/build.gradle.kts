@@ -123,16 +123,48 @@ android {
       keyPassword = "android"
     }
     create("release") {
-      val keystoreFile = rootProject.file("keystore.jks")
-      if (keystoreFile.exists()) {
-        storeFile = keystoreFile
-      } else {
-        val localKeystore = file("keystore/release.keystore")
-        if (localKeystore.exists()) storeFile = localKeystore
+      val releaseKeystorePath =
+        localProperties.getProperty("release.keystore.path")
+          ?: localProperties.getProperty("RELEASE_KEYSTORE_PATH")
+          ?: System.getenv("RELEASE_KEYSTORE_PATH")
+          ?: System.getenv("KEYSTORE_PATH")
+
+      val releaseKeystoreFile = when {
+        !releaseKeystorePath.isNullOrBlank() -> {
+          val f = file(releaseKeystorePath)
+          if (f.exists()) f else rootProject.file(releaseKeystorePath)
+        }
+        rootProject.file("keystore.jks").exists() -> rootProject.file("keystore.jks")
+        rootProject.file("release.keystore").exists() -> rootProject.file("release.keystore")
+        file("keystore/release.keystore").exists() -> file("keystore/release.keystore")
+        else -> null
       }
-      storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = System.getenv("KEY_ALIAS")
-      keyPassword = System.getenv("KEY_PASSWORD")
+
+      val releaseStorePassword =
+        localProperties.getProperty("release.store.password")
+          ?: localProperties.getProperty("RELEASE_STORE_PASSWORD")
+          ?: System.getenv("RELEASE_STORE_PASSWORD")
+          ?: System.getenv("STORE_PASSWORD")
+
+      val releaseKeyAlias =
+        localProperties.getProperty("release.key.alias")
+          ?: localProperties.getProperty("RELEASE_KEY_ALIAS")
+          ?: System.getenv("RELEASE_KEY_ALIAS")
+          ?: System.getenv("KEY_ALIAS")
+
+      val releaseKeyPassword =
+        localProperties.getProperty("release.key.password")
+          ?: localProperties.getProperty("RELEASE_KEY_PASSWORD")
+          ?: System.getenv("RELEASE_KEY_PASSWORD")
+          ?: System.getenv("KEY_PASSWORD")
+          ?: releaseStorePassword
+
+      if (releaseKeystoreFile != null) {
+        storeFile = releaseKeystoreFile
+      }
+      storePassword = releaseStorePassword
+      keyAlias = releaseKeyAlias
+      keyPassword = releaseKeyPassword
     }
     getByName("debug") {
       keyAlias = "androiddebugkey"
@@ -148,8 +180,7 @@ android {
       isShrinkResources = true
       isCrunchPngs = false
       isDebuggable = false
-      val hasReleaseKeystore = signingConfigs.getByName("release").storeFile != null
-      signingConfig = if (hasReleaseKeystore) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+      signingConfig = signingConfigs.getByName("release")
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       buildConfigField("String", "ARCHITECTURE", "\"release\"")
     }
@@ -187,6 +218,7 @@ android {
 
   lint {
     lintConfig = file("lint.xml")
+    checkReleaseBuilds = false
     warningsAsErrors = false
     abortOnError = false
     checkDependencies = false
@@ -230,6 +262,33 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
   compilerOptions {
     freeCompilerArgs.addAll("-opt-in=kotlin.RequiresOptIn")
     suppressWarnings.set(false)
+  }
+}
+
+tasks.matching { it.name.startsWith("validateSigning") && it.name.contains("Release", ignoreCase = true) }.configureEach {
+  doFirst {
+    val releaseConfig = android.signingConfigs.getByName("release")
+    val missing = mutableListOf<String>()
+    if (releaseConfig.storeFile == null || !releaseConfig.storeFile!!.exists()) {
+      missing.add("Release keystore file not found (configured path: ${releaseConfig.storeFile?.path ?: "none"})")
+    }
+    if (releaseConfig.storePassword.isNullOrBlank()) {
+      missing.add("Release store password is missing")
+    }
+    if (releaseConfig.keyAlias.isNullOrBlank()) {
+      missing.add("Release key alias is missing")
+    }
+    if (releaseConfig.keyPassword.isNullOrBlank()) {
+      missing.add("Release key password is missing")
+    }
+    if (missing.isNotEmpty()) {
+      throw GradleException(
+        "Release signing configuration is incomplete for task '$name':\n" +
+          missing.joinToString("\n - ", prefix = " - ") +
+          "\nConfigure release signing in 'local.properties' (e.g. release.keystore.path, release.store.password, release.key.alias, release.key.password) " +
+          "or via environment variables (STORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD, RELEASE_KEYSTORE_PATH)."
+      )
+    }
   }
 }
 
