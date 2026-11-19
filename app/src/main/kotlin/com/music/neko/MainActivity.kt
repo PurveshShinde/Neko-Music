@@ -559,6 +559,10 @@ class MainActivity : ComponentActivity() {
         }
       }
 
+      if (!neko.music.app.config.NekoUpdateConfig.isConfigured) {
+        saveUpdateAvailableState(context, false)
+      }
+
       if (lastSeenVersion.isEmpty()) {
         // Fresh install, not an update — nothing "new" to show, so mark this
         // version seen right away rather than waiting on a dialog dismissal.

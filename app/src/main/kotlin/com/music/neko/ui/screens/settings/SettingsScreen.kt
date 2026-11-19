@@ -55,7 +55,8 @@ fun SettingsScreen(
   val context = LocalContext.current
   val isAndroid12OrLater = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
   val isUpdateAvailable =
-    getUpdateAvailableState(context) &&
+    neko.music.app.config.NekoUpdateConfig.isConfigured &&
+      getUpdateAvailableState(context) &&
       neko.music.app.echomusic.updater.getAutoUpdateCheckSetting(context)
 
   var searchQuery by rememberSaveable { mutableStateOf("") }

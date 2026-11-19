@@ -73,7 +73,10 @@ fun UpdateSettings(
     mutableStateOf(getUpdateNotificationsSetting(context))
   }
   var betaUpdatesEnabled by remember { mutableStateOf(getBetaUpdatesSetting(context)) }
-  val isUpdateAvailable = getUpdateAvailableState(context) && autoUpdateEnabled
+  val isUpdateAvailable =
+    neko.music.app.config.NekoUpdateConfig.isConfigured &&
+      getUpdateAvailableState(context) &&
+      autoUpdateEnabled
   var apkCount by remember { mutableStateOf(getDownloadedApkCount(context)) }
   var showInfoDialog by remember { mutableStateOf(false) }
   var releaseNotes by remember { mutableStateOf<String?>(null) }

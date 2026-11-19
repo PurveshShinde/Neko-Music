@@ -8,6 +8,7 @@ import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
@@ -832,12 +833,20 @@ fun PlaylistListItem(
               stringResource(R.string.uploaded_playlist) -> R.drawable.backup
               else -> if (autoPlaylist) R.drawable.trending_up else R.drawable.ic_launcher_nobg
             }
-          Icon(
-            painter = painterResource(painter),
-            contentDescription = null,
-            tint = LocalContentColor.current.copy(alpha = 0.8f),
-            modifier = Modifier.size(ListThumbnailSize / 2)
-          )
+          if (painter == R.drawable.ic_launcher_nobg) {
+            Image(
+              painter = painterResource(painter),
+              contentDescription = null,
+              modifier = Modifier.size(ListThumbnailSize / 2)
+            )
+          } else {
+            Icon(
+              painter = painterResource(painter),
+              contentDescription = null,
+              tint = LocalContentColor.current.copy(alpha = 0.8f),
+              modifier = Modifier.size(ListThumbnailSize / 2)
+            )
+          }
         },
         shape = RoundedCornerShape(ThumbnailCornerRadius)
       )
@@ -942,12 +951,20 @@ fun PlaylistGridItem(
               else -> if (autoPlaylist) R.drawable.trending_up else R.drawable.ic_launcher_nobg
             }
           Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            Icon(
-              painter = painterResource(painter),
-              contentDescription = null,
-              tint = LocalContentColor.current.copy(alpha = 0.8f),
-              modifier = Modifier.size(width / 2)
-            )
+            if (painter == R.drawable.ic_launcher_nobg) {
+              Image(
+                painter = painterResource(painter),
+                contentDescription = null,
+                modifier = Modifier.size(width / 2)
+              )
+            } else {
+              Icon(
+                painter = painterResource(painter),
+                contentDescription = null,
+                tint = LocalContentColor.current.copy(alpha = 0.8f),
+                modifier = Modifier.size(width / 2)
+              )
+            }
           }
         },
         shape = RoundedCornerShape(ThumbnailCornerRadius)

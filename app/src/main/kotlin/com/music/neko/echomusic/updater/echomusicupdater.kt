@@ -568,16 +568,19 @@ const val KEY_BETA_UPDATES = "beta_updates"
 const val KEY_UPDATE_AVAILABLE = "update_available"
 
 fun getUpdateAvailableState(context: Context): Boolean {
+  if (!neko.music.app.config.NekoUpdateConfig.isConfigured) return false
   val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
   return sharedPrefs.getBoolean(KEY_UPDATE_AVAILABLE, false)
 }
 
 fun saveUpdateAvailableState(context: Context, available: Boolean) {
   val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-  sharedPrefs.edit().putBoolean(KEY_UPDATE_AVAILABLE, available).apply()
+  val actualAvailable = available && neko.music.app.config.NekoUpdateConfig.isConfigured
+  sharedPrefs.edit().putBoolean(KEY_UPDATE_AVAILABLE, actualAvailable).apply()
 }
 
 fun getAutoUpdateCheckSetting(context: Context): Boolean {
+  if (!neko.music.app.config.NekoUpdateConfig.isConfigured) return false
   val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
   return sharedPrefs.getBoolean(KEY_AUTO_UPDATE_CHECK, true)
 }
