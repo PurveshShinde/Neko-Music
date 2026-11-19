@@ -293,7 +293,7 @@ tasks.matching { it.name.startsWith("validateSigning") && it.name.contains("Rele
 }
 
 dependencies {
-  implementation("nl.dionsegijn:konfetti-compose:2.0.4")
+  implementation("nl.dionsegijn:konfetti-compose:2.2.0")
 
   implementation(project(":core"))
   implementation(project(":playback"))
@@ -302,7 +302,7 @@ dependencies {
   implementation(project(":usbaudio"))
 
   // Firebase - GMS flavor only (excluded from F-Droid / FOSS builds)
-  "gmsImplementation"(platform("com.google.firebase:firebase-bom:34.19.0"))
+  "gmsImplementation"(platform("com.google.firebase:firebase-bom:35.2.0"))
   "gmsImplementation"("com.google.firebase:firebase-analytics")
 
   // GMS Location Services for high-accuracy weather AI context
@@ -351,7 +351,7 @@ dependencies {
   implementation(libs.media3.ui)
   implementation(libs.media3.okhttp)
   implementation(libs.media3.cronet)
-  implementation("com.google.android.gms:play-services-cronet:18.0.1")
+  implementation("com.google.android.gms:play-services-cronet:18.1.1")
 
   // Google Cast - only included in GMS flavor (not available in F-Droid/FOSS builds)
   "gmsImplementation"(libs.mediarouter)
@@ -406,7 +406,7 @@ dependencies {
   implementation(libs.work.runtime.ktx)
   implementation(libs.androidx.core.splashscreen)
   implementation(libs.ffmpeg.kit.audio)
-  implementation("io.github.dokar3:quickjs-kt-android:1.0.14")
+  implementation("io.github.dokar3:quickjs-kt-android:1.0.18")
 
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
