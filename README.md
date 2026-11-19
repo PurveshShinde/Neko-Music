@@ -1,13 +1,7 @@
-<p align="center">
-  <img src="assets/banner.png" alt="Neko Music Banner" width="100%" />
-</p>
-
-<h1 align="center">Neko Music</h1>
-
-<p align="center">
-  A sleek, ad-free, open-source music streaming client for Android.<br>
-  Built natively with <b>Kotlin</b> and <b>Jetpack Compose</b>, featuring audiophile Bit-Perfect USB DAC output, multi-source synced lyrics, and an immersive AMOLED design.
-</p>
+<div align="center">
+  <img src="assets/banner.png" alt="Neko Music Banner" width="100%"/>
+  <p><b>A modern, ad-free Android music streaming client built natively with Kotlin and Jetpack Compose.</b></p>
+</div>
 
 <p align="center">
   <a href="https://kotlinlang.org"><img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF.svg?style=flat&logo=kotlin&logoColor=white" alt="Kotlin"></a>
@@ -16,158 +10,236 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg?style=flat" alt="GPL-3.0 License"></a>
 </p>
 
-<p align="center">
-  <a href="#features">Features</a> &bull;
-  <a href="#architecture">Architecture</a> &bull;
-  <a href="SETUP.md">Setup &amp; Build</a> &bull;
-  <a href="DESIGN.md">Design Guidelines</a> &bull;
-  <a href="CONTRIBUTING.md">Contributing</a> &bull;
-  <a href="CREDITS.md">Credits &amp; Lineage</a> &bull;
-  <a href="PRIVACY_POLICY.md">Privacy Policy</a>
-</p>
-
 ---
 
 ## Overview
 
-**Neko Music** is an independent, feature-rich Android music streaming client designed around user autonomy, audio quality, and visual elegance.
+**Neko Music** is an ad-free, open-source Android music streaming client engineered for audiophiles, enthusiasts, and users who value privacy and design.
 
-Streaming directly from YouTube Music via the InnerTube API, Neko Music delivers uninterrupted, ad-free audio playback with zero background telemetry. The application is built using **Kotlin**, **Jetpack Compose (Material 3)**, and a modular **Clean Architecture**.
+Operating directly with YouTube Music via the InnerTube API, Neko Music provides uninterrupted, high-fidelity audio streaming without advertisements, proprietary tracking, or background telemetry. The app features native Bit-Perfect USB DAC audio output, multi-source synchronized lyrics, a responsive parametric equalizer, and an immersive Material 3 user interface with full AMOLED dark mode.
 
-Neko Music is derived from **Echo Music**, with ancestral roots in **InnerTune** and **ViMusic**, incorporating Spotify integration from **Vivi Music**, widgets from **Metrolist**, and sovereign branding, infrastructure, and refinements maintained by [Purvesh Shinde](https://github.com/PurveshShinde).
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Audio Extensions](#audio-extensions)
+- [Installation & Setup](#installation--setup)
+- [Architecture](#architecture)
+- [Documentation](#documentation)
+- [Contributors](#contributors)
+- [Lineage & Special Thanks](#lineage--special-thanks)
+- [Legal Disclaimer & Terms of Use](#legal-disclaimer--terms-of-use)
+- [Developer & Contact](#developer--contact)
+- [License](#license)
+
+---
+
+## Screenshots
+
+<div align="left">
+  <table style="margin: 0 auto; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 15px; border: none;">
+        <b>Home Screen</b><br><br>
+        <img src="Screenshots/Home.png" alt="Home Screen" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
+      </td>
+      <td align="center" style="padding: 15px; border: none;">
+        <b>Material Player</b><br><br>
+        <img src="Screenshots/Material%20you%20music%20page.png" alt="Material Player" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
+      </td>
+      <td align="center" style="padding: 15px; border: none;">
+        <b>Apple Style Player</b><br><br>
+        <img src="Screenshots/Apple%20inspired%20music%20page.png" alt="Apple Style Player" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" style="padding: 15px; border: none;">
+        <b>Synchronized Lyrics</b><br><br>
+        <img src="Screenshots/lyrics.png" alt="Synchronized Lyrics" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
+      </td>
+      <td align="center" style="padding: 15px; border: none;">
+        <b>Search &amp; Explore</b><br><br>
+        <img src="Screenshots/search%20page.png" alt="Search &amp; Explore" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
+      </td>
+      <td align="center" style="padding: 15px; border: none;">
+        <b>Music Library</b><br><br>
+        <img src="Screenshots/library.png" alt="Music Library" width="220" style="border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2);"/>
+      </td>
+    </tr>
+  </table>
+</div>
 
 ---
 
 ## Features
 
-### 🎧 Audio & Playback
-- **Ad-Free Playback**: Direct audio streaming with no promotional audio injections or sponsored interruptions.
-- **Bit-Perfect USB DAC Output**: Custom C++ JNI bridge and USB Host audio driver (`:usbaudio`) that bypasses the standard Android OS 48 kHz resampler.
-- **Parametric Equalizer & DSP**: 10-band equalizer, bass boost, virtualizer, and loudness normalization (`:audio-dsp`, `:dsp-core`).
-- **Gapless Playback & Crossfade**: Smooth track transitions with customizable duration.
-- **AndroidX Media3 (ExoPlayer)**: Native background audio service, persistent notification controls, and lock-screen media sessions.
-- **Offline Caching & Downloads**: Full offline song caching with local database export.
+<details>
+<summary><b>Streaming &amp; Playback</b></summary>
+<br>
 
-### 📝 Lyrics & Visuals
-- **Multi-Source Synced Lyrics**: Aggregates time-synced lyrics from **LRCLIB**, **KuGou**, **BetterLyrics** (Apple/Spotify TTML syllable sync), **SimpMusic**, **PaxSenix**, **YouLyPlus**, and **Unison**.
-- **AI Lyrics Translation**: Real-time translation of foreign lyrics using OpenRouter, DeepL, or Mistral AI (using user-provided API keys).
-- **Dynamic Video Canvas**: Looping video backgrounds for supported tracks via Apple Music Canvas.
-- **Song Recognition**: Quick audio recognition powered by ShazamKit (`:shazamkit`).
+- **Ad-Free Streaming** — Direct audio streaming from YouTube Music without advertisements or sponsored interruptions.
+- **Background Playback** — Continuous playback with screen off or while multitasking using AndroidX Media3 ExoPlayer.
+- **Offline Mode &amp; Caching** — Download songs, albums, and playlists for offline playback via the built-in download manager.
+- **Gapless Playback &amp; Crossfade** — Configurable crossfade durations and gapless audio track transitions.
+- **Audio &amp; Video Mode Switching** — Toggle seamlessly between audio-only streams and companion video playback.
+- **Smart Queue Management** — Dynamic queue insertion, playlist mixing, and persistent queue state across app launches.
+</details>
 
-### 🎨 Design & Customization
-- **True AMOLED Dark Mode**: Pitch-black interface (`#000000`) engineered for OLED battery savings.
-- **Liquid Glass Aesthetic**: Glassmorphic blur sheets, squircle corner geometry, and fluid transition animations.
-- **Dynamic Color (Monet)**: Theme and accent palettes dynamically adapt to active track artwork.
-- **Home Screen Widgets**: Glance widgets including Modern Flow, Vintage Vinyl Turntable, Compact Glow, and Music Recognizer.
+<details>
+<summary><b>Audio Engine &amp; DSP</b></summary>
+<br>
 
-### 🌐 Integrations & Library
-- **Spotify Integration**: Connect your Spotify account to browse, search, and mirror your private and public Spotify playlists directly into Neko Music.
-- **Listen Together**: Synchronized group listening sessions over WebSockets with binary serialization.
-- **Last.fm Scrobbling**: Real-time track scrobbling and now-playing updates.
-- **Discord Rich Presence**: Live activity status on Discord displaying current track, artist, and playback state.
-- **Local Media Support**: Index, organize, and play local audio files alongside streaming music.
+- **Bit-Perfect USB DAC Output** — Native C++ JNI bridge and USB Host audio driver (`:usbaudio`) that bypasses the standard Android OS 48 kHz audio resampler for bit-perfect output.
+- **Parametric Equalizer** — 10-band equalizer with fine-grained frequency, gain, and bandwidth control (`:audio-dsp`, `:dsp-core`).
+- **Audio DSP Processing** — Integrated bass boost, virtualizer, and loudness normalization.
+- **Bluetooth Telemetry &amp; Codec Badging** — Real-time audio pipeline badges for active codecs, bit depth, and sample rates.
+</details>
+
+<details>
+<summary><b>Lyrics &amp; Visuals</b></summary>
+<br>
+
+- **Multi-Source Synced Lyrics** — Fallback aggregation across LRCLIB, KuGou, BetterLyrics, SimpMusic, YouLyPlus, and Unison.
+- **Syllable-Level Synchronization** — Word-by-word synchronized lyric rendering.
+- **AI Lyrics Translation** — In-app translation for foreign language lyrics using user-provided API keys (OpenRouter, DeepL, or Mistral AI).
+- **Animated Video Canvas** — Looping canvas video support for compatible tracks via Apple Music Canvas integration.
+- **Song Recognition** — On-device audio recognition powered by ShazamKit (`:shazamkit`).
+</details>
+
+<details>
+<summary><b>User Interface &amp; Customization</b></summary>
+<br>
+
+- **True AMOLED Dark Mode** — Pitch-black surfaces (`#000000`) optimized for battery efficiency on OLED displays.
+- **Liquid Glass Aesthetic** — Modern glassmorphism, customizable blur backdrops, and squircle corner geometry.
+- **Dynamic Monet Theming** — Theme accent colors adapt dynamically to current track album artwork.
+- **Glance Home Screen Widgets** — Multiple widget styles including Modern Flow, Vinyl Turntable, Compact Glow, and Music Recognizer.
+- **Customizable Layouts** — Adjustable player styles (Material 3 and Apple-inspired), thumbnail visibility, and UI density.
+</details>
+
+<details>
+<summary><b>Integrations &amp; Media Management</b></summary>
+<br>
+
+- **Spotify Playlist Mirroring** — Connect Spotify to browse and import public and private playlists directly into Neko Music.
+- **Listen Together** — Synchronized real-time playback sessions with friends over WebSockets.
+- **Last.fm Scrobbling** — Automatic track scrobbling and now-playing status updates.
+- **Discord Rich Presence** — Displays currently playing track, artist, and playback progress on Discord.
+- **Local Audio Indexing** — Scan, index, and organize local device music alongside streaming catalogs.
+</details>
+
+---
+
+## Audio Extensions
+
+Neko Music includes native client support for self-hosted audio extension servers, enabling higher-fidelity playback streams:
+
+- **320 kbps Audio Extension**: Streams high-bitrate 320 kbps MP3/AAC audio before falling back to YouTube Music.
+- **Lossless Audio Extension**: Streams studio-master lossless FLAC and ALAC audio (up to 24-bit / 192 kHz) with direct bit-perfect DAC pass-through.
+
+### How to Configure an Extension Server:
+1. Open Neko Music and navigate to **Settings** &rarr; **Extensions**.
+2. Tap **Add Custom Server**, specify a name, and enter your deployed server URL.
+3. Toggle **Prefer Extension Audio** to **ON** to prioritize extension audio sources over standard streaming.
+
+---
+
+## Installation & Setup
+
+### Pre-compiled Releases
+Pre-built APKs for supported architectures (ARM64 and Universal) are available on the **[Releases](https://github.com/PurveshShinde/Neko-Music/releases)** page.
+
+### Building from Source
+For complete prerequisites (Android Studio, JDK 21, Android SDK/NDK), release signing instructions, flavor options (`foss` vs `gms`), and build commands, refer to **[SETUP.md](SETUP.md)**.
+
+```bash
+# Clone the repository
+git clone https://github.com/PurveshShinde/Neko-Music.git
+cd Neko-Music
+
+# Build FOSS Debug APK (100% open-source variant)
+./gradlew assembleArm64FossDebug
+```
 
 ---
 
 ## Architecture
 
-Neko Music is structured across specialized Gradle modules:
+Neko Music is built on a clean, modular multi-project Gradle architecture:
 
-```mermaid
-graph TD
-    App[":app (UI, Navigation, DI)"] --> Playback[":playback (Media3 ExoPlayer)"]
-    App --> Core[":core (Room DB, DataStore, Repos)"]
-    App --> Lyrics[":lyrics (Lyrics Aggregator)"]
-    App --> Innertube[":innertube (YouTube Music API)"]
-    App --> UsbAudio[":usbaudio (JNI USB DAC Driver)"]
-    App --> AudioDsp[":audio-dsp (Equalizer & DSP)"]
-    App --> ShazamKit[":shazamkit (Song Recognition)"]
-    App --> Canvas[":canvas / :applecanvas (Video Canvas)"]
-    
-    Lyrics --> LrcLib[":lrclib"]
-    Lyrics --> KuGou[":kugou"]
-    Lyrics --> BetterLyrics[":betterlyrics"]
-    Lyrics --> SimpMusic[":simpmusic"]
-    Lyrics --> YouLyPlus[":youlyplus"]
-    Lyrics --> Unison[":unison"]
-    
-    Playback --> Core
-    Playback --> Domain[":domain"]
-    AudioDsp --> DspCore[":dsp-core"]
-```
-
-| Module | Purpose |
+| Module | Description |
 | :--- | :--- |
 | **`:app`** | Main entry point, Jetpack Compose UI screens, ViewModels, navigation, and dependency injection |
 | **`:core`** | Room SQLite database (`InternalDatabase`), schema migrations, DataStore, and shared utilities |
 | **`:domain`** | Pure Kotlin domain models, business logic interfaces, and contracts |
-| **`:playback`** | Media3 ExoPlayer service (`MusicService`), notification callback, queue management, and downloads |
+| **`:playback`** | Media3 ExoPlayer service (`MusicService`), notification management, queue control, and downloads |
 | **`:innertube`** | YouTube Music InnerTube client (stream resolution, search, playlists, albums, and artist info) |
-| **`:lyrics`** | Synchronized lyrics engine with fallback chain across 7+ providers and AI translation |
+| **`:lyrics`** | Synchronized lyrics engine with fallback chain across 6+ providers and AI translation |
 | **`:usbaudio`** | Native C++ JNI bridge and USB Host driver for Bit-Perfect DAC output |
-| **`:audio-dsp`** | Equalizer engine, parametric EQ, and digital signal processing |
+| **`:audio-dsp`** | Equalizer engine, parametric EQ, and digital signal processing (`:dsp-core`) |
 | **`:shazamkit`** | Audio fingerprinting and song recognition via Shazam API |
-| **`:canvas` / `:applecanvas`** | Animated video canvas playback engine and providers |
+| **`:canvas`** / **`:applecanvas`** | Animated video canvas playback engine and providers |
 | **`:metadata`** | Metadata enrichment from Spotify, MusicBrainz, and Last.fm |
 
 ---
 
 ## Documentation
 
-Comprehensive project documentation:
-
-| Document | Description |
+| Document | Purpose |
 | :--- | :--- |
-| **[SETUP.md](SETUP.md)** | Prerequisites, SDK/NDK configuration, Android Studio setup, and Gradle build commands |
-| **[DESIGN.md](DESIGN.md)** | Jetpack Compose styling, Material 3 theming, Liquid Glass surfaces, and color tokens |
-| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Contribution workflow, coding style, licensing rules, and pull request guidelines |
-| **[CREDITS.md](CREDITS.md)** | Upstream project lineage, copyright notices, and third-party acknowledgements |
-| **[CHANGELOG.md](CHANGELOG.md)** | Chronological history of release changes and version milestones |
-| **[PRIVACY_POLICY.md](PRIVACY_POLICY.md)** | Data handling policies, zero-telemetry guarantee, and local database security |
-| **[SECURITY.md](SECURITY.md)** | Security disclosure policy and vulnerability reporting process |
-| **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** | Contributor Covenant community behavioral standards |
-| **[LICENSE](LICENSE)** | Complete GNU General Public License v3.0 legal terms |
+| **[SETUP.md](SETUP.md)** | Environment setup, SDK/NDK configuration, signing keys, and build instructions |
+| **[DESIGN.md](DESIGN.md)** | Jetpack Compose guidelines, Material 3 theming tokens, and Liquid Glass specs |
+| **[CONTRIBUTING.md](CONTRIBUTING.md)** | Contribution standards, code style, git workflow, and pull request procedures |
+| **[CREDITS.md](CREDITS.md)** | Upstream lineage, copyright notices, and third-party dependency licenses |
+| **[PRIVACY_POLICY.md](PRIVACY_POLICY.md)** | Privacy guarantees, zero-telemetry commitment, and local storage policy |
+| **[SECURITY.md](SECURITY.md)** | Security vulnerability reporting guidelines |
+| **[CHANGELOG.md](CHANGELOG.md)** | Release notes and version history |
+| **[LICENSE](LICENSE)** | GNU General Public License v3.0 text |
 
 ---
 
-## Quick Start
+## Contributors
 
-### Prerequisites
-- **Android Studio** (Ladybug | 2024.2.1 or newer recommended)
-- **JDK 21** (Eclipse Adoptium Temurin 21 or Android Studio embedded JDK)
-- **Android SDK** (API 36 / 37, Build Tools 36.x, NDK `28.2.13676358`)
-
-### Building from Source
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/PurveshShinde/Neko-Music.git
-cd Neko-Music
-
-# 2. Build FOSS Debug variant (100% open-source, no proprietary Google services)
-./gradlew assembleArm64FossDebug
-
-# Or on Windows PowerShell:
-.\gradlew.bat assembleArm64FossDebug
-```
-
-For release signing, Google Services configuration, and flavor options (`foss` vs `gms`), refer to **[SETUP.md](SETUP.md)**.
+<!-- readme: contributors -start -->
+<!-- readme: contributors -end -->
 
 ---
 
-## Lineage & Upstream Acknowledgements
+## Lineage & Special Thanks
 
-Neko Music is proudly open-source and builds upon the dedication of the open-source Android music community:
+Neko Music is built upon the dedication and innovation of the open-source Android music community:
 
 - **Echo Music** ([EchoMusicApp/Echo-Music](https://github.com/EchoMusicApp/Echo-Music)): Immediate upstream project by Aditya ([@iad1tya](https://github.com/iad1tya)) and contributors (GPL-3.0).
 - **InnerTune** ([z-huang/InnerTune](https://github.com/z-huang/InnerTune)): Foundational architecture and InnerTube client by Zion Huang (GPL-3.0).
 - **ViMusic** ([vfsfitvnm/ViMusic](https://github.com/vfsfitvnm/ViMusic)): Pioneer open-source YouTube Music client by vfsfitvnm (GPL-3.0).
-- **Spotify Integration**: Spotube/Vivi Music reverse-engineered Spotify authentication and session mapper by Chartreux Westia (`© Chartreux Westia — github.com/koiverse`, GPL-3.0).
+- **Spotify Integration**: Reverse-engineered Spotify authentication by Chartreux Westia (`© Chartreux Westia — github.com/koiverse`, GPL-3.0).
 - **Lossless Extension**: Audio addon provider by Silly Kat ([EchoMusicApp/lossless-extension](https://github.com/EchoMusicApp/lossless-extension), GPL-3.0).
 - **Metrolist**: Glance widgets, ListenTogether concepts, and audio playback utilities (GPL-3.0).
 - **Vendored Components**: `Kyant0/backdrop` (Apache 2.0) and `elyesmansour/compose-floating-tab-bar` (Apache 2.0).
 
-For full details, copyright holders, and license texts, see **[CREDITS.md](CREDITS.md)**.
+For detailed copyright records and third-party notices, refer to **[CREDITS.md](CREDITS.md)**.
+
+---
+
+## Legal Disclaimer & Terms of Use
+
+### 1. 100% Free, Open-Source & Strictly Non-Commercial
+Neko Music is a free, open-source project (FOSS) developed for educational purposes and personal use under the GNU General Public License v3.0. There are no paid features, advertisements, tracking, subscriptions, or monetization mechanisms of any kind. This project has no commercial intent.
+
+### 2. Custom Client with Content Filtering
+Neko Music operates strictly as a specialized, third-party client interface. It parses publicly accessible endpoints and APIs of YouTube and YouTube Music, rendering them within a custom Android user interface. The ad-free streaming functionality is functionally equivalent to viewing public content via a browser with standard content filtering enabled.
+
+### 3. Support Content Creators
+We encourage all users to support the artists and creators whose music they enjoy by subscribing to [YouTube Premium](https://www.youtube.com/premium) and purchasing official merchandise, concert tickets, and media.
+
+### 4. No Hosting of Copyrighted Material
+Neko Music does not host, store, cache on remote servers, or distribute any audio, video, or copyrighted media files. All streamed media originates directly from YouTube's public infrastructure. The application serves solely as an audio stream player.
+
+### 5. User Responsibility & Contact
+The software is provided "AS IS", without warranty of any kind. Users are responsible for ensuring that their use complies with their local laws and the applicable terms of service. For questions or technical inquiries regarding the open-source codebase, please open an issue in the [GitHub Repository](https://github.com/PurveshShinde/Neko-Music/issues).
 
 ---
 
