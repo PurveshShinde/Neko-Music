@@ -80,6 +80,11 @@ fun LastFMSettingsScreen(navController: NavController) {
   var lastfmUsername by rememberPreference(LastFMUsernameKey, "")
   var lastfmSession by rememberPreference(LastFMSessionKey, "")
 
+  val isConfigured = remember {
+    neko.music.app.BuildConfig.LASTFM_API_KEY.isNotBlank() &&
+      neko.music.app.BuildConfig.LASTFM_SECRET.isNotBlank()
+  }
+
   val isLoggedIn = remember(lastfmSession) { lastfmSession != "" }
 
   val (useNowPlaying, onUseNowPlayingChange) =
@@ -316,6 +321,9 @@ fun LastFMSettingsScreen(navController: NavController) {
                   modifier = Modifier.alpha(if (isLoggedIn) 1f else 0.5f),
                 )
               },
+              description = if (!isConfigured) {
+                { Text("Last.fm credentials are not configured for this release") }
+              } else null,
               trailingContent = {
                 if (isLoggedIn) {
                   OutlinedButton(
@@ -327,7 +335,10 @@ fun LastFMSettingsScreen(navController: NavController) {
                     Text(stringResource(R.string.action_logout))
                   }
                 } else {
-                  OutlinedButton(onClick = { showLoginDialog = true }) {
+                  OutlinedButton(
+                    onClick = { showLoginDialog = true },
+                    enabled = isConfigured
+                  ) {
                     Text(stringResource(R.string.action_login))
                   }
                 }

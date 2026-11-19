@@ -1,4 +1,4 @@
-﻿package neko.music.app.echomusic.component
+package neko.music.app.echomusic.component
 
 import neko.music.app.R
 
@@ -197,9 +197,11 @@ fun UpdateAvailableDialog(
           Button(
             onClick = {
               onDismiss()
-              val intent =
-                Intent(Intent.ACTION_VIEW, android.net.Uri.parse("https://echomusic.fun"))
-              context.startActivity(intent)
+              val updateUrl = neko.music.app.config.NekoUpdateConfig.releaseApkUrl(version)
+              if (updateUrl.isNotBlank()) {
+                val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse(updateUrl))
+                context.startActivity(intent)
+              }
             },
             shape = actionShape,
           ) {

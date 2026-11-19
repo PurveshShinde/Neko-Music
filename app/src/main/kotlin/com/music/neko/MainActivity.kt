@@ -214,7 +214,7 @@ import neko.music.app.ui.screens.settings.NavigationTab
 import neko.music.app.ui.screens.settings.RingtoneViewModel
 import neko.music.app.ui.theme.ColorSaver
 import neko.music.app.ui.theme.DefaultThemeColor
-import neko.music.app.ui.theme.echomusicTheme
+import neko.music.app.ui.theme.NekoMusicTheme
 import neko.music.app.ui.theme.extractThemeColor
 import neko.music.app.ui.utils.appBarScrollBehavior
 import neko.music.app.ui.utils.resetHeightOffset
@@ -507,7 +507,7 @@ class MainActivity : ComponentActivity() {
     }
 
     setContent {
-      echomusicApp(
+      nekoMusicApp(
         playerConnection = playerConnection,
         database = database,
         downloadUtil = downloadUtil,
@@ -519,7 +519,7 @@ class MainActivity : ComponentActivity() {
   @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
   @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
   @Composable
-  private fun echomusicApp(
+  private fun nekoMusicApp(
     playerConnection: PlayerConnection?,
     database: MusicDatabase,
     downloadUtil: DownloadUtil,
@@ -571,6 +571,8 @@ class MainActivity : ComponentActivity() {
       }
     }
 
+    // Startup update checking disabled until custom updates are configured
+    /*
     LaunchedEffect(Unit) {
       val prefs = context.dataStore.data.first()
 
@@ -603,6 +605,7 @@ class MainActivity : ComponentActivity() {
         )
       }
     }
+    */
 
     val HasShownBirthdayNotificationKey = remember {
       androidx.datastore.preferences.core.booleanPreferencesKey("has_shown_birthday_notification")
@@ -754,7 +757,7 @@ class MainActivity : ComponentActivity() {
       }
     }
 
-    echomusicTheme(
+    NekoMusicTheme(
       darkTheme = useDarkTheme,
       pureBlack = pureBlack,
       isMonochrome = isMonochrome,
@@ -762,6 +765,8 @@ class MainActivity : ComponentActivity() {
     ) {
       val hapticHelper = rememberHapticHelper()
 
+      // Update template dialog commented out until custom updates are configured
+      /*
       if (showUpdateDialog) {
         neko.music.app.echomusic.component.UpdateAvailableDialog(
           version = availableUpdateVersion,
@@ -769,7 +774,9 @@ class MainActivity : ComponentActivity() {
           description = availableUpdateDescription,
           onDismiss = { showUpdateDialog = false },
         )
-      } else {
+      } else
+      */
+      run {
         whatsNewInfo?.let { info ->
           neko.music.app.echomusic.updater.WhatsNewDialog(
             version = BuildConfig.VERSION_NAME,

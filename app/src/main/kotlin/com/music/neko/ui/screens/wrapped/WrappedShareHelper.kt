@@ -497,7 +497,7 @@ object WrappedShareHelper {
       typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
     }
     canvas.drawText(
-      "CRAFTED WITH ECHO MUSIC • ${data.yearLabel} REPLAY • echomusic.app/wrapped",
+      "CRAFTED WITH NEKO MUSIC • ${data.yearLabel} REPLAY • nekomusic.app/wrapped",
       width / 2f,
       1750f,
       footerPaint
@@ -509,11 +509,11 @@ object WrappedShareHelper {
         ComposeToImage.saveBitmapAsFile(
           context = context,
           bitmap = bitmap,
-          fileName = "Echo_Wrapped_${data.yearLabel}_${System.currentTimeMillis()}"
+          fileName = "Neko_Wrapped_${data.yearLabel}_${System.currentTimeMillis()}"
         )
       } catch (_: Exception) {
         val cachePath = java.io.File(context.cacheDir, "images").apply { mkdirs() }
-        val imageFile = java.io.File(cachePath, "Echo_Wrapped_${System.currentTimeMillis()}.png")
+        val imageFile = java.io.File(cachePath, "Neko_Wrapped_${System.currentTimeMillis()}.png")
         java.io.FileOutputStream(imageFile).use { out ->
           bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
         }
@@ -525,11 +525,11 @@ object WrappedShareHelper {
         putExtra(Intent.EXTRA_STREAM, uri)
         putExtra(
           Intent.EXTRA_TEXT,
-          "Here is my ${data.yearLabel} Wrapped on Echo Music! 🎵\nTop Song: ${data.topSong?.title ?: "Various"}\nTop Artist: ${data.topArtist?.title ?: "Various"}\nPersona: ${data.dominantVibe}"
+          "Here is my ${data.yearLabel} Wrapped on Neko Music! 🎵\nTop Song: ${data.topSong?.title ?: "Various"}\nTop Artist: ${data.topArtist?.title ?: "Various"}\nPersona: ${data.dominantVibe}"
         )
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
       }
-      val chooser = Intent.createChooser(intent, "Share Echo Wrapped").apply {
+      val chooser = Intent.createChooser(intent, "Share Neko Wrapped").apply {
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
       }
       context.startActivity(chooser)

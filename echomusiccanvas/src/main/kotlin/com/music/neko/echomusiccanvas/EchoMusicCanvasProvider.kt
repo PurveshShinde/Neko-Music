@@ -19,6 +19,8 @@ data class echomusicCanvasManifest(val items: List<echomusicCanvasItem> = emptyL
 @Serializable data class echomusicCanvasItem(val song: String, val artist: String, val url: String)
 
 object echomusicCanvasProvider {
+  /** Disabled for Neko v0.0.1: Echo canvas server is external unverified infrastructure. */
+  const val IS_ENABLED = false
   private const val BASE_URL = "https://canvas.echomusic.fun/canvas.json"
 
   private val json = Json {
@@ -73,6 +75,7 @@ object echomusicCanvasProvider {
     song: String,
     artist: String,
   ): CanvasArtwork? {
+    if (!IS_ENABLED) return null
     if (song.isBlank() || artist.isBlank()) return null
 
     val manifest = fetchManifest() ?: return null

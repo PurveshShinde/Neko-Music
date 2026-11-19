@@ -624,7 +624,7 @@
     <string name="playback_progress">Progression de la lecture</string>
     <string name="widget_playing_on">Lecture sur</string>
     <string name="widget_this_phone">Ce téléphone</string>
-    <string name="widget_echo_music">Echo Music</string>
+    <string name="widget_echo_music">Neko Music</string>
     <string name="widget_queue">File d\'attente</string>
     <string name="widget_cast">Caster</string>
     <string name="widget_options">Plus d\'options</string>
@@ -745,7 +745,7 @@
     <string name="ai_lyrics_translation">Espace IA (AI Hub)</string>
     <string name="contribute_to_lossless">Contribuer à Lossless Music</string>
     <string name="lossless_music_hub">Hub Musique Lossless</string>
-    <string name="lossless_desc">Ajoutez de l\'audio haute fidélité sans perte (.flac) à l\'écosystème Echo Music. Taille max : 99 Mo.</string>
+    <string name="lossless_desc">Ajoutez de l\'audio haute fidélité sans perte (.flac) à l\'écosystème Neko Music. Taille max : 99 Mo.</string>
     <string name="login_with_github">Se connecter avec GitHub</string>
     <string name="lossless_audio_file">Fichier audio Lossless</string>
     <string name="choose_file">Choisir un fichier .flac (Max 99 Mo)</string>
@@ -859,7 +859,7 @@
     <string name="delete_from_history">Supprimer de l\'historique</string>
     <string name="re_listen">Réécouter</string>
     <string name="hold_to_recognize">Maintenir l\'icône de recherche appuyée pour reconnaître de la musique</string>
-    <string name="play_on_app">Lire sur Echo Music</string>
+    <string name="play_on_app">Lire sur Neko Music</string>
     <string name="recognized_track">Morceau reconnu</string>
 
     <!-- Importation CSV -->
@@ -959,7 +959,7 @@
 
     <string name="perm_required">Requis</string>
     <string name="perm_permissions">Autorisations</string>
-    <string name="perm_intro_text">Ces autorisations sont nécessaires pour que echomusic fonctionne correctement. Veuillez les accorder pour continuer.</string>
+    <string name="perm_intro_text">Ces autorisations sont nécessaires pour que Neko Music fonctionne correctement. Veuillez les accorder pour continuer.</string>
 
     <string name="perm_notif_title">Notifications</string>
     <string name="perm_notif_desc">Sachez immédiatement quand votre musique est lue et contrôlez-la depuis la barre de notification.</string>
@@ -1098,8 +1098,7 @@
     <string name="test_connection_summary">Vérifiez votre fournisseur, votre modèle et votre clé API</string>
     <string name="prefer_extension_audio">Préférer l\'audio des extensions</string>
     <string name="prefer_extension_audio_summary">Rechercher dans les extensions avant YouTube Music</string>
-    <string name="music_quality_title">Qualité musicale (320 kbps)</string>
-    <string name="music_quality_summary">Visitez 320kbps.echomusic.fun pour le guide de configuration</string>
     <string name="add_custom_server">Ajouter un serveur personnalisé</string>
     <string name="add_custom_server_summary">Configurer un hôte de module personnalisé</string>
 </resources>
+

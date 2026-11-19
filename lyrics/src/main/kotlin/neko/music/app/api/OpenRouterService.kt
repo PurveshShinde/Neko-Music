@@ -66,8 +66,8 @@ object OpenRouterService {
         if (anthropic) {
           addHeader("anthropic-version", ANTHROPIC_VERSION)
         } else {
-          addHeader("HTTP-Referer", "https://github.com/EchoMusicApp/Echo-Music")
-          addHeader("X-Title", "echomusic")
+          addHeader("HTTP-Referer", "https://github.com/PurveshShinde/Neko-Music")
+          addHeader("X-Title", "NekoMusic")
         }
       }
       .addHeader("Content-Type", "application/json")

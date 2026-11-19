@@ -39,9 +39,11 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
 
-    // LastFM API keys from GitHub Secrets
-    val lastFmKey = "266d77b5790e413ada7e41ef100d017a"
-    val lastFmSecret = "41d3ae3b039ddac06c37fb30055bf93b"
+    // LastFM API keys from local properties or environment variables (disabled by default in v0.0.1)
+    val lastFmKey =
+      localProperties.getProperty("LASTFM_API_KEY") ?: System.getenv("LASTFM_API_KEY") ?: ""
+    val lastFmSecret =
+      localProperties.getProperty("LASTFM_SECRET") ?: System.getenv("LASTFM_SECRET") ?: ""
 
     buildConfigField("String", "LASTFM_API_KEY", "\"$lastFmKey\"")
     buildConfigField("String", "LASTFM_SECRET", "\"$lastFmSecret\"")
@@ -70,9 +72,13 @@ android {
     val isNightly = project.hasProperty("nightly") && project.property("nightly") == "true"
     buildConfigField("Boolean", "IS_NIGHTLY", isNightly.toString())
 
-    val discordApplicationId = "1518210534070292541"
-    val discordApplicationIdLong = 1518210534070292541L
-    val discordRedirectScheme = "discord-$discordApplicationId"
+    // Discord Application ID (disabled by default in v0.0.1 pending registration)
+    val discordApplicationId =
+      localProperties.getProperty("DISCORD_APPLICATION_ID") ?: System.getenv("DISCORD_APPLICATION_ID") ?: ""
+    val discordApplicationIdLong =
+      discordApplicationId.toLongOrNull() ?: 0L
+    val discordRedirectScheme =
+      if (discordApplicationId.isNotBlank()) "discord-$discordApplicationId" else "discord-disabled"
 
     buildConfigField("String", "DISCORD_APPLICATION_ID", "\"$discordApplicationId\"")
     buildConfigField("long", "DISCORD_APPLICATION_ID_LONG", "${discordApplicationIdLong}L")

@@ -208,8 +208,9 @@ fun ArtistMenu(
                         type = "text/plain"
                         putExtra(
                           Intent.EXTRA_TEXT,
-                          "https://share.echomusic.fun/channel/${artist.id}"
+                          "https://music.youtube.com/channel/${artist.id}"
                         )
+                        putExtra(Intent.EXTRA_TITLE, "${artist.artist.name} - Neko Music")
                       }
                     context.startActivity(Intent.createChooser(intent, null))
                   }

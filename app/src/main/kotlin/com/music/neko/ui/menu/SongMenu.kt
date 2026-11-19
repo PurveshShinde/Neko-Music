@@ -437,7 +437,8 @@ fun SongMenu(
                     Intent().apply {
                       action = Intent.ACTION_SEND
                       type = "text/plain"
-                      putExtra(Intent.EXTRA_TEXT, "https://share.echomusic.fun/watch?v=${song.id}")
+                      putExtra(Intent.EXTRA_TEXT, "https://music.youtube.com/watch?v=${song.id}")
+                      putExtra(Intent.EXTRA_TITLE, "${song.title} - Neko Music")
                     }
                   context.startActivity(Intent.createChooser(intent, null))
                 }

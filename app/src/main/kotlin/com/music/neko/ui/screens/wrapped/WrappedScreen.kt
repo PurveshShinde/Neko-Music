@@ -613,7 +613,7 @@ private fun IntroSlideSpotify(
 
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
       Text(
-        text = "Every beat, replay, and late-night obsession that soundtracked your life on Echo Music.",
+        text = "Every beat, replay, and late-night obsession that soundtracked your life on Neko Music.",
         style = MaterialTheme.typography.bodyLarge.copy(
           fontSize = 16.sp,
           fontWeight = FontWeight.Medium,
@@ -2055,7 +2055,7 @@ private fun InsufficientDataView(
       Spacer(modifier = Modifier.height(12.dp))
 
       Text(
-        text = "You've played ${state.songsPlayed} songs so far. Listen to at least ${state.minSongsRequired} tracks to unlock your personalized Echo Wrapped story.",
+        text = "You've played ${state.songsPlayed} songs so far. Listen to at least ${state.minSongsRequired} tracks to unlock your personalized Neko Wrapped story.",
         style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 22.sp),
         color = Color.White.copy(alpha = 0.7f),
         textAlign = TextAlign.Center

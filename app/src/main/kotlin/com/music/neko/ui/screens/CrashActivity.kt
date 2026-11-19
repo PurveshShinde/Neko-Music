@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import neko.music.app.R
-import neko.music.app.ui.theme.echomusicTheme
+import neko.music.app.ui.theme.NekoMusicTheme
 import neko.music.app.utils.CrashHandler
 import java.io.File
 import java.text.SimpleDateFormat
@@ -56,7 +56,7 @@ class CrashActivity : ComponentActivity() {
 
     setContent {
       val darkTheme = isSystemInDarkTheme()
-      echomusicTheme(darkTheme = darkTheme) {
+      NekoMusicTheme(darkTheme = darkTheme) {
         CrashScreen(
           crashLog = crashLog,
           onClose = { finishAffinity() },

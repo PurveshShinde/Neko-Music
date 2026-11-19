@@ -172,97 +172,14 @@ fun AboutScreen(
           items =
             listOf(
               Material3SettingsItem(
-                icon = painterResource(R.drawable.website),
-                title = { Text("Website") },
-                description = { Text("app.cyou") },
-                onClick = { uriHandler.openUri("https://iad1tya.cyou") }
-              ),
-              Material3SettingsItem(
-                icon = painterResource(R.drawable.ic_instagram_new),
-                title = { Text("Instagram") },
-                description = { Text("@app") },
-                onClick = { uriHandler.openUri("https://instagram.com/iad1tya") }
-              ),
-              Material3SettingsItem(
-                icon = painterResource(R.drawable.ic_x_new),
-                title = { Text("X (Twitter)") },
-                description = { Text("@xad1tya") },
-                onClick = { uriHandler.openUri("https://x.com/xad1tya") }
+                icon = painterResource(R.drawable.github),
+                title = { Text("GitHub") },
+                description = { Text("@PurveshShinde") },
+                onClick = { uriHandler.openUri("https://github.com/PurveshShinde") }
               )
             )
         )
       }
-
-      item {
-        Material3SettingsGroup(
-          title = "Support",
-          items =
-            listOf(
-              Material3SettingsItem(
-                icon = painterResource(R.drawable.coffee),
-                title = { Text("Buy Me a Coffee") },
-                description = { Text("buymeacoffee.com/app") },
-                onClick = { uriHandler.openUri("https://buymeacoffee.com/iad1tya") }
-              ),
-              Material3SettingsItem(
-                icon = painterResource(R.drawable.ic_patreon_new),
-                title = { Text("Patreon") },
-                description = { Text("patreon.com/cw/app") },
-                onClick = { uriHandler.openUri("https://www.patreon.com/cw/iad1tya") }
-              ),
-              Material3SettingsItem(
-                icon = painterResource(R.drawable.upi_new),
-                title = { Text("UPI") },
-                description = { Text("app@upi") },
-                onClick = {
-                  uriHandler.openUri(
-                    "https://intradeus.github.io/http-protocol-redirector/?r=upi://pay?pa=iad1tya@upi&pn=Aditya%20Yadav&am=&tn=Thank%20You%20so%20much%20for%20this%20support"
-                  )
-                }
-              )
-            )
-        )
-      }
-
-      item {
-        Material3SettingsGroup(
-          title = "Community",
-          items =
-            listOf(
-              Material3SettingsItem(
-                icon = painterResource(R.drawable.ic_discord_new),
-                title = { Text("Discord") },
-                description = { Text("discord.gg/Xt5hgsJJuA") },
-                onClick = { uriHandler.openUri("https://discord.gg/Xt5hgsJJuA") }
-              )
-            )
-        )
-      }
-
-      /* item {
-          AboutSectionCard(title = "App") {
-              AboutActionRow(
-                  icon = painterResource(R.drawable.github),
-                  title = "GitHub",
-                  subtitle = "EchoMusicApp/Echo-Music",
-                  onClick = { uriHandler.openUri("https://github.com/EchoMusicApp/Echo-Music") },
-              )
-              AboutDivider()
-              AboutActionRow(
-                  icon = painterResource(R.drawable.ic_discord_new),
-                  title = "Discord",
-                  subtitle = "discord.gg/EcfV3AxH5c",
-                  onClick = { uriHandler.openUri("https://discord.gg/EcfV3AxH5c") },
-              )
-              AboutDivider()
-              AboutActionRow(
-                  icon = painterResource(R.drawable.ic_telegram_new),
-                  title = "Telegram",
-                  subtitle = "t.me/EchoMusicApp",
-                  onClick = { uriHandler.openUri("https://t.me/EchoMusicApp") },
-              )
-          }
-      } */
 
     }
   }
@@ -325,7 +242,7 @@ private fun AboutAppCard() {
         )
       } else {
         coil3.compose.AsyncImage(
-          model = "https://avatars.githubusercontent.com/u/147871321?v=4",
+          model = "https://avatars.githubusercontent.com/PurveshShinde",
           contentDescription = null,
           modifier =
             Modifier.fillMaxSize().graphicsLayer { rotationY = 180f }, // Un-flip the backside image
@@ -337,7 +254,7 @@ private fun AboutAppCard() {
     Spacer(Modifier.height(4.dp))
 
     Text(
-      text = if (rotation <= 90f) "Neko Music" else "Developed by Aditya",
+      text = if (rotation <= 90f) "Neko Music" else "Developed by Purvesh Shinde",
       style = MaterialTheme.typography.titleLarge,
       fontWeight = FontWeight.Bold,
       color = MaterialTheme.colorScheme.onSurface,

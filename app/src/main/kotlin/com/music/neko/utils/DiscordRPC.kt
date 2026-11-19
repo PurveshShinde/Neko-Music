@@ -65,6 +65,10 @@ class DiscordRPC(
     currentPlaybackTimeMillis: Long,
     isPaused: Boolean = false,
   ) = runCatching {
+    if (BuildConfig.DISCORD_APPLICATION_ID.isBlank() || BuildConfig.DISCORD_APPLICATION_ID_LONG == 0L) {
+      Timber.tag(TAG).v("Discord Application ID is not configured; skipping RPC update")
+      return@runCatching
+    }
     if (lastSongId != song.song.id) {
       translationCache.clear()
       DiscordImageResolver.clearCache()
@@ -275,14 +279,14 @@ class DiscordRPC(
     val button1Label =
       context.dataStore[DiscordActivityButton1LabelKey] ?: "Listen on YouTube Music"
     val button1Enabled = context.dataStore[DiscordActivityButton1EnabledKey] ?: true
-    val button2Label = context.dataStore[DiscordActivityButton2LabelKey] ?: "Go to Echo Music"
+    val button2Label = context.dataStore[DiscordActivityButton2LabelKey] ?: "Go to Neko Music"
     val button2Enabled = context.dataStore[DiscordActivityButton2EnabledKey] ?: true
     val button1UrlSource = context.dataStore[DiscordActivityButton1UrlSourceKey] ?: "songurl"
     val button1CustomUrl = context.dataStore[DiscordActivityButton1CustomUrlKey] ?: ""
     val button2UrlSource = context.dataStore[DiscordActivityButton2UrlSourceKey] ?: "custom"
     val button2CustomUrl =
       context.dataStore[DiscordActivityButton2CustomUrlKey]
-        ?: neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL.ifBlank { "https://github.com/NEKO_USERNAME/NEKO_REPOSITORY" }
+        ?: neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL.ifBlank { "https://github.com/PurveshShinde/Neko-Music" }
 
     return buildList {
         if (button1Enabled) {

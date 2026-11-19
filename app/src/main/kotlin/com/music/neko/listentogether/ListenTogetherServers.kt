@@ -22,17 +22,7 @@ object ListenTogetherServers {
   private val SERVER_JSON_URL =
     neko.music.app.config.NekoUpdateConfig.SERVER_JSON_URL
 
-  private val _servers =
-    MutableStateFlow(
-      listOf(
-        ListenTogetherServer(
-          name = "Metrolist Server",
-          url = "wss://metroserverx.meowery.eu/ws",
-          location = "Poland",
-          operator = "Metrolist"
-        )
-      )
-    )
+  private val _servers = MutableStateFlow<List<ListenTogetherServer>>(emptyList())
 
   val serversFlow: StateFlow<List<ListenTogetherServer>> = _servers
 
@@ -64,7 +54,7 @@ object ListenTogetherServers {
   }
 
   val defaultServerUrl: String
-    get() = servers.first().url
+    get() = servers.firstOrNull()?.url ?: ""
 
   fun findByUrl(url: String): ListenTogetherServer? = servers.firstOrNull { it.url == url }
 }

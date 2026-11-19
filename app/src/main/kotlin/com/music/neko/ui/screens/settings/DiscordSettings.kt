@@ -188,8 +188,16 @@ fun DiscordSettings(
     }
 
   val launchAuthorization: () -> Unit = {
-    authorizationMessage = null
-    authorizationUiModeName = DiscordAuthorizationUiMode.Waiting.name
+    if (!DiscordOAuthRepository.isConfigured) {
+      android.widget.Toast.makeText(
+        context,
+        "Discord integration is disabled in v0.0.1 (Application ID not configured)",
+        android.widget.Toast.LENGTH_SHORT
+      ).show()
+    } else {
+      authorizationMessage = null
+      authorizationUiModeName = DiscordAuthorizationUiMode.Waiting.name
+    }
   }
 
   LaunchedEffect(authorizationUiMode) {
@@ -274,7 +282,7 @@ fun DiscordSettings(
   val (button2Label) =
     rememberPreference(
       key = DiscordActivityButton2LabelKey,
-      defaultValue = "Go to Echo Music",
+      defaultValue = "Go to Neko Music",
     )
   val (button2Enabled) =
     rememberPreference(
@@ -299,7 +307,7 @@ fun DiscordSettings(
   val (button2CustomUrl) =
     rememberPreference(
       key = DiscordActivityButton2CustomUrlKey,
-      defaultValue = neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL.ifBlank { "https://github.com/NEKO_USERNAME/NEKO_REPOSITORY" },
+      defaultValue = neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL.ifBlank { "https://github.com/PurveshShinde/Neko-Music" },
     )
 
   val (activityType, onActivityTypeChange) =
@@ -418,6 +426,33 @@ fun DiscordSettings(
         ),
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+      if (!DiscordOAuthRepository.isConfigured) {
+        item {
+          Surface(
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+          ) {
+            Row(
+              modifier = Modifier.padding(16.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+              Icon(
+                painter = painterResource(R.drawable.info),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+              )
+              Text(
+                text = "Discord integration is disabled in v0.0.1 pending Discord Application registration.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+              )
+            }
+          }
+        }
+      }
+
       item {
         DiscordAccountGroupCard(
           displayName = accountDisplayName,
@@ -437,7 +472,7 @@ fun DiscordSettings(
               launchAuthorization()
             }
           },
-          primaryActionEnabled = authorizationUiMode != DiscordAuthorizationUiMode.Waiting,
+          primaryActionEnabled = (isLoggedIn || DiscordOAuthRepository.isConfigured) && authorizationUiMode != DiscordAuthorizationUiMode.Waiting,
         )
       }
 
@@ -1286,10 +1321,10 @@ fun RichPresence(
   button1Enabled: Boolean = true,
   button1UrlSource: String = "songurl",
   button1CustomUrl: String = "",
-  button2Label: String = "Go to Echo Music",
+  button2Label: String = "Go to Neko Music",
   button2Enabled: Boolean = true,
   button2UrlSource: String = "custom",
-  button2CustomUrl: String = neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL.ifBlank { "https://github.com/NEKO_USERNAME/NEKO_REPOSITORY" },
+  button2CustomUrl: String = neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL.ifBlank { "https://github.com/PurveshShinde/Neko-Music" },
   isPlaying: Boolean = false,
 ) {
   val context = LocalContext.current

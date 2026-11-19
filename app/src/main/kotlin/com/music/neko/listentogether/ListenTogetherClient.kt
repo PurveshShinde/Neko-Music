@@ -435,8 +435,13 @@ class ListenTogetherClient @Inject constructor(private val context: Context) {
       return
     }
 
-    _connectionState.value = ConnectionState.CONNECTING
     val serverUrl = getServerUrl()
+    if (serverUrl.isBlank()) {
+      log(LogLevel.INFO, "ListenTogether server is not configured")
+      _connectionState.value = ConnectionState.DISCONNECTED
+      return
+    }
+    _connectionState.value = ConnectionState.CONNECTING
     log(LogLevel.INFO, "Connecting to server", serverUrl)
 
     codec.format = MessageFormat.JSON

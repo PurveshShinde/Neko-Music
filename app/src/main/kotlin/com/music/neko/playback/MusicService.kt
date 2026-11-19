@@ -4957,7 +4957,8 @@ class MusicService : MediaLibraryService(), Player.Listener, PlaybackStatsListen
     val shareIntent =
       Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, "https://share.echomusic.fun/watch?v=$songId")
+        putExtra(Intent.EXTRA_TEXT, "https://music.youtube.com/watch?v=$songId")
+        songData.song.title.let { putExtra(Intent.EXTRA_TITLE, "$it - Neko Music") }
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
       }
     startActivity(

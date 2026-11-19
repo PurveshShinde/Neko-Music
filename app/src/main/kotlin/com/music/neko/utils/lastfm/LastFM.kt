@@ -48,7 +48,7 @@ object LastFM {
     format: String = "json"
   ) {
     contentType(ContentType.Application.FormUrlEncoded)
-    userAgent("Metrolist (https://github.com/MetrolistGroup/Metrolist)")
+    userAgent("NekoMusic (https://github.com/PurveshShinde/Neko-Music)")
     val paramsForSig =
       mutableMapOf("method" to method, "api_key" to apiKey).apply {
         sessionKey?.let { put("sk", it) }
@@ -92,6 +92,9 @@ object LastFM {
 
   // Mobile session authentication
   suspend fun getMobileSession(username: String, password: String) = runCatching {
+    if (API_KEY.isBlank() || SECRET.isBlank()) {
+      throw IllegalStateException("Last.fm credentials are not configured for this build.")
+    }
     val response =
       client.post {
         lastfmParams(
@@ -122,6 +125,7 @@ object LastFM {
     trackNumber: Int? = null,
     duration: Int? = null
   ) = runCatching {
+    if (API_KEY.isBlank() || SECRET.isBlank()) return@runCatching
     client.post {
       lastfmParams(
         method = "track.updateNowPlaying",
@@ -149,6 +153,7 @@ object LastFM {
     trackNumber: Int? = null,
     duration: Int? = null
   ) = runCatching {
+    if (API_KEY.isBlank() || SECRET.isBlank()) return@runCatching
     client.post {
       lastfmParams(
         method = "track.scrobble",
@@ -170,6 +175,7 @@ object LastFM {
   }
 
   suspend fun setLoveStatus(artist: String, track: String, love: Boolean) = runCatching {
+    if (API_KEY.isBlank() || SECRET.isBlank()) return@runCatching
     val method = if (love) "track.love" else "track.unlove"
     client.post {
       lastfmParams(

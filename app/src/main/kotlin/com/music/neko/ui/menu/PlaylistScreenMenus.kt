@@ -162,7 +162,7 @@ fun LocalPlaylistMenu(
         onClick = {
           val shareText =
             if (isYouTubePlaylist) {
-              "https://share.echomusic.fun/playlist?list=${playlist.playlist.browseId}"
+              "https://music.youtube.com/playlist?list=${playlist.playlist.browseId}"
             } else {
               songs.joinToString("\n") { it.song.song.title }
             }
@@ -170,6 +170,7 @@ fun LocalPlaylistMenu(
             Intent().apply {
               action = Intent.ACTION_SEND
               putExtra(Intent.EXTRA_TEXT, shareText)
+              putExtra(Intent.EXTRA_TITLE, "${playlist.playlist.name} - Neko Music")
               type = "text/plain"
             }
           val shareIntent = Intent.createChooser(sendIntent, null)

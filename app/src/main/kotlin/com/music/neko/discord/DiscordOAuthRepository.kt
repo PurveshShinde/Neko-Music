@@ -74,7 +74,17 @@ object DiscordOAuthRepository {
   val redirectUri: String
     get() = "${BuildConfig.DISCORD_REDIRECT_SCHEME}://authorize/callback"
 
+  val isConfigured: Boolean
+    get() = BuildConfig.DISCORD_APPLICATION_ID.isNotBlank() && BuildConfig.DISCORD_APPLICATION_ID_LONG != 0L
+
   fun createAuthorizationSession(): DiscordAuthorizationSession {
+    if (!isConfigured) {
+      return DiscordAuthorizationSession(
+        state = "",
+        codeVerifier = "",
+        authorizationUri = Uri.EMPTY,
+      )
+    }
     val state = randomUrlSafeString(byteCount = 32)
     val verifier = randomUrlSafeString(byteCount = 64)
     val challenge = sha256Base64Url(verifier)

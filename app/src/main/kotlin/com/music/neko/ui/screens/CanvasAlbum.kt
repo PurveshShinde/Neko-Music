@@ -63,15 +63,11 @@ fun rememberAlbumCanvas(
         searchTasks
           .filter { (s, a) -> s.isNotBlank() && a.isNotBlank() }
           .firstNotNullOfOrNull { (s, a) ->
-            echomusicCanvasProvider.getBySongArtist(song = s, artist = a)?.takeIf {
-              !it.preferredAnimationUrl.isNullOrBlank()
-            }
-              ?: AppleMusicCanvasProvider.getByAlbumArtist(
-                  album = s,
-                  artist = a,
-                  storefront = storefront
-                )
-                ?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
+            AppleMusicCanvasProvider.getByAlbumArtist(
+              album = s,
+              artist = a,
+              storefront = storefront
+            )?.takeIf { !it.preferredAnimationUrl.isNullOrBlank() }
               ?: TidalCanvasProvider.getByAlbumArtist(album = s, artist = a)?.takeIf {
                 !it.preferredAnimationUrl.isNullOrBlank()
               }

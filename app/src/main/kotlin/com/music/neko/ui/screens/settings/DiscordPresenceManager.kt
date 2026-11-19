@@ -58,6 +58,10 @@ object DiscordPresenceManager {
 
   private val lastRpcEndTimeState = MutableStateFlow<Long?>(null)
   val lastRpcEndTimeFlow = lastRpcEndTimeState.asStateFlow()
+
+  val isConfigured: Boolean
+    get() = neko.music.app.BuildConfig.DISCORD_APPLICATION_ID.isNotBlank() &&
+            neko.music.app.BuildConfig.DISCORD_APPLICATION_ID_LONG != 0L
   val lastRpcEndTime: Long?
     get() = lastRpcEndTimeState.value
 
@@ -111,6 +115,7 @@ object DiscordPresenceManager {
     generation: Long,
   ): Boolean =
     withContext(Dispatchers.IO) {
+      if (!isConfigured) return@withContext false
       val appContext = context.applicationContext
       rpcMutex.withLock {
         if (generation != updateGeneration.get()) {
@@ -186,6 +191,10 @@ object DiscordPresenceManager {
     positionProvider: () -> Long,
     isPausedProvider: () -> Boolean,
   ) {
+    if (!isConfigured) {
+      Timber.tag(LOG_TAG).d("Discord RPC start skipped: Application ID not configured")
+      return
+    }
     lastStartContext = context.applicationContext
     lastToken = token
     lastSongProvider = songProvider

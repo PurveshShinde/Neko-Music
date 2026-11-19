@@ -356,8 +356,9 @@ fun AlbumMenu(
                     type = "text/plain"
                     putExtra(
                       Intent.EXTRA_TEXT,
-                      "https://share.echomusic.fun/playlist?list=${album.album.playlistId}"
+                      "https://music.youtube.com/playlist?list=${album.album.playlistId}"
                     )
+                    putExtra(Intent.EXTRA_TITLE, "${album.album.title} - Neko Music")
                   }
                 context.startActivity(Intent.createChooser(intent, null))
               }

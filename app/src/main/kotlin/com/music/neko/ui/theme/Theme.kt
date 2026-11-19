@@ -30,7 +30,7 @@ import neko.music.app.utils.rememberPreference
 val DefaultThemeColor = Color(0xFFED5564)
 
 @Composable
-fun echomusicTheme(
+fun NekoMusicTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
   pureBlack: Boolean = false,
   isMonochrome: Boolean = false,
@@ -197,3 +197,18 @@ val ColorSaver =
 
     override fun SaverScope.save(value: Color): Int = value.toArgb()
   }
+
+@Composable
+fun echomusicTheme(
+  darkTheme: Boolean = isSystemInDarkTheme(),
+  pureBlack: Boolean = false,
+  isMonochrome: Boolean = false,
+  themeColor: Color = DefaultThemeColor,
+  content: @Composable () -> Unit,
+) = NekoMusicTheme(
+  darkTheme = darkTheme,
+  pureBlack = pureBlack,
+  isMonochrome = isMonochrome,
+  themeColor = themeColor,
+  content = content,
+)

@@ -620,8 +620,9 @@ fun PlayerMenu(
                     type = "text/plain"
                     putExtra(
                       android.content.Intent.EXTRA_TEXT,
-                      "https://share.echomusic.fun/watch?v=${mediaMetadata.id}"
+                      "https://music.youtube.com/watch?v=${mediaMetadata.id}"
                     )
+                    putExtra(android.content.Intent.EXTRA_TITLE, "${mediaMetadata.title} - Neko Music")
                   }
                 context.startActivity(android.content.Intent.createChooser(intent, null))
                 onDismiss()
@@ -1742,7 +1743,7 @@ fun ListenTogetherDialog(visible: Boolean, mediaMetadata: MediaMetadata?, onDism
                 Spacer(modifier = Modifier.height(12.dp))
                 val inviteLink =
                   remember(room.roomCode) {
-                    "https://metroserverx.meowery.eu/listen?code=${room.roomCode}"
+                    "Neko Music - Listen Together Room: ${room.roomCode}"
                   }
                 Row(
                   verticalAlignment = Alignment.CenterVertically,
