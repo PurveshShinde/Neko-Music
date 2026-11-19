@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "887842405081",
-    "project_id": "echo-aab3b",
-    "storage_bucket": "echo-aab3b.firebasestorage.app"
+    "project_number": "625343094502",
+    "project_id": "nekomusic-a4",
+    "storage_bucket": "nekomusic-a4.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:887842405081:android:2be388a7f6a02d941a5cc8",
+        "mobilesdk_app_id": "1:625343094502:android:45f0544771449c17bb6527",
         "android_client_info": {
           "package_name": "neko.music.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCvXEL8c5TOPmYUo33ghC7Cf64qYUGWfZg"
+          "current_key": "AIzaSyAbWF0F-uxAM3bJGu611YGhYOi2MSKSKew"
         }
       ],
       "services": {
@@ -26,7 +26,7 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:887842405081:android:2be388a7f6a02d941a5cc8",
+        "mobilesdk_app_id": "1:625343094502:android:45f0544771449c17bb6527",
         "android_client_info": {
           "package_name": "neko.music.app.debug"
         }
@@ -34,7 +34,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCvXEL8c5TOPmYUo33ghC7Cf64qYUGWfZg"
+          "current_key": "AIzaSyAbWF0F-uxAM3bJGu611YGhYOi2MSKSKew"
         }
       ],
       "services": {

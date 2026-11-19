@@ -21,7 +21,6 @@ val hasGoogleServicesConfig = file("google-services.json").exists()
 
 if (hasGoogleServicesConfig) {
   apply(plugin = "com.google.gms.google-services")
-  apply(plugin = "com.google.firebase.crashlytics")
 }
 
 android {
@@ -246,7 +245,6 @@ dependencies {
   // Firebase - GMS flavor only (excluded from F-Droid / FOSS builds)
   "gmsImplementation"(platform("com.google.firebase:firebase-bom:34.19.0"))
   "gmsImplementation"("com.google.firebase:firebase-analytics")
-  "gmsImplementation"("com.google.firebase:firebase-crashlytics")
 
   // GMS Location Services for high-accuracy weather AI context
   "gmsImplementation"(libs.play.services.location)

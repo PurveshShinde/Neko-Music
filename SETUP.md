@@ -96,7 +96,7 @@ Output APK will be located at:
 
 If building the `gms` flavor with your own Firebase project:
 1. Create an Android application in the [Firebase Console](https://console.firebase.google.com/) with package name `neko.music.app` (and `neko.music.app.debug`).
-2. Download `google-services.json` and place it in the [`app/`](file:///d:/Projects/Personal%20Projects/Neko-Music/app/) directory.
+2. Download `google-services.json` and place it in the [`app/`](app/) directory.
 3. If no `google-services.json` is present or if building the `foss` flavor, Firebase features are automatically disabled by Gradle.
 
 ### 2. AI Lyrics Translation API Keys
@@ -130,7 +130,7 @@ Then compile:
 Ensure `local.properties` exists in the repository root and contains an absolute path to your Android SDK using escaped backslashes on Windows (`C:\\Users\\...\\Sdk`).
 
 ### 2. Room Auto-Migration Error (`Schema 'x.json' required for migration was not found`)
-Historical database schemas are stored in [`core/schemas/neko.music.app.db.InternalDatabase/`](file:///d:/Projects/Personal%20Projects/Neko-Music/core/schemas/neko.music.app.db.InternalDatabase/). Ensure this directory contains all versioned JSON files (`1.json` through the latest version).
+Historical database schemas are stored in [`core/schemas/neko.music.app.db.InternalDatabase/`](core/schemas/neko.music.app.db.InternalDatabase/). Ensure this directory contains all versioned JSON files (`1.json` through the latest version).
 
 ### 3. JNI / NDK CMake Compilation Failures
 Verify that NDK `28.2.13676358` and CMake are properly installed in the Android SDK Manager. The USB DAC module (`:usbaudio`) compiles C++20 code via CMake.
