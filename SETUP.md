@@ -1,240 +1,156 @@
-# Setting Up and Running Neko Music
+# Setup & Build Instructions
 
-This document provides setup instructions for configuring your development environment, installing dependencies, executing the application across platforms, and compiling release binaries.
-
-For general project information, architectural overview, and feature highlights, refer to [README.md](README.md).
-
----
-
-## Table of Contents
-
-- [Prerequisites](#prerequisites)
-- [Initial Setup](#initial-setup)
-- [Asset and Code Generation](#asset-and-code-generation)
-- [Running in Development](#running-in-development)
-- [Building for Release](#building-for-release)
-- [Permissions and Platform Configuration](#permissions-and-platform-configuration)
-- [Troubleshooting](#troubleshooting)
-- [Related Documents](#related-documents)
+This document provides complete instructions for setting up your development environment and compiling **Neko Music** from source.
 
 ---
 
 ## Prerequisites
 
-Ensure your system meets the requirements below before attempting to build or run Neko Music:
+Ensure you have the following installed on your workstation:
 
-### General Requirements
-
-- **Flutter SDK**: Version 3.8.0 or higher. Verify installation via `flutter --version`.
-- **Dart SDK**: Included with Flutter.
-- **Git**: Required for package retrieval and version control.
-
-### Platform-Specific Tooling
-
-#### Android
-
-- **Android Studio** or **Android Command Line Tools** with Android SDK platform tools.
-- **Android SDK Platform**: API Level 34 (compileSdk / targetSdk) with minimum supported API level 21 (Android 5.0).
-- **Java Development Kit (JDK)**: JDK 17 (required for Gradle and Kotlin compilation).
-- A connected physical Android device with USB debugging enabled, or an Android Virtual Device (AVD).
-
-#### Linux
-
-- **MPV Developer Libraries**: Required by `media_kit` for native audio rendering:
-  ```bash
-  sudo apt-get update
-  sudo apt-get install -y libmpv-dev mpv libgtk-3-dev pkg-config cmake ninja-build clang
-  ```
-
-#### Windows
-
-- **Visual Studio 2022**: Installed with the "Desktop development with C++" workload.
-
-#### macOS
-
-- **Xcode**: Version 14.0 or higher with command-line tools.
-- **CocoaPods**: Installed via `sudo gem install cocoapods` or Homebrew.
+1. **Java Development Kit (JDK)**: **JDK 21** (Eclipse Adoptium Temurin 21 or Android Studio embedded JDK).
+2. **Android Studio**: Android Studio Ladybug (2024.2.1) or newer recommended.
+3. **Android SDK & NDK**:
+   - **compileSdk**: `37`
+   - **targetSdk**: `36`
+   - **minSdk**: `26` (Android 8.0+)
+   - **NDK Version**: `28.2.13676358` (installed via Android Studio SDK Manager $\rightarrow$ SDK Tools $\rightarrow$ NDK)
+   - **CMake**: `3.22.1` or newer
+4. **Git**: Installed and available in your terminal path.
 
 ---
 
 ## Initial Setup
 
-1. **Clone the Repository**
+### 1. Clone the Repository
 
-   ```bash
-   git clone https://github.com/PurveshShinde/Neko-Music.git
-   cd Neko-Music
-   ```
+```bash
+git clone https://github.com/PurveshShinde/Neko-Music.git
+cd Neko-Music
+```
 
-2. **Retrieve Dependencies**
+### 2. Configure `local.properties`
 
-   Fetch all Flutter packages and Git submodules declared in `pubspec.yaml`:
+Create a `local.properties` file in the root directory pointing to your Android SDK and NDK installations:
 
-   ```bash
-   flutter pub get
-   ```
+```bash
+# On Linux / macOS
+cp local.properties.template local.properties
 
-3. **Verify Environment Configuration**
+# On Windows PowerShell
+Copy-Item local.properties.template local.properties
+```
 
-   Check that all development toolchains are functional:
+Edit `local.properties`:
 
-   ```bash
-   flutter doctor -v
-   ```
-
----
-
-## Asset and Code Generation
-
-Before running the application for the first time, generate launcher icons and native splash screens:
-
-1. **Generate Launcher Icons**
-
-   ```bash
-   dart run flutter_launcher_icons
-   ```
-
-2. **Generate Native Splash Screen**
-
-   ```bash
-   dart run flutter_native_splash:create
-   ```
+```properties
+sdk.dir=C:\\Users\\<your-username>\\AppData\\Local\\Android\\Sdk
+# Optional if installed in standard SDK path:
+ndk.dir=C:\\Users\\<your-username>\\AppData\\Local\\Android\\Sdk\\ndk\\28.2.13676358
+```
 
 ---
 
-## Running in Development
+## Build Variants & Flavors
 
-1. **List Connected Devices**
+Neko Music supports two product flavors across different CPU architectures:
 
-   Verify that your target emulator, device, or desktop runner is detected:
+| Flavor | Description | Dependencies |
+| :--- | :--- | :--- |
+| **`foss`** | **100% Free and Open Source**. Excludes proprietary Google libraries. Uses stubs for Google Cast and disables Firebase. Ideal for F-Droid and de-Googled devices. | Pure open-source |
+| **`gms`** | Standard build with Google Play Services integration, Google Cast support, and optional Firebase Crashlytics reporting. | Google Play Services |
 
-   ```bash
-   flutter devices
-   ```
+### Common Build Tasks
 
-2. **Start the Application**
+#### 1. FOSS Builds (Recommended for local development)
 
-   Run on the default connected device:
+```bash
+# Assemble 64-bit ARM debug APK (fastest build for physical devices)
+./gradlew assembleArm64FossDebug
 
-   ```bash
-   flutter run
-   ```
+# Assemble universal FOSS debug APK (includes all ABIs)
+./gradlew assembleUniversalFossDebug
 
-   Run on a specific device by ID:
+# Windows PowerShell:
+.\gradlew.bat assembleArm64FossDebug
+```
 
-   ```bash
-   flutter run -d <DEVICE_ID>
-   ```
+Output APK will be located at:
+`app/build/outputs/apk/arm64Foss/debug/app-arm64-foss-debug.apk`
 
-3. **Development Controls**
+#### 2. GMS Builds
 
-   While the Flutter debug session is active in your terminal:
-   - Press `r` to trigger Hot Reload.
-   - Press `R` to trigger Hot Restart.
-   - Press `v` to open Flutter DevTools.
-   - Press `q` to terminate the session.
+```bash
+# Debug build with Google Play Services & Cast
+./gradlew assembleArm64GmsDebug
 
----
-
-## Building for Release
-
-### Android Release Builds
-
-1. **Universal Release APK**
-
-   Produces a single universal APK containing all supported architectures:
-
-   ```bash
-   flutter build apk --release
-   ```
-
-   Output path:
-   `build/app/outputs/flutter-apk/app-release.apk`
-
-2. **Split-Per-ABI APKs (Recommended for Distribution)**
-
-   Produces separate APKs optimized for specific CPU architectures (`arm64-v8a`, `armeabi-v7a`, `x86_64`):
-
-   ```bash
-   flutter build apk --release --split-per-abi
-   ```
-
-   Output path:
-   `build/app/outputs/flutter-apk/app-<abi>-release.apk`
-
-3. **Android App Bundle (Google Play)**
-
-   ```bash
-   flutter build appbundle --release
-   ```
-
-   Output path:
-   `build/app/outputs/bundle/release/app-release.aab`
-
-### Desktop Release Builds
-
-- **Windows**:
-  ```bash
-  flutter build windows --release
-  ```
-  Output path: `build/windows/runner/Release/`
-
-- **Linux**:
-  ```bash
-  flutter build linux --release
-  ```
-  Output path: `build/linux/x64/release/bundle/`
-
-- **macOS**:
-  ```bash
-  flutter build macos --release
-  ```
-  Output path: `build/macos/Build/Products/Release/`
+# Universal GMS debug
+./gradlew assembleUniversalGmsDebug
+```
 
 ---
 
-## Permissions and Platform Configuration
+## Optional Configurations
 
-Neko Music relies on background execution, lock screen integration, and storage access.
+### 1. Firebase Crashlytics & Analytics (GMS only)
 
-### Android Permissions (Declared in `AndroidManifest.xml`)
+If building the `gms` flavor with your own Firebase project:
+1. Create an Android application in the [Firebase Console](https://console.firebase.google.com/) with package name `neko.music.app` (and `neko.music.app.debug`).
+2. Download `google-services.json` and place it in the [`app/`](app/) directory.
+3. If no `google-services.json` is present or if building the `foss` flavor, Firebase features are automatically disabled by Gradle.
 
-- `android.permission.INTERNET`: Required for metadata queries and audio stream extraction.
-- `android.permission.FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PLAYBACK`: Required for continuous background playback and notification controls.
-- `android.permission.POST_NOTIFICATIONS`: Required on Android 13+ (API 33+) to post media controls to the notification drawer.
-- `android.permission.WAKE_LOCK`: Keeps CPU active while audio playback is in progress.
-- `android.permission.READ_EXTERNAL_STORAGE` / `WRITE_EXTERNAL_STORAGE`: Used on Android 12 and below for saving downloaded audio files.
+### 2. AI Lyrics Translation API Keys
+
+Neko Music supports real-time translation of foreign language lyrics via LLM providers:
+1. Obtain an API key from [OpenRouter](https://openrouter.ai/), [DeepL](https://www.deepl.com/), or [Mistral AI](https://mistral.ai/).
+2. In the app, navigate to **Settings $\rightarrow$ AI Settings**.
+3. Select your desired provider and paste your API key.
+
+### 3. Release Signing
+
+To sign release builds, specify the signing credentials in your environment variables or in `gradle.properties`:
+
+```properties
+KEYSTORE_PATH=/path/to/your/release.keystore
+STORE_PASSWORD=your_keystore_password
+KEY_ALIAS=your_key_alias
+KEY_PASSWORD=your_key_password
+```
+
+Then compile:
+```bash
+./gradlew assembleArm64FossRelease
+```
 
 ---
 
 ## Troubleshooting
 
-### Issue: NewPipeExtractor Downloader Null Pointer Exception
+### 1. `SDK location not found`
+Ensure `local.properties` exists in the repository root and contains an absolute path to your Android SDK using escaped backslashes on Windows (`C:\\Users\\...\\Sdk`).
 
-- **Cause**: The NewPipe extractor requires initialization before making extractor queries.
-- **Resolution**: `NewPipeExtractor.init()` is executed during `main()` in `lib/main.dart`. Ensure execution originates from the standard entry point.
+### 2. Room Auto-Migration Error (`Schema 'x.json' required for migration was not found`)
+Historical database schemas are stored in [`core/schemas/neko.music.app.db.InternalDatabase/`](core/schemas/neko.music.app.db.InternalDatabase/). Ensure this directory contains all versioned JSON files (`1.json` through the latest version).
 
-### Issue: Java Version Mismatch During Gradle Build
+### 3. JNI / NDK CMake Compilation Failures
+Verify that NDK `28.2.13676358` and CMake are properly installed in the Android SDK Manager. The USB DAC module (`:usbaudio`) compiles C++20 code via CMake.
 
-- **Cause**: The Android Gradle Plugin requires JDK 17. Older Java versions cause compilation failures.
-- **Resolution**: Confirm your active Java version with `java -version` and point `JAVA_HOME` to JDK 17.
-
-### Issue: Missing MPV Libraries on Linux
-
-- **Cause**: `media_kit` requires native `libmpv` headers on Linux desktop targets.
-- **Resolution**: Run `sudo apt-get install libmpv-dev mpv` and verify installation with `mpv --version`.
-
-### Issue: Background Playback Killed by Device
-
-- **Cause**: Aggressive vendor battery managers terminate foreground services.
-- **Resolution**: Disable battery optimization for Neko Music in system settings on test hardware.
+### 4. Gradle Daemon Memory / Sockets
+If Gradle fails to connect to its daemon on Windows due to sandbox or local socket restrictions, run with `--no-daemon`:
+```powershell
+.\gradlew.bat assembleArm64FossDebug --no-daemon
+```
 
 ---
 
-## Related Documents
+## Code Style & Testing
 
-- [README.md](README.md) - Project overview and architecture.
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution process and standards.
-- [DESIGN.md](DESIGN.md) - UI design language and theme architecture.
-- [LICENSE](LICENSE) - MIT License terms and conditions.
+Before submitting a Pull Request, verify your changes compile and pass tests:
 
+```bash
+# Run unit tests across all modules
+./gradlew test
+
+# Run Android lint
+./gradlew lint
+```

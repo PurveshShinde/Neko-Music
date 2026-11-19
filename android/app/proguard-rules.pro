@@ -1,2 +1,0 @@
--dontwarn java.beans.**
--dontwarn org.mozilla.javascript.**

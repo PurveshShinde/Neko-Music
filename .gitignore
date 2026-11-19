@@ -1,48 +1,48 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
-
-# IntelliJ related
 *.iml
-*.ipr
-*.iws
-.idea/
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.kotlin/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# Mac
+.DS_Store
 
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-/coverage/
+# build folders
+build/
+app/build/
+androidApp/build/
+composeApp/build/
+cast/build/
+cast-empty/build/
+crashlytics/build/
+crashlytics-empty/build/
+lastfm/build/
+lastfm-empty/build/
+*/build/
 
-# Symbolication related
-app.*.symbols
+# Release artifacts
+release/
 
-# Obfuscation related
-app.*.map.json
+# Keystores & Signing credentials
+*.jks
+*.keystore
+release-keystore/
+# Gradle
+.gradle/
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# Kotlin Multiplatform
+/.kotlin
 
-# Widget Preview related
-.widget_preview/
+# Logs
+*.log
+
+# Reference source repositories (never commit)
+BitChord-main/
+ArchiveTune-main/
+PixelMusic-main/
