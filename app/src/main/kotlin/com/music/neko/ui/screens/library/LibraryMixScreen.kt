@@ -180,34 +180,59 @@ fun LibraryMixScreen(
   fun <T> List<T>.sortItems(): List<T> {
     return when (sortType) {
       MixSortType.CREATE_DATE ->
-        this.sortedBy { item ->
-          when (item) {
-            is Album -> item.album.bookmarkedAt
-            is Artist -> item.artist.bookmarkedAt
-            is Playlist -> item.playlist.createdAt
-            else -> LocalDateTime.now()
+        this.sortedWith(
+          compareBy<T> { item ->
+            when (item) {
+              is Album -> item.album.bookmarkedAt
+              is Artist -> item.artist.bookmarkedAt
+              is Playlist -> item.playlist.createdAt
+              else -> LocalDateTime.MIN
+            }
+          }.thenBy { item ->
+            when (item) {
+              is Album -> item.id
+              is Artist -> item.id
+              is Playlist -> item.id
+              else -> ""
+            }
           }
-        }
+        )
       MixSortType.NAME ->
         this.sortedWith(
-          compareBy(collator) { item ->
+          compareBy<T, String>(collator) { item ->
             when (item) {
               is Album -> item.album.title
               is Artist -> item.artist.name
               is Playlist -> item.playlist.name
               else -> ""
             }
-          },
+          }.thenBy { item ->
+            when (item) {
+              is Album -> item.id
+              is Artist -> item.id
+              is Playlist -> item.id
+              else -> ""
+            }
+          }
         )
       MixSortType.LAST_UPDATED ->
-        this.sortedBy { item ->
-          when (item) {
-            is Album -> item.album.lastUpdateTime
-            is Artist -> item.artist.lastUpdateTime
-            is Playlist -> item.playlist.lastUpdateTime
-            else -> LocalDateTime.now()
+        this.sortedWith(
+          compareBy<T> { item ->
+            when (item) {
+              is Album -> item.album.lastUpdateTime
+              is Artist -> item.artist.lastUpdateTime
+              is Playlist -> item.playlist.lastUpdateTime
+              else -> LocalDateTime.MIN
+            }
+          }.thenBy { item ->
+            when (item) {
+              is Album -> item.id
+              is Artist -> item.id
+              is Playlist -> item.id
+              else -> ""
+            }
           }
-        }
+        )
     }.reversed(sortDescending)
   }
 
@@ -433,7 +458,7 @@ fun LibraryMixScreen(
                 menuState = menuState,
                 coroutineScope = coroutineScope,
                 playlist = playlist,
-                modifier = Modifier.animateItem(),
+                modifier = Modifier,
               )
             }
           }
@@ -719,7 +744,7 @@ fun LibraryMixScreen(
                 menuState = menuState,
                 coroutineScope = coroutineScope,
                 playlist = playlist,
-                modifier = Modifier.animateItem(),
+                modifier = Modifier,
               )
             }
           }

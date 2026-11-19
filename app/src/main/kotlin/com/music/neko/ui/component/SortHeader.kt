@@ -84,8 +84,8 @@ inline fun <reified T : Enum<T>> SortHeader(
           state = rememberTooltipState(),
         ) {
           SplitButtonDefaults.TrailingButton(
-            checked = sortDescending,
-            onCheckedChange = { onSortDescendingChange(it) },
+            checked = false,
+            onCheckedChange = { onSortDescendingChange(!sortDescending) },
             colors =
               ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -99,7 +99,7 @@ inline fun <reified T : Enum<T>> SortHeader(
           ) {
             val rotation: Float by
               animateFloatAsState(
-                targetValue = if (sortDescending) 180f else 0f,
+                targetValue = if (sortDescending) 0f else 180f,
                 label = "Trailing Icon Rotation",
               )
             Icon(
@@ -114,8 +114,8 @@ inline fun <reified T : Enum<T>> SortHeader(
         }
       } else {
         SplitButtonDefaults.TrailingButton(
-          checked = menuExpanded,
-          onCheckedChange = { menuExpanded = it },
+          checked = false,
+          onCheckedChange = { menuExpanded = !menuExpanded },
           colors =
             ButtonDefaults.buttonColors(
               containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,

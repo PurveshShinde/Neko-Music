@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <!-- Upstream InnerTune strings -->
 <!-- Do not add new features here -->
@@ -512,6 +512,7 @@
     <string name="spotify_no_sources">No Spotify playlists found</string>
     <string name="spotify_import_in_progress">Importing Spotify playlists</string>
     <string name="spotify_import_progress_step">%1$s • %2$d/%3$d sources • %4$d/%5$d tracks</string>
+    <string name="spotify_importing_tracks">Importing %1$d/%2$d tracks</string>
     <string name="spotify_import_complete">Spotify import complete</string>
     <string name="spotify_import_summary">%1$d sources • %2$d imported • %3$d failed</string>
     <string name="spotify_source_summary">%1$s: %2$d/%3$d imported</string>
