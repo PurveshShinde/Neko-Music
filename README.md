@@ -204,6 +204,9 @@ Neko Music is built on a clean, modular multi-project Gradle architecture:
 ## Contributors
 
 <!-- readme: contributors -start -->
+<table>
+<tr><td align="center"><a href="https://github.com/PurveshShinde"><img src="https://avatars.githubusercontent.com/u/134372658?v=4" width="60" height="60" /></a></td></tr>
+</table>
 <!-- readme: contributors -end -->
 
 ---
