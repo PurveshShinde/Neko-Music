@@ -71,6 +71,7 @@ The following components are embedded directly in source to maintain binary comp
 | :--- | :--- | :--- | :---: | :--- |
 | **Backdrop Shaders** | Copyright © 2025 Kyant | [Kyant0/backdrop](https://github.com/Kyant0/backdrop) | **Apache-2.0** | AGSL hardware-accelerated frosted glass blur shaders (`Shaders.kt`). |
 | **Floating Tab Bar** | Elyes Mansour | [elyesmansour/compose-floating-tab-bar](https://github.com/elyesmansour/compose-floating-tab-bar) | **Apache-2.0** | Animated floating navigation tab bar (`FloatingTabBar.kt`). |
+| **BBH Bartle Font** | Studio Drama & BBH Project Authors | [Studio-DRAMA/BBH](https://github.com/Studio-DRAMA/BBH) | **OFL-1.1** | Display typeface licensed under SIL Open Font License v1.1 (`bbh_bartle_regular.ttf`). |
 
 ---
 
