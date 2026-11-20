@@ -5,20 +5,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
-    groups:
-      gradle-dependencies:
-        patterns:
-          - "*"
-        exclude-patterns:
-          - "org.jetbrains.kotlin:*"
-          - "org.jetbrains.kotlin.plugin.compose"
-          - "org.jetbrains.kotlin.plugin.serialization"
-          - "com.google.devtools.ksp"
-          - "gradle-wrapper"
-        update-types:
-          - "minor"
-          - "patch"
+    open-pull-requests-limit: 0
     ignore:
       - dependency-name: "com.google.android.gms:play-services-cronet"
         versions:
@@ -29,7 +16,4 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-    groups:
-      actions:
-        patterns:
-          - "*"
+    open-pull-requests-limit: 0
