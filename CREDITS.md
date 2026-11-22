@@ -53,7 +53,7 @@ PurveshShinde/Neko-Music (GPL-3.0)
 ### 2.3 Vivi Music
 - **Contributors:** Vivi Music Project Contributors
 - **Licence:** GPL-3.0
-- **Scope:** Dynamic theme components (`ColorPicker.kt`, `FloatingNavBar.kt`, `FontSelectionScreen.kt`) and listening analytics ViewModels (`DetailedListeningHistoryViewModel.kt`, `ListeningSummaryViewModel.kt`).
+- **Scope:** Dynamic theme components (`ColorPicker.kt`, `FloatingNavBar.kt`, `FontSelectionScreen.kt`), listening analytics ViewModels (`DetailedListeningHistoryViewModel.kt`, `ListeningSummaryViewModel.kt`), and Spotify authentication, session management, canvas resolver, and GraphQL client (`SpotifyLoginScreen.kt`, `SpotifySessionManager.kt`, `SpotifyCanvasProvider.kt`, `SpotifySession.kt`, `Spotify.kt`).
 
 ### 2.4 Lossless Audio Extension
 - **Author:** **Silly Kat**

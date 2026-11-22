@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import neko.music.app.BuildConfig
 import neko.music.app.LocalPlayerAwareWindowInsets
 import neko.music.app.R
+import neko.music.app.echomusic.component.UpdateAvailableDialog
 import neko.music.app.echomusic.component.UpdateInfoDialog
 import neko.music.app.echomusic.updater.autoClearOldApks
 import neko.music.app.echomusic.updater.getAutoUpdateCheckSetting
@@ -42,6 +43,8 @@ import neko.music.app.echomusic.updater.getBetaUpdatesSetting
 import neko.music.app.echomusic.updater.getDownloadedApkCount
 import neko.music.app.echomusic.updater.getUpdateAvailableState
 import neko.music.app.echomusic.updater.getUpdateNotificationsSetting
+import neko.music.app.echomusic.updater.saveUpdateAvailableState
+import kotlinx.coroutines.launch
 import neko.music.app.ui.component.IconButton
 import neko.music.app.ui.component.Material3SettingsGroup
 import neko.music.app.ui.component.Material3SettingsItem
@@ -68,6 +71,7 @@ fun UpdateSettings(
   val scrollState = androidx.compose.foundation.rememberScrollState()
 
   val context = LocalContext.current
+  val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
   var autoUpdateEnabled by remember { mutableStateOf(getAutoUpdateCheckSetting(context)) }
   var updateNotificationsEnabled by remember {
     mutableStateOf(getUpdateNotificationsSetting(context))
@@ -79,6 +83,14 @@ fun UpdateSettings(
       autoUpdateEnabled
   var apkCount by remember { mutableStateOf(getDownloadedApkCount(context)) }
   var showInfoDialog by remember { mutableStateOf(false) }
+  var showUpdateDialog by remember { mutableStateOf(false) }
+  var updateVersion by remember { mutableStateOf("") }
+  var updateChangelog by remember {
+    mutableStateOf<List<neko.music.app.echomusic.updater.ChangelogSection>>(emptyList())
+  }
+  var updateDescription by remember { mutableStateOf<String?>(null) }
+  var updateApkUrl by remember { mutableStateOf<String?>(null) }
+  var updateSize by remember { mutableStateOf<String?>(null) }
   var releaseNotes by remember { mutableStateOf<String?>(null) }
 
   LaunchedEffect(Unit) {
@@ -86,6 +98,21 @@ fun UpdateSettings(
     apkCount = getDownloadedApkCount(context)
 
     if (neko.music.app.config.NekoUpdateConfig.isConfigured) {
+      neko.music.app.echomusic.updater.checkForUpdate(
+        context = context,
+        onSuccess = { tag, isAvailable, changelog, size, _, description, _, apkUrl ->
+          saveUpdateAvailableState(context, isAvailable)
+          if (isAvailable) {
+            updateVersion = tag
+            updateChangelog = changelog
+            updateDescription = description
+            updateSize = size
+            updateApkUrl = apkUrl
+          }
+        },
+        onError = {}
+      )
+
       kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         try {
           val url =
@@ -102,6 +129,17 @@ fun UpdateSettings(
 
   if (showInfoDialog) {
     UpdateInfoDialog(onDismiss = { showInfoDialog = false })
+  }
+
+  if (showUpdateDialog) {
+    UpdateAvailableDialog(
+      version = updateVersion,
+      changelog = updateChangelog,
+      description = updateDescription,
+      apkUrl = updateApkUrl,
+      fileSize = updateSize,
+      onDismiss = { showUpdateDialog = false },
+    )
   }
 
   Column(
@@ -137,9 +175,26 @@ fun UpdateSettings(
               }
             },
             onClick = {
-              if (neko.music.app.config.NekoUpdateConfig.isConfigured) {
-                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(neko.music.app.config.NekoUpdateConfig.REPOSITORY_URL))
-                context.startActivity(intent)
+              if (updateVersion.isNotEmpty()) {
+                showUpdateDialog = true
+              } else if (neko.music.app.config.NekoUpdateConfig.isConfigured) {
+                coroutineScope.launch {
+                  neko.music.app.echomusic.updater.checkForUpdate(
+                    context = context,
+                    onSuccess = { tag, isAvailable, changelog, size, _, description, _, apkUrl ->
+                      saveUpdateAvailableState(context, isAvailable)
+                      if (isAvailable) {
+                        updateVersion = tag
+                        updateChangelog = changelog
+                        updateDescription = description
+                        updateSize = size
+                        updateApkUrl = apkUrl
+                        showUpdateDialog = true
+                      }
+                    },
+                    onError = {}
+                  )
+                }
               }
             }
           )

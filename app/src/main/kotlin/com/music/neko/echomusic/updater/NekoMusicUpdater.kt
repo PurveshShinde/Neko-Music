@@ -61,6 +61,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import java.security.MessageDigest
 import androidx.navigation.NavHostController
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
@@ -658,6 +661,242 @@ fun isNewerVersion(latestVersion: String, currentVersion: String): Boolean {
   return false
 }
 
+data class ReleaseApkCandidate(
+  val name: String,
+  val downloadUrl: String,
+  val sizeInMB: String,
+  val priority: Int,
+)
+
+fun selectBestApkAsset(assets: JSONArray): ReleaseApkCandidate? {
+  val abis = Build.SUPPORTED_ABIS.map { it.lowercase() }
+  val isArm64 = abis.any { it.contains("arm64") || it.contains("aarch64") }
+  val isArmV7 = abis.any { it.contains("armeabi-v7a") || it.contains("armeabi") }
+  val isX86_64 = abis.any { it.contains("x86_64") }
+  val isX86 = abis.any { it == "x86" || (it.contains("x86") && !it.contains("x86_64")) }
+
+  val candidates = mutableListOf<ReleaseApkCandidate>()
+
+  for (i in 0 until assets.length()) {
+    val asset = assets.getJSONObject(i)
+    val name = asset.getString("name")
+    val lowerName = name.lowercase()
+    if (!lowerName.endsWith(".apk") || lowerName.contains("debug")) {
+      continue
+    }
+
+    val mentionsArm64 =
+      lowerName.contains("arm64") || lowerName.contains("v8a") || lowerName.contains("aarch64")
+    val mentionsArmV7 =
+      (lowerName.contains("v7a") || lowerName.contains("armeabi") || lowerName.contains("arm-")) &&
+        !mentionsArm64
+    val mentionsX86_64 =
+      lowerName.contains("x86_64") || lowerName.contains("x86-64") || lowerName.contains("x64")
+    val mentionsX86 = lowerName.contains("x86") && !mentionsX86_64
+    val isUniversal =
+      lowerName.contains("universal") || lowerName.contains("all-arch") || lowerName.contains("fat")
+
+    // Explicitly reject foreign architecture APKs that are incompatible with this device
+    if (mentionsArm64 && !isArm64) continue
+    if (mentionsArmV7 && !isArmV7) continue
+    if (mentionsX86_64 && !isX86_64) continue
+    if (mentionsX86 && !isX86) continue
+
+    // Do not assume an unlabeled APK is Universal. It must be explicitly Universal or have a compatible arch
+    val hasKnownArch = mentionsArm64 || mentionsArmV7 || mentionsX86_64 || mentionsX86
+    if (!hasKnownArch && !isUniversal) {
+      continue
+    }
+
+    val sizeInBytes = asset.optLong("size", 0L)
+    val sizeInMB =
+      if (sizeInBytes > 0) {
+        String.format(java.util.Locale.US, "%.1f MB", sizeInBytes / (1024.0 * 1024.0))
+      } else {
+        ""
+      }
+    val downloadUrl = asset.getString("browser_download_url")
+
+    // Priority ranking:
+    // 1: Primary native ABI match for device
+    // 2: Universal fallback
+    // 3: Secondary compatible ABI (e.g. 32-bit armv7 on 64-bit device if supported)
+    val priority =
+      when {
+        isArm64 && mentionsArm64 -> 1
+        isX86_64 && mentionsX86_64 -> 1
+        !isArm64 && isArmV7 && mentionsArmV7 -> 1
+        !isX86_64 && isX86 && mentionsX86 -> 1
+        isUniversal -> 2
+        isArm64 && isArmV7 && mentionsArmV7 -> 3
+        isX86_64 && isX86 && mentionsX86 -> 3
+        else -> continue
+      }
+    candidates.add(ReleaseApkCandidate(name, downloadUrl, sizeInMB, priority))
+  }
+
+  return candidates.minByOrNull { it.priority }
+}
+
+private fun getSha256Digest(bytes: ByteArray): String {
+  val md = MessageDigest.getInstance("SHA-256")
+  return md.digest(bytes).joinToString("") { "%02x".format(it) }
+}
+
+/**
+ * Cryptographically verifies that the downloaded APK's signing certificate matches
+ * the trusted signing certificate of the currently installed Neko Music application.
+ *
+ * Supports API 28+ (GET_SIGNING_CERTIFICATES, multiple signers, and key rotation history)
+ * and API 26-27 (GET_SIGNATURES).
+ */
+fun isApkSignatureMatching(context: Context, apkFile: File): Boolean {
+  return try {
+    val pm = context.packageManager
+    val signingFlags =
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        PackageManager.GET_SIGNING_CERTIFICATES
+      } else {
+        @Suppress("DEPRECATION")
+        PackageManager.GET_SIGNATURES
+      }
+
+    val installedPkg =
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        pm.getPackageInfo(
+          context.packageName,
+          PackageManager.PackageInfoFlags.of(signingFlags.toLong()),
+        )
+      } else {
+        @Suppress("DEPRECATION")
+        pm.getPackageInfo(context.packageName, signingFlags)
+      }
+
+    val archivePkg =
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        pm.getPackageArchiveInfo(
+          apkFile.absolutePath,
+          PackageManager.PackageInfoFlags.of(signingFlags.toLong()),
+        )
+      } else {
+        @Suppress("DEPRECATION")
+        pm.getPackageArchiveInfo(apkFile.absolutePath, signingFlags)
+      } ?: return false
+
+    // Preserve existing package name verification
+    if (archivePkg.packageName != context.packageName) {
+      Log.w(
+        "ApkVerification",
+        "Package name mismatch: expected ${context.packageName}, found ${archivePkg.packageName}",
+      )
+      return false
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      val installedSigningInfo = installedPkg.signingInfo ?: return false
+      val archiveSigningInfo = archivePkg.signingInfo ?: return false
+
+      if (installedSigningInfo.hasMultipleSigners() || archiveSigningInfo.hasMultipleSigners()) {
+        if (!installedSigningInfo.hasMultipleSigners() || !archiveSigningInfo.hasMultipleSigners()) {
+          return false
+        }
+        val installedSigners =
+          installedSigningInfo.apkContentsSigners
+            ?.map { getSha256Digest(it.toByteArray()) }
+            ?.toSet() ?: return false
+        val archiveSigners =
+          archiveSigningInfo.apkContentsSigners
+            ?.map { getSha256Digest(it.toByteArray()) }
+            ?.toSet() ?: return false
+        return installedSigners.isNotEmpty() && installedSigners == archiveSigners
+      }
+
+      val installedCurrent =
+        installedSigningInfo.apkContentsSigners
+          ?.map { getSha256Digest(it.toByteArray()) }
+          ?.toSet() ?: return false
+      val archiveCurrent =
+        archiveSigningInfo.apkContentsSigners
+          ?.map { getSha256Digest(it.toByteArray()) }
+          ?.toSet() ?: return false
+
+      if (installedCurrent.isEmpty() || archiveCurrent.isEmpty()) {
+        return false
+      }
+
+      if (installedCurrent == archiveCurrent) {
+        return true
+      }
+
+      // Check key rotation lineage: the downloaded archive's signing history must contain the installed app's current signer
+      val archiveHistory =
+        archiveSigningInfo.signingCertificateHistory
+          ?.map { getSha256Digest(it.toByteArray()) }
+          ?.toSet() ?: emptySet()
+      if (archiveHistory.isNotEmpty() && installedCurrent.all { it in archiveHistory }) {
+        return true
+      }
+
+      Log.w("ApkVerification", "Certificate signature mismatch between installed app and downloaded APK.")
+      return false
+    } else {
+      @Suppress("DEPRECATION")
+      val installedSignatures =
+        installedPkg.signatures?.map { getSha256Digest(it.toByteArray()) }?.toSet() ?: return false
+      @Suppress("DEPRECATION")
+      val archiveSignatures =
+        archivePkg.signatures?.map { getSha256Digest(it.toByteArray()) }?.toSet() ?: return false
+
+      val matches = installedSignatures.isNotEmpty() && installedSignatures == archiveSignatures
+      if (!matches) {
+        Log.w("ApkVerification", "Legacy certificate signature mismatch.")
+      }
+      return matches
+    }
+  } catch (e: Exception) {
+    Log.e("ApkVerification", "Error verifying APK signatures: ${e.message}", e)
+    false
+  }
+}
+
+fun isApkValid(context: Context, file: File): Boolean {
+  if (!file.exists() || file.length() < 1024L) return false
+  return isApkSignatureMatching(context, file)
+}
+
+fun installDownloadedApk(context: Context, apkFile: File): Boolean {
+  if (!isApkValid(context, apkFile)) {
+    return false
+  }
+
+  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    if (!context.packageManager.canRequestPackageInstalls()) {
+      val intent =
+        Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+          data = Uri.parse("package:${context.packageName}")
+          addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+      context.startActivity(intent)
+      return false
+    }
+  }
+
+  val uri =
+    FileProvider.getUriForFile(
+      context,
+      "${context.packageName}.FileProvider",
+      apkFile,
+    )
+  val installIntent =
+    Intent(Intent.ACTION_VIEW).apply {
+      setDataAndType(uri, "application/vnd.android.package-archive")
+      addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+      addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+  context.startActivity(installIntent)
+  return true
+}
+
 suspend fun checkForUpdate(
   context: Context,
   onSuccess:
@@ -669,7 +908,7 @@ suspend fun checkForUpdate(
       date: String,
       description: String?,
       imageUrl: String?,
-      apkUrl: String?
+      apkUrl: String?,
     ) -> Unit,
   onError: () -> Unit,
 ) {
@@ -683,9 +922,27 @@ suspend fun checkForUpdate(
       val json = url.openStream().bufferedReader().use { it.readText() }
       val targetRelease = JSONObject(json)
 
+      // Ignore drafts
+      if (targetRelease.optBoolean("draft", false)) {
+        withContext(Dispatchers.Main) {
+          onSuccess(BuildConfig.VERSION_NAME, false, emptyList(), "", "", null, null, null)
+        }
+        return@withContext
+      }
+
+      // Ignore prereleases unless beta updates are enabled
+      val isPrerelease = targetRelease.optBoolean("prerelease", false)
+      if (isPrerelease && !getBetaUpdatesSetting(context)) {
+        withContext(Dispatchers.Main) {
+          onSuccess(BuildConfig.VERSION_NAME, false, emptyList(), "", "", null, null, null)
+        }
+        return@withContext
+      }
+
       val currentVersion = BuildConfig.VERSION_NAME
       val targetTagName = targetRelease.getString("tag_name")
-      val shouldShow = neko.music.app.config.NekoUpdateConfig.isNewerVersion(currentVersion, targetTagName)
+      val shouldShow =
+        neko.music.app.config.NekoUpdateConfig.isNewerVersion(currentVersion, targetTagName)
 
       if (shouldShow) {
         val tagWithPrefix = targetRelease.getString("tag_name")
@@ -696,9 +953,7 @@ suspend fun checkForUpdate(
         var imageUrl: String? = null
         try {
           val changelogUrl =
-            URL(
-              neko.music.app.config.NekoUpdateConfig.changelogUrl(tagWithPrefix)
-            )
+            URL(neko.music.app.config.NekoUpdateConfig.changelogUrl(tagWithPrefix))
           val changelogJson = changelogUrl.openStream().bufferedReader().use { it.readText() }
           val changelogData = JSONObject(changelogJson)
 
@@ -733,23 +988,11 @@ suspend fun checkForUpdate(
 
         val publishedAt = targetRelease.getString("published_at")
         val formattedReleaseDate = formatGitHubDate(publishedAt)
-        val assets = targetRelease.getJSONArray("assets")
+        val assets = targetRelease.optJSONArray("assets") ?: JSONArray()
 
-        var apkSizeInMB = ""
-        var apkDownloadUrl = ""
-        for (j in 0 until assets.length()) {
-          val asset = assets.getJSONObject(j)
-          val assetName = asset.getString("name")
-          if (
-            assetName.endsWith(".apk", ignoreCase = true) &&
-              !assetName.lowercase().contains("debug")
-          ) {
-            val apkSizeInBytes = asset.getLong("size")
-            apkSizeInMB = String.format("%.1f", apkSizeInBytes / (1024.0 * 1024.0))
-            apkDownloadUrl = asset.getString("browser_download_url")
-            break
-          }
-        }
+        val selectedApk = selectBestApkAsset(assets)
+        val apkSizeInMB = selectedApk?.sizeInMB ?: ""
+        val apkDownloadUrl = selectedApk?.downloadUrl ?: ""
 
         if (apkDownloadUrl.isNotEmpty()) {
           withContext(Dispatchers.Main) {
@@ -761,7 +1004,7 @@ suspend fun checkForUpdate(
               formattedReleaseDate,
               description,
               imageUrl,
-              apkDownloadUrl
+              apkDownloadUrl,
             )
           }
           return@withContext
@@ -779,6 +1022,7 @@ suspend fun checkForUpdate(
 }
 
 const val KEY_LAST_SEEN_CHANGELOG_VERSION = "last_seen_changelog_version"
+const val KEY_DISMISSED_UPDATE_VERSION = "dismissed_update_version"
 
 fun getLastSeenChangelogVersion(context: Context): String {
   val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -788,6 +1032,61 @@ fun getLastSeenChangelogVersion(context: Context): String {
 fun saveLastSeenChangelogVersion(context: Context, version: String) {
   val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
   sharedPrefs.edit().putString(KEY_LAST_SEEN_CHANGELOG_VERSION, version).apply()
+}
+
+fun getDismissedUpdateVersion(context: Context): String {
+  val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+  return sharedPrefs.getString(KEY_DISMISSED_UPDATE_VERSION, "") ?: ""
+}
+
+fun saveDismissedUpdateVersion(context: Context, version: String) {
+  val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+  sharedPrefs.edit().putString(KEY_DISMISSED_UPDATE_VERSION, version).apply()
+}
+
+/**
+ * Provides structured fallback release notes from local metadata when network access
+ * is unavailable or GitHub API is unreachable on first launch after an update.
+ */
+fun getLocalChangelogFallback(currentVersion: String): WhatsNewInfo? {
+  val cleanCurrent = currentVersion.removePrefix("b").removePrefix("v").trim()
+  return when (cleanCurrent) {
+    "0.0.2" -> WhatsNewInfo(
+      changelog = listOf(
+        ChangelogSection(
+          title = "Added",
+          items = listOf(
+            "Vivi Music Spotify Integration: Lightweight GraphQL and web-session-based Spotify integration.",
+            "WebView Session Authentication: In-app secure web login capturing session credentials (sp_dc, sp_key) with automated token refresh.",
+            "Spotify Canvas Support: Canvas video artwork provider decoding background visual clips via Spotify's protobuf service.",
+            "Dual Attribution & Legal Compliance: Preserved verbatim notices and standardized GPL-3.0 headers across all Spotify integration files."
+          )
+        ),
+        ChangelogSection(
+          title = "Changed",
+          items = listOf(
+            "Spotify Architecture Overhaul: Replaced legacy Spotube client dependencies with modern Ktor-based endpoints.",
+            "Dynamic Client User-Agent Alignment: Replaced static version strings with dynamic BuildConfig.VERSION_NAME."
+          )
+        )
+      ),
+      description = "Welcome to Neko Music v0.0.2! Here is what's new in this release."
+    )
+    "0.0.1" -> WhatsNewInfo(
+      changelog = listOf(
+        ChangelogSection(
+          title = "Added",
+          items = listOf(
+            "Neko Brand Identity: Launch icons, themed placeholder art, and updated visual assets.",
+            "Redesigned About Screen: Developer links, project repository, and easter egg.",
+            "Centralized Update Configuration: Fully decoupled update infrastructure routing to GitHub Releases."
+          )
+        )
+      ),
+      description = "Welcome to Neko Music v0.0.1!"
+    )
+    else -> null
+  }
 }
 
 data class WhatsNewInfo(

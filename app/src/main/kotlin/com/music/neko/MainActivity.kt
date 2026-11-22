@@ -537,7 +537,16 @@ class MainActivity : ComponentActivity() {
         emptyList()
       )
     }
+    var showWelcomeDialog by remember {
+      androidx.compose.runtime.mutableStateOf(false)
+    }
     var availableUpdateDescription by remember {
+      androidx.compose.runtime.mutableStateOf<String?>(null)
+    }
+    var availableUpdateApkUrl by remember {
+      androidx.compose.runtime.mutableStateOf<String?>(null)
+    }
+    var availableUpdateSize by remember {
       androidx.compose.runtime.mutableStateOf<String?>(null)
     }
     var whatsNewInfo by remember {
@@ -547,50 +556,75 @@ class MainActivity : ComponentActivity() {
     }
 
     LaunchedEffect(Unit) {
-      val currentVersion = BuildConfig.VERSION_NAME
+      val currentVersionName = BuildConfig.VERSION_NAME
+      val currentVersionCode = BuildConfig.VERSION_CODE
       val lastSeenVersion =
         neko.music.app.echomusic.updater.getLastSeenChangelogVersion(context)
+      val prefs = context.dataStore.data.first()
+      val lastOpenedCode = prefs[neko.music.app.constants.LastOpenedVersionCodeKey] ?: -1
 
-      if (lastSeenVersion.isEmpty() || lastSeenVersion != currentVersion) {
-        // Run migrations for fresh installs and updates
+      // Distinguish Upgrade vs Fresh Install / Cleared Data without arbitrary timestamp thresholds:
+      // 1. Definite upgrade via version tracking preferences recorded by v0.0.1:
+      val isKnownUpgrade =
+        (lastSeenVersion.isNotEmpty() && lastSeenVersion != currentVersionName) ||
+          (lastOpenedCode in 1 until currentVersionCode)
+
+      // 2. Fallback upgrade detection for existing installations where tracking keys were not recorded:
+      // Checks whether pre-existing application state exists in DataStore from prior usage.
+      // On a fresh installation or after "Clear Data", DataStore has 0 user preferences.
+      // On an existing v0.0.1 installation, prior user preferences already exist in storage.
+      val hasPriorPreferences = prefs.asMap().keys.any { key ->
+        key.name != neko.music.app.constants.ForceOpusKey.name &&
+          key.name != neko.music.app.constants.EnableCronetKey.name &&
+          key.name != neko.music.app.constants.LastOpenedVersionCodeKey.name
+      }
+      val isUpgradeWithoutPrefs =
+        (lastSeenVersion.isEmpty() && lastOpenedCode == -1) && hasPriorPreferences
+
+      val isUpgrade = isKnownUpgrade || isUpgradeWithoutPrefs
+      val isFreshInstallOrCleared = !isUpgrade && (lastSeenVersion.isEmpty() || lastOpenedCode == -1)
+
+      if (isFreshInstallOrCleared) {
+        // Fresh installation or data cleared: show welcome poster only; do not show changelog.
+        showWelcomeDialog = true
+        whatsNewInfo = null
         context.dataStore.edit { preferences ->
           preferences[neko.music.app.constants.ForceOpusKey] = true
           preferences[neko.music.app.constants.EnableCronetKey] = true
         }
-      }
-
-      if (!neko.music.app.config.NekoUpdateConfig.isConfigured) {
         saveUpdateAvailableState(context, false)
-      }
-
-      if (lastSeenVersion != currentVersion) {
+      } else if (isUpgrade) {
+        // Application update: show changelog for newly installed version only; do not show welcome poster.
+        showWelcomeDialog = false
+        context.dataStore.edit { preferences ->
+          preferences[neko.music.app.constants.ForceOpusKey] = true
+          preferences[neko.music.app.constants.EnableCronetKey] = true
+        }
         saveUpdateAvailableState(context, false)
-      }
 
-      if (lastSeenVersion.isEmpty()) {
-        // Fresh install, not an update — nothing "new" to show, so mark this
-        // version seen right away rather than waiting on a dialog dismissal.
-        neko.music.app.echomusic.updater.saveLastSeenChangelogVersion(context, currentVersion)
-        saveUpdateAvailableState(context, false)
-      } else if (lastSeenVersion != currentVersion) {
-        // Only mark the version seen once its changelog is actually shown (see
-        // onDismiss below) — if the fetch fails here, retry on the next launch
-        // instead of losing that version's release notes forever.
-        whatsNewInfo = neko.music.app.echomusic.updater.fetchChangelogForVersion(currentVersion)
+        val fetchedInfo = neko.music.app.echomusic.updater.fetchChangelogForVersion(currentVersionName)
+          ?: neko.music.app.echomusic.updater.getLocalChangelogFallback(currentVersionName)
+        whatsNewInfo = fetchedInfo
+
+        if (fetchedInfo == null) {
+          neko.music.app.echomusic.updater.saveLastSeenChangelogVersion(context, currentVersionName)
+          context.dataStore.edit {
+            it[neko.music.app.constants.LastOpenedVersionCodeKey] = currentVersionCode
+          }
+        }
+      } else {
+        // Normal launch: already processed version; direct to app.
+        showWelcomeDialog = false
+        whatsNewInfo = null
       }
     }
 
-    // Startup update checking disabled until custom updates are configured
-    /*
     LaunchedEffect(Unit) {
-      val prefs = context.dataStore.data.first()
-
       if (neko.music.app.config.NekoUpdateConfig.isConfigured && getAutoUpdateCheckSetting(context)) {
-
         delay(2000L)
         checkForUpdate(
           context = context,
-          onSuccess = { latestVersion, isAvailable, changelog, _, _, description, _, _ ->
+          onSuccess = { latestVersion, isAvailable, changelog, size, _, description, _, apkUrl ->
             val currentVersion = BuildConfig.VERSION_NAME
             Log.d(
               "UpdateCheck",
@@ -599,10 +633,19 @@ class MainActivity : ComponentActivity() {
             saveUpdateAvailableState(context, isAvailable)
 
             if (isAvailable) {
-              availableUpdateVersion = latestVersion
-              availableUpdateChangelog = changelog
-              availableUpdateDescription = description
-              showUpdateDialog = true
+              val dismissedVersion =
+                neko.music.app.echomusic.updater.getDismissedUpdateVersion(context)
+              val cleanLatest = latestVersion.removePrefix("v").removePrefix("b").trim()
+              val cleanDismissed = dismissedVersion.removePrefix("v").removePrefix("b").trim()
+
+              if (cleanLatest != cleanDismissed) {
+                availableUpdateVersion = latestVersion
+                availableUpdateChangelog = changelog
+                availableUpdateDescription = description
+                availableUpdateSize = size
+                availableUpdateApkUrl = apkUrl
+                showUpdateDialog = true
+              }
             }
 
             if (isAvailable && getUpdateNotificationsSetting(context)) {
@@ -614,7 +657,6 @@ class MainActivity : ComponentActivity() {
         )
       }
     }
-    */
 
 
     LaunchedEffect(enableHighRefreshRate) {
@@ -713,19 +755,25 @@ class MainActivity : ComponentActivity() {
     ) {
       val hapticHelper = rememberHapticHelper()
 
-      // Update template dialog commented out until custom updates are configured
-      /*
-      if (showUpdateDialog) {
+      if (showUpdateDialog && whatsNewInfo == null && !showWelcomeDialog) {
         neko.music.app.echomusic.component.UpdateAvailableDialog(
           version = availableUpdateVersion,
           changelog = availableUpdateChangelog,
           description = availableUpdateDescription,
-          onDismiss = { showUpdateDialog = false },
+          apkUrl = availableUpdateApkUrl,
+          fileSize = availableUpdateSize,
+          onDismiss = {
+            neko.music.app.echomusic.updater.saveDismissedUpdateVersion(
+              context,
+              availableUpdateVersion,
+            )
+            showUpdateDialog = false
+          },
         )
-      } else
-      */
-      run {
-        whatsNewInfo?.let { info ->
+      }
+
+      whatsNewInfo?.let { info ->
+        if (!showWelcomeDialog) {
           neko.music.app.echomusic.updater.WhatsNewDialog(
             version = BuildConfig.VERSION_NAME,
             info = info,
@@ -734,10 +782,34 @@ class MainActivity : ComponentActivity() {
                 context,
                 BuildConfig.VERSION_NAME,
               )
+              lifecycleScope.launch {
+                context.dataStore.edit {
+                  it[neko.music.app.constants.LastOpenedVersionCodeKey] =
+                    BuildConfig.VERSION_CODE
+                }
+              }
               whatsNewInfo = null
             },
           )
         }
+      }
+
+      if (showWelcomeDialog && whatsNewInfo == null) {
+        WelcomeDialog(
+          onDismissRequest = {
+            showWelcomeDialog = false
+            neko.music.app.echomusic.updater.saveLastSeenChangelogVersion(
+              context,
+              BuildConfig.VERSION_NAME,
+            )
+            lifecycleScope.launch {
+              context.dataStore.edit {
+                it[neko.music.app.constants.LastOpenedVersionCodeKey] =
+                  BuildConfig.VERSION_CODE
+              }
+            }
+          }
+        )
       }
       BoxWithConstraints(
         modifier =
@@ -1062,16 +1134,6 @@ class MainActivity : ComponentActivity() {
         var sharedSong: SongItem? by remember { mutableStateOf(null) }
         val snackbarHostState = remember { SnackbarHostState() }
         var showSettingDialoge by remember { mutableStateOf(false) }
-
-        var showWelcomeDialog by remember { mutableStateOf(false) }
-
-        LaunchedEffect(Unit) {
-          val prefs = context.dataStore.data.first()
-          val lastOpened = prefs[neko.music.app.constants.LastOpenedVersionCodeKey] ?: -1
-          if (lastOpened < BuildConfig.VERSION_CODE) {
-            showWelcomeDialog = true
-          }
-        }
 
         LaunchedEffect(Unit) {
           val activeIntent = pendingIntent ?: intent
@@ -1817,20 +1879,6 @@ class MainActivity : ComponentActivity() {
                 navController.navigate(route)
               },
               homeViewModel = homeViewModel,
-            )
-          }
-
-          if (showWelcomeDialog) {
-            WelcomeDialog(
-              onDismissRequest = {
-                showWelcomeDialog = false
-                coroutineScope.launch {
-                  context.dataStore.edit {
-                    it[neko.music.app.constants.LastOpenedVersionCodeKey] =
-                      BuildConfig.VERSION_CODE
-                  }
-                }
-              }
             )
           }
 

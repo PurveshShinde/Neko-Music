@@ -18,7 +18,7 @@ class JellyfinApiService @Inject constructor() {
   companion object {
     private const val TAG = "JellyfinApi"
     private const val CLIENT_NAME = "NekoMusic"
-    private const val CLIENT_VERSION = "0.0.1"
+    private val CLIENT_VERSION = neko.music.app.BuildConfig.VERSION_NAME
     private const val DEVICE_NAME = "Android"
     private const val DEVICE_ID = "NekoMusic-Android"
   }

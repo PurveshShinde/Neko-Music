@@ -96,7 +96,7 @@ object ListenBrainzManager {
             .post(body)
             .addHeader("Content-Type", "application/json")
             .addHeader("Authorization", "Token $token")
-            .addHeader("User-Agent", "NekoMusic/0.0.1")
+            .addHeader("User-Agent", "NekoMusic/${neko.music.app.BuildConfig.VERSION_NAME}")
             .build()
 
         httpClient.newCall(request).execute().use { resp ->
@@ -165,7 +165,7 @@ object ListenBrainzManager {
             .post(body)
             .addHeader("Content-Type", "application/json")
             .addHeader("Authorization", "Token $token")
-            .addHeader("User-Agent", "NekoMusic/0.0.1")
+            .addHeader("User-Agent", "NekoMusic/${neko.music.app.BuildConfig.VERSION_NAME}")
             .build()
 
         httpClient.newCall(request).execute().use { resp ->

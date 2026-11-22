@@ -1,6 +1,9 @@
 /*
- * NekoMusic (2026)
- * Licensed under GPL-3.0 | See git history for contributors
+ * EchoMusic (2026)
+ * © Chartreux Westia — github.com/koiverse
+ * Derived from Vivi Music Project Contributors (GPL-3.0)
+ * GPL-3.0 License | Contributors: see git history
+ * Do not remove or alter this notice. - Per GPL-3.0 Section 4 & Section 5
  */
 
 package neko.music.app.spotify

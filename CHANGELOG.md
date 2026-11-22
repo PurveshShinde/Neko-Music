@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.0.2] - 2026-11-22
+
+Integration of lightweight Spotify authentication and session infrastructure derived from Vivi Music, paired with GPL-3.0 attribution integrity and version maintenance.
+
+### Added
+- **Vivi Music Spotify Integration:** Lightweight GraphQL and web-session-based Spotify integration (`Spotify.kt`, `SpotifyAuth.kt`, `SpotifyLoginScreen.kt`, `SpotifySessionManager.kt`, `SpotifyCanvasProvider.kt`, `SpotifySession.kt`).
+- **WebView Session Authentication:** In-app secure web login capturing session credentials (`sp_dc`, `sp_key`) with automated token refresh and expiration handling.
+- **Spotify Canvas Support:** Canvas video artwork provider decoding background visual clips via Spotify's protobuf service.
+- **Dual Attribution & Legal Compliance:** Preserved verbatim Chartreux Westia copyright notice alongside Vivi Music Project Contributors notice in `Spotify.kt`, standardized GPL-3.0 headers across all Spotify integration files, and expanded `CREDITS.md` documentation scope.
+
+### Changed
+- **Spotify Architecture Overhaul:** Replaced legacy Spotube client dependencies with modern Ktor-based GraphQL and REST endpoints.
+- **Dynamic Client User-Agent Alignment:** Replaced static version strings in `ListenBrainzManager` and `JellyfinApiService` with dynamic `BuildConfig.VERSION_NAME`.
+
+---
+
 ## [0.0.1] - 2026-11-22
 
 Initial sovereign release of **Neko Music**, establishing an independent brand identity, updated UI visual language, and decoupled release infrastructure derived from Echo Music.

@@ -1,18 +1,21 @@
 package neko.music.app.echomusic.updater
 
 import android.content.Context
-import android.os.Environment
 import java.io.File
 
 fun getDownloadedApksDir(context: Context): File {
-  return File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "echo_updates")
+  return File(context.cacheDir, "updates")
 }
 
 fun getDownloadedApkCount(context: Context): Int {
   val dir = getDownloadedApksDir(context)
   if (!dir.exists() || !dir.isDirectory) return 0
   return dir
-    .listFiles { file -> file.isFile && file.name.endsWith(".apk", ignoreCase = true) }
+    .listFiles { file ->
+      file.isFile &&
+        file.name.endsWith(".apk", ignoreCase = true) &&
+        !file.name.endsWith(".tmp", ignoreCase = true)
+    }
     ?.size ?: 0
 }
 
@@ -21,7 +24,11 @@ fun clearDownloadedApks(context: Context): Boolean {
   if (!dir.exists() || !dir.isDirectory) return true
   var allDeleted = true
   dir
-    .listFiles { file -> file.isFile && file.name.endsWith(".apk", ignoreCase = true) }
+    .listFiles { file ->
+      file.isFile &&
+        (file.name.endsWith(".apk", ignoreCase = true) ||
+          file.name.endsWith(".tmp", ignoreCase = true))
+    }
     ?.forEach { file ->
       if (!file.delete()) {
         allDeleted = false
@@ -37,8 +44,10 @@ fun autoClearOldApks(context: Context) {
   dir
     .listFiles { file ->
       file.isFile &&
-        file.name.endsWith(".apk", ignoreCase = true) &&
+        (file.name.endsWith(".apk", ignoreCase = true) ||
+          file.name.endsWith(".tmp", ignoreCase = true)) &&
         file.lastModified() < oneDayAgo
     }
     ?.forEach { it.delete() }
 }
+
