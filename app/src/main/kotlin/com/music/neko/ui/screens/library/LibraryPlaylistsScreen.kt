@@ -348,7 +348,7 @@ fun LibraryPlaylistsScreen(
                 menuState = menuState,
                 coroutineScope = coroutineScope,
                 playlist = playlist,
-                modifier = Modifier.animateItem()
+                modifier = Modifier
               )
             }
           }
@@ -487,7 +487,7 @@ fun LibraryPlaylistsScreen(
                 menuState = menuState,
                 coroutineScope = coroutineScope,
                 playlist = playlist,
-                modifier = Modifier.animateItem()
+                modifier = Modifier
               )
             }
           }

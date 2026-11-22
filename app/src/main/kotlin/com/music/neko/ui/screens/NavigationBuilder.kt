@@ -560,7 +560,27 @@ fun NavGraphBuilder.navigationBuilder(
     neko.music.app.ui.screens.settings.DiscordExperimental(navController)
   }
 
-  composable("settings/spotify_import") { SpotifyImportScreen(navController) }
+  composable("settings/spotify_import") {
+    val rootEntry = remember(it) { navController.getBackStackEntry(navController.graph.id) }
+    val spotifyImportViewModel: neko.music.app.spotifyimport.SpotifyImportViewModel =
+      androidx.hilt.navigation.compose.hiltViewModel(rootEntry)
+    SpotifyImportScreen(
+      navController = navController,
+      spotifyImportViewModel = spotifyImportViewModel,
+    )
+  }
+
+  composable("settings/spotify_login") {
+    val rootEntry = remember(it) { navController.getBackStackEntry(navController.graph.id) }
+    val spotifyImportViewModel: neko.music.app.spotifyimport.SpotifyImportViewModel =
+      androidx.hilt.navigation.compose.hiltViewModel(rootEntry)
+    SpotifyLoginScreen(
+      navController = navController,
+      onCookiesCaptured = { spDc, spKey ->
+        spotifyImportViewModel.connectWithCookies(spDc = spDc, spKey = spKey)
+      }
+    )
+  }
 
   composable(route = "settings/integrations/listen_together") {
     ListenTogetherSettings(navController, scrollBehavior)
