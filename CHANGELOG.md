@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.0.1] - 2026-11-19
+## [0.0.1] - 2026-11-22
 
 Initial sovereign release of **Neko Music**, establishing an independent brand identity, updated UI visual language, and decoupled release infrastructure derived from Echo Music.
 
@@ -17,7 +17,6 @@ Initial sovereign release of **Neko Music**, establishing an independent brand i
 - **About Screen Easter Egg:** 3D card-flip interaction displaying developer attribution and GitHub avatar upon tapping the app logo.
 - **Welcome Onboarding Dialog:** Streamlined first-launch dialog clearly separating developer information from the project repository, featuring a direct "Star Neko Music" button.
 - **Centralized Update Configuration (`NekoUpdateConfig.kt`):** Fully decoupled update system routing to `PurveshShinde/Neko-Music` on GitHub Releases with semantic version comparison.
-- **Architecture & Infrastructure Assessment:** Comprehensive documentation ([`neko_independent_infrastructure_assessment.md`](neko_independent_infrastructure_assessment.md)) evaluating third-party service sovereignty, Lossless Audio extension reuse, and deployment options.
 - **Credits & Lineage Documentation ([`CREDITS.md`](CREDITS.md)):** Detailed technical attribution documenting inherited foundations from Echo Music, InnerTune, ViMusic, Vivi Music (Spotify integration), and Metrolist.
 
 ### Changed
@@ -32,7 +31,6 @@ Initial sovereign release of **Neko Music**, establishing an independent brand i
 - **Playlist Placeholder Rendering:** Resolved placeholder skeleton UI fallback to use Neko Cat assets instead of legacy artwork.
 
 ### Removed
-- **Aditya Birthday Feature:** Completely removed the previous developer's hardcoded October 14 birthday notification, notification channel, preferences key, and `birthday_image.webp`.
 - **Flow Neuroengine Dead Configuration:** Removed unused `FLOW_NEURO_BASE_URL` and `FLOW_NEURO_API_KEY` properties and BuildConfig fields.
 - **Legacy Drawables:** Deleted obsolete, unreferenced `support_echo.xml` and `license_echo.xml` files.
 
