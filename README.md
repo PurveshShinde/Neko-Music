@@ -33,7 +33,7 @@ Operating directly with YouTube Music via the InnerTube API, Neko Music provides
 - [Lineage & Special Thanks](#lineage--special-thanks)
 - [Legal Disclaimer & Terms of Use](#legal-disclaimer--terms-of-use)
 - [Developer & Contact](#developer--contact)
-- [License](#license)
+- [License & Attribution](#license--attribution)
 
 ---
 
@@ -254,17 +254,78 @@ The software is provided "AS IS", without warranty of any kind. Users are respon
 
 ---
 
-## License
+## License & Attribution
 
-Neko Music is licensed under the **GNU General Public License v3.0** ([GPL-3.0](LICENSE)).
+### 1. GNU General Public License v3.0
+
+**Neko Music** is free and open-source software created and maintained by **[Purvesh Shinde](https://github.com/PurveshShinde)** ([@PurveshShinde](https://github.com/PurveshShinde)) and licensed under the **GNU General Public License v3.0** ([GPL-3.0](./LICENSE)).
 
 ```
 Neko Music — An ad-free open-source music streaming client for Android.
-Copyright (C) 2026 Purvesh Shinde and Neko Music Contributors.
-Copyright (C) Echo Music, InnerTune, ViMusic, and Upstream Contributors.
+Copyright (C) 2026 Purvesh Shinde (Neko Music)
+Based on Echo Music: Copyright (C) 2026 Echo Music Project contributors
+Based on InnerTune: Copyright (C) 2022-2024 Zion Huang
+Based on ViMusic: Copyright (C) 2022-2023 vfsfitvnm
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
 ```
+
+### 2. Upstream Base Project & Lineage
+
+Neko Music is created and maintained by **[Purvesh Shinde](https://github.com/PurveshShinde)** ([@PurveshShinde](https://github.com/PurveshShinde)) as a sovereign fork derived directly from **[Echo Music](https://github.com/EchoMusicApp/Echo-Music)**, originally developed by Aditya ([@iad1tya](https://github.com/iad1tya)) and contributors. The application builds upon a proud lineage of open-source music innovations:
+
+```
+vfsfitvnm/ViMusic (GPL-3.0)
+       │
+       ▼
+z-huang/InnerTune (GPL-3.0)
+       │
+       ▼
+EchoMusicApp/Echo-Music (GPL-3.0)
+       │
+       ▼
+PurveshShinde/Neko-Music (GPL-3.0)
+```
+
+- **Neko Music** ([PurveshShinde/Neko-Music](https://github.com/PurveshShinde/Neko-Music)): Sovereign fork created and maintained by **Purvesh Shinde** ([@PurveshShinde](https://github.com/PurveshShinde)) (GPL-3.0).
+- **Echo Music** ([EchoMusicApp/Echo-Music](https://github.com/EchoMusicApp/Echo-Music)): Immediate upstream project providing the modern architecture, multi-source lyrics integrations, dynamic player UI foundations, and playback engine by Aditya ([@iad1tya](https://github.com/iad1tya)) and contributors (GPL-3.0).
+- **InnerTune** ([z-huang/InnerTune](https://github.com/z-huang/InnerTune)): Foundational Android architecture, InnerTube client implementation, and database schema patterns by Zion Huang ([@z-huang](https://github.com/z-huang)) (GPL-3.0).
+- **ViMusic** ([vfsfitvnm/ViMusic](https://github.com/vfsfitvnm/ViMusic)): Pioneer open-source YouTube Music client architecture and core media playback streaming models by vfsfitvnm (GPL-3.0).
+- **Spotify Integration**: Spotube/GraphQL reverse-engineered client authentication and library mirroring by Chartreux Westia (`© Chartreux Westia — github.com/koiverse`, GPL-3.0).
+- **Lossless Audio Extension**: Extension manifest and stream resolver by Silly Kat ([EchoMusicApp/lossless-extension](https://github.com/EchoMusicApp/lossless-extension), GPL-3.0).
+- **Metrolist Project**: Glance home screen widgets, ListenTogether concepts, and audio playback utilities (GPL-3.0).
+- **Vendored Components**: Frosted glass backdrop shaders by Kyant ([Kyant0/backdrop](https://github.com/Kyant0/backdrop), Apache-2.0) and floating navigation tab bar by Elyes Mansour ([elyesmansour/compose-floating-tab-bar](https://github.com/elyesmansour/compose-floating-tab-bar), Apache-2.0).
+
+For comprehensive third-party dependency licenses and individual copyright records, please refer to **[CREDITS.md](CREDITS.md)**.
+
+### 3. Key Modifications in Neko Music
+
+In compliance with GNU GPL v3.0 Section 5(a), the significant changes and enhancements developed in Neko Music include:
+
+- **UI & Aesthetic Overhaul:** Introduction of the *Liquid Glass* design system with AGSL hardware-accelerated frosted glass blur shaders, customizable corner squircle geometry, pure AMOLED dark mode (`#000000`), dynamic Monet color palette adaptation to album art, and dual player styling (Material 3 and Apple-inspired).
+- **Navigation Dock & Widgets:** Custom animated floating navigation tab bar/dock, responsive layout scaling across diverse screen form factors, modernized 4-section About screen, and comprehensive Glance home screen widgets (Modern Flow, Vinyl Turntable, Compact Glow, Music Recognizer).
+- **Infrastructure Decoupling & Telemetry Removal:** Complete independence from upstream hosting infrastructure; decoupled update checking in favor of an authorized native GitHub Releases pipeline; removed hardcoded third-party API credentials (Discord Application ID, Last.fm API keys) to give users personal configuration ownership; removed telemetry and proprietary Crashlytics tracking.
+- **Brand Modernization & Localization:** New sovereign brand identity with light/dark adaptive Neko Cat launcher icons, themed graphics assets, `nekomusic://` deep-linking scheme with universal YouTube Music web fallback, and synchronized translations across 27+ locale configurations.
+- **Build System & CI Hardening:** Production multi-flavor build architecture (`foss` and `gms` variants across ARM64 and Universal APK targets), hardened GitHub Actions release automation with memory optimizations and secure keystore handling, and NTFS build-cache tuning for reliable Windows builds.
+
+### 4. Compliance & Contact Note
+
+We have the utmost respect for copyleft software, open-source principles, and the upstream developers whose work paved the way for this project. All original upstream copyright notices, file headers, and license terms have been meticulously preserved across the codebase.
+
+If you are an upstream author, contributor, or copyright holder and believe that any attribution, copyright header, or license detail is missing or needs clarification, please let us know immediately:
+
+- Open an issue on our [GitHub Issues](https://github.com/PurveshShinde/Neko-Music/issues) tracker.
+- Reach out directly to the maintainer via [purveshshinde.vercel.app](https://purveshshinde.vercel.app/) or via the contact info on the repository profile.
+
+We take compliance and attribution seriously and will gladly review and address any inquiries promptly and amicably.
