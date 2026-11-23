@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.0.3] - 2026-11-23
+
+Major performance and storage optimization release reducing APK installation footprint by over 35%, restoring dynamic discovery feed search, and refining audio-only streaming architecture.
+
+### Added
+- **Dynamic Search & Discovery Feed:** Restored Echo Music style dynamic search feed displaying live Apple Music Top 100 charts, trending artists, and community albums.
+- **Optimized Locale Target:** Focused resource packaging on primary supported languages (`en`, `hi`, `ja`), stripping 54 unused localization tables.
+- **Normalized Mockup Showcase:** Updated repository and README screenshot suite with pixel-aligned 526x1067 mockups highlighting Material You and Apple player styles.
+
+### Changed
+- **Significant Storage Reduction:** Decreased arm64 APK binary size from 47.7 MB to 30.9 MB (-35.2% / -16.8 MB savings) and universal APK from 78.2 MB to 61.4 MB (-21.5% savings).
+- **Streamlined Player Pill:** Cleaned playback mode selector to toggle between `Song` and `Music Flow` modes.
+- **Fluid Navigation Physics:** Enhanced bottom dock navigation with elastic stretch-and-settle animation and softened `tween(300)` screen transitions.
+
+### Removed
+- **Video Podcast Architecture:** Completely removed legacy video podcast components (`PodcastVideoProvider.kt`, `PodcastVideoScreen.kt`, and video routing) to establish an ad-free, pure-audio music engine.
+- **Kuromoji Romaji Dictionary:** Decoupled heavy uncompressed Kuromoji IPADIC dictionary JAR (~16 MB) while maintaining full support for synchronized English, Hindi, and native Japanese lyrics.
+- **Static Search Categories:** Purged over 300 lines of hardcoded static category cards in favor of real-time trending InnerTube data.
+- **Unused Assets:** Removed over 6 MB of obsolete repository assets (including 3 MB `LMEB.gif`, legacy badges, and deprecated screenshots).
+
+---
+
 ## [0.0.2] - 2026-11-22
 
 Integration of lightweight Spotify authentication and session infrastructure derived from Vivi Music, paired with GPL-3.0 attribution integrity and version maintenance.
