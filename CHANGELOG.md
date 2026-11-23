@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.0.5] - 2026-11-23
+
+Listen Together physical device room creation fix with Protobuf Lite code shrinker rules, and full Echo Music 1.4.8 UI parity.
+
+### Added
+- **Protobuf Lite Proguard Rules:** Added explicit R8 / ProGuard keep rules for `app.listentogether.proto.**` and `com.google.protobuf.**`, preventing code shrinking from stripping Protobuf builders and message models in release builds on physical devices.
+- **Enhanced Connection Error Feedback:** Improved `ListenTogetherClient` to catch `Throwable` and immediately emit connection errors instead of silently swallowing encoding and network exceptions.
+
+### Changed
+- **Echo 1.4.8 UI Alignment:** Aligned `ListenTogetherScreen` layout, button hierarchy, and avatar styling directly with Echo Music 1.4.8.
+- **Version Bump:** Bumped version to `0.0.5` (`versionCode = 5`).
+
+---
+
 ## [0.0.4] - 2026-11-23
 
 Listen Together server visibility restoration, Android supported music link enhancements, and Android 12+ deep link compatibility fixes.

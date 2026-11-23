@@ -86,11 +86,11 @@ import neko.music.app.R
 import neko.music.app.constants.AppBarHeight
 import neko.music.app.constants.ListenTogetherInTopBarKey
 import neko.music.app.constants.ListenTogetherServerUrlKey
-import neko.music.app.listentogether.ListenTogetherServers
 import neko.music.app.constants.ListenTogetherUsernameKey
 import neko.music.app.listentogether.ConnectionState
 import neko.music.app.listentogether.JoinRequestPayload
 import neko.music.app.listentogether.ListenTogetherEvent
+import neko.music.app.listentogether.ListenTogetherServers
 import neko.music.app.listentogether.SuggestionReceivedPayload
 import neko.music.app.listentogether.UserInfo
 import neko.music.app.ui.component.DefaultDialog
@@ -172,6 +172,18 @@ fun ListenTogetherScreen(navController: NavController, showTopBar: Boolean = fal
             context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
           val clip = android.content.ClipData.newPlainText("ListenTogetherRoom", event.roomCode)
           clipboard.setPrimaryClip(clip)
+        }
+        is ListenTogetherEvent.ConnectionError -> {
+          isCreatingRoom = false
+          isJoiningRoom = false
+          joinErrorMessage = event.error
+          Toast.makeText(context, event.error, Toast.LENGTH_SHORT).show()
+        }
+        is ListenTogetherEvent.ServerError -> {
+          isCreatingRoom = false
+          isJoiningRoom = false
+          joinErrorMessage = event.message
+          Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
         }
         else -> {}
       }
@@ -697,7 +709,7 @@ private fun RoomStatusCard(
       if (isHost) {
         Spacer(modifier = Modifier.height(16.dp))
         val inviteLink =
-          remember(roomCode) { "Neko Music - Listen Together Room: $roomCode" }
+          remember(roomCode) { "https://metroserverx.meowery.eu/listen?code=$roomCode" }
         Row(
           verticalAlignment = Alignment.CenterVertically,
           horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),

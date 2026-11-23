@@ -354,7 +354,7 @@ class ListenTogetherClient @Inject constructor(private val context: Context) {
     encodeDefaults = true
   }
 
-  private val codec = MessageCodec(MessageFormat.JSON, false)
+  private val codec = MessageCodec(MessageFormat.PROTOBUF, false)
 
   @Volatile private var webSocket: WebSocket? = null
   private var pingJob: Job? = null
@@ -448,7 +448,8 @@ class ListenTogetherClient @Inject constructor(private val context: Context) {
     _connectionState.value = ConnectionState.CONNECTING
     log(LogLevel.INFO, "Connecting to server", serverUrl)
 
-    codec.format = MessageFormat.JSON
+    val isMetroServer = serverUrl.contains("meowery.eu") || serverUrl.contains("metro")
+    codec.format = if (isMetroServer) MessageFormat.PROTOBUF else MessageFormat.JSON
     codec.compressionEnabled = false
 
     val request = Request.Builder().url(serverUrl).build()
@@ -1153,6 +1154,20 @@ class ListenTogetherClient @Inject constructor(private val context: Context) {
             codec.decodePayload(msgType, payloadBytes, detectedFormat) as? ErrorPayload ?: return
           log(LogLevel.ERROR, "Server error", "${payload.code}: ${payload.message}")
 
+          if (payload.code == "invalid_message" && codec.format == MessageFormat.JSON) {
+            log(LogLevel.INFO, "Server requires Protobuf, switching and retrying room action")
+            codec.format = MessageFormat.PROTOBUF
+            storedUsername?.let { username ->
+              if (_roomState.value == null) {
+                scope.launch {
+                  delay(200)
+                  sendMessage(MessageTypes.CREATE_ROOM, CreateRoomPayload(username))
+                }
+              }
+            }
+            return
+          }
+
           when (payload.code) {
             "session_not_found" -> {
 
@@ -1308,7 +1323,7 @@ class ListenTogetherClient @Inject constructor(private val context: Context) {
           log(LogLevel.WARNING, "Unknown message type", msgType)
         }
       }
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       log(LogLevel.ERROR, "Error parsing message", e.message)
     }
   }
@@ -1318,12 +1333,27 @@ class ListenTogetherClient @Inject constructor(private val context: Context) {
       val data = codec.encode(type, payload)
       log(LogLevel.DEBUG, "Sending message", "$type (${codec.format.name})")
 
-      val success = webSocket?.send(okio.ByteString.of(*data)) ?: false
+      val ws = webSocket
+      if (ws == null) {
+        log(LogLevel.ERROR, "Cannot send message, WebSocket is null", type)
+        scope.launch {
+          _events.emit(ListenTogetherEvent.ConnectionError("Not connected to server"))
+        }
+        return
+      }
+
+      val success = ws.send(okio.ByteString.of(*data))
       if (!success) {
         log(LogLevel.ERROR, "Failed to send message", type)
+        scope.launch {
+          _events.emit(ListenTogetherEvent.ConnectionError("Failed to send message: $type"))
+        }
       }
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       log(LogLevel.ERROR, "Error encoding message", "$type: ${e.message}")
+      scope.launch {
+        _events.emit(ListenTogetherEvent.ConnectionError("Encoding error: ${e.message ?: e.javaClass.simpleName}"))
+      }
     }
   }
 

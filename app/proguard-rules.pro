@@ -184,3 +184,22 @@
 -keepclasseswithmembers class neko.music.app.listentogether.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
+
+## Protobuf & Listen Together Lite Proto
+-keep class com.google.protobuf.** { *; }
+-dontwarn com.google.protobuf.**
+-keep class app.listentogether.proto.** { *; }
+-keepclassmembers class app.listentogether.proto.** {
+    *;
+}
+-keep class neko.music.app.listentogether.proto.** { *; }
+-keepclassmembers class neko.music.app.listentogether.proto.** {
+    *;
+}
+-keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite {
+    <fields>;
+    public *;
+}
+-keepclassmembers enum * extends com.google.protobuf.Internal$EnumLite {
+    *;
+}
