@@ -85,6 +85,8 @@ import neko.music.app.LocalPlayerAwareWindowInsets
 import neko.music.app.R
 import neko.music.app.constants.AppBarHeight
 import neko.music.app.constants.ListenTogetherInTopBarKey
+import neko.music.app.constants.ListenTogetherServerUrlKey
+import neko.music.app.listentogether.ListenTogetherServers
 import neko.music.app.constants.ListenTogetherUsernameKey
 import neko.music.app.listentogether.ConnectionState
 import neko.music.app.listentogether.JoinRequestPayload
@@ -1268,13 +1270,25 @@ private fun JoinCreateRoomSection(
 
 @Composable
 private fun SettingsLinkCard(onClick: () -> Unit) {
+  val serverUrl by
+    rememberPreference(ListenTogetherServerUrlKey, ListenTogetherServers.defaultServerUrl)
+  val server = remember(serverUrl) { ListenTogetherServers.findByUrl(serverUrl) }
+  val serverDescription =
+    if (server != null) {
+      "${server.name} (${server.location})"
+    } else if (serverUrl.isNotBlank()) {
+      serverUrl
+    } else {
+      stringResource(R.string.listen_together_settings_desc)
+    }
+
   Material3SettingsGroup(
     items =
       listOf(
         Material3SettingsItem(
           icon = painterResource(R.drawable.settings),
           title = { Text(stringResource(R.string.settings)) },
-          description = { Text(stringResource(R.string.listen_together_settings_desc)) },
+          description = { Text(serverDescription) },
           onClick = onClick
         )
       )

@@ -22,7 +22,15 @@ object ListenTogetherServers {
   private val SERVER_JSON_URL =
     neko.music.app.config.NekoUpdateConfig.SERVER_JSON_URL
 
-  private val _servers = MutableStateFlow<List<ListenTogetherServer>>(emptyList())
+  private val DEFAULT_SERVER =
+    ListenTogetherServer(
+      name = "MetroList Server",
+      url = "wss://metroserverx.meowery.eu/ws",
+      location = "Poland",
+      operator = "MetroList"
+    )
+
+  private val _servers = MutableStateFlow<List<ListenTogetherServer>>(listOf(DEFAULT_SERVER))
 
   val serversFlow: StateFlow<List<ListenTogetherServer>> = _servers
 
@@ -38,23 +46,23 @@ object ListenTogetherServers {
         val response = client.newCall(request).execute()
         response.body?.string()?.let { jsonString ->
           val jsonObject = Json.parseToJsonElement(jsonString).jsonObject
-          val name = jsonObject["name"]?.jsonPrimitive?.content ?: "Hugging Face Sync"
+          val name = jsonObject["name"]?.jsonPrimitive?.content ?: DEFAULT_SERVER.name
           val url =
             jsonObject["serverUrl"]?.jsonPrimitive?.content
-              ?: "wss://devilmi-vivi-music-listen-together.hf.space"
-          val region = jsonObject["region"]?.jsonPrimitive?.content ?: "Global - VIVIDH"
+              ?: DEFAULT_SERVER.url
+          val region = jsonObject["region"]?.jsonPrimitive?.content ?: DEFAULT_SERVER.location
 
           _servers.value =
-            listOf(ListenTogetherServer(name = name, url = url, location = region, operator = ""))
+            listOf(ListenTogetherServer(name = name, url = url, location = region, operator = "MetroList"))
         }
       } catch (e: Exception) {
-        // Fallback implicitly retained
+        // Fallback to default server retained
       }
     }
   }
 
   val defaultServerUrl: String
-    get() = servers.firstOrNull()?.url ?: ""
+    get() = servers.firstOrNull()?.url ?: DEFAULT_SERVER.url
 
   fun findByUrl(url: String): ListenTogetherServer? = servers.firstOrNull { it.url == url }
 }

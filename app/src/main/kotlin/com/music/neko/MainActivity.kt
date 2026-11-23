@@ -2015,6 +2015,9 @@ class MainActivity : ComponentActivity() {
         val videoId =
           when {
             path == "watch" -> uri.getQueryParameter("v")
+            path == "shorts" -> uri.pathSegments.getOrNull(1)
+            path == "v" || path == "embed" ->
+              uri.pathSegments.getOrNull(1) ?: uri.pathSegments.firstOrNull()
             uri.host == "youtu.be" || uri.host == "share.echomusic.fun" ->
               uri.pathSegments.firstOrNull()
             else -> null

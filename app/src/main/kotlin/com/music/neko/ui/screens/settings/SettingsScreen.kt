@@ -339,38 +339,53 @@ fun SettingsScreen(
           )
         )
       }
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if ("supported links".contains(searchLower)) {
-          add(
-            Material3SettingsItem(
-              isHighlighted = (highlightKey == "supported links"),
-              icon = painterResource(R.drawable.link),
-              title = { Text("Supported Links") },
-              description = { Text("App linking settings") },
-              onClick = {
-                try {
-                  val intent =
+      val supportedLinksTitle = "Supported Links"
+      val supportedLinksDesc = "Open YouTube Music & supported links in Neko Music"
+      if (
+        supportedLinksTitle.lowercase().contains(searchLower) ||
+          supportedLinksDesc.lowercase().contains(searchLower) ||
+          "links".contains(searchLower) ||
+          "open by default".contains(searchLower) ||
+          "default app".contains(searchLower)
+      ) {
+        add(
+          Material3SettingsItem(
+            isHighlighted = (highlightKey == supportedLinksTitle),
+            icon = painterResource(R.drawable.link),
+            title = { Text(supportedLinksTitle) },
+            description = { Text(supportedLinksDesc) },
+            onClick = {
+              try {
+                val intent =
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     Intent(
                       Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS,
                       Uri.parse("package:${context.packageName}")
                     )
-                  intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                  context.startActivity(intent)
-                } catch (e: Exception) {
-                  when (e) {
-                    is ActivityNotFoundException,
-                    is SecurityException -> {
-                      Toast.makeText(context, "Cannot open settings", Toast.LENGTH_SHORT).show()
-                    }
-                    else -> {
-                      Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
-                    }
+                  } else {
+                    Intent(
+                      Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                      Uri.parse("package:${context.packageName}")
+                    )
                   }
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+              } catch (e: Exception) {
+                try {
+                  val fallbackIntent =
+                    Intent(
+                      Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                      Uri.parse("package:${context.packageName}")
+                    )
+                  fallbackIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                  context.startActivity(fallbackIntent)
+                } catch (e2: Exception) {
+                  Toast.makeText(context, "Cannot open settings", Toast.LENGTH_SHORT).show()
                 }
               }
-            )
+            }
           )
-        }
+        )
       }
       if (
         aboutText.lowercase().contains(searchLower) || aboutDesc.lowercase().contains(searchLower)

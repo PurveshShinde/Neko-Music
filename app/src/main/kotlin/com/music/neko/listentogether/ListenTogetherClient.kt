@@ -147,7 +147,9 @@ sealed class ListenTogetherEvent {
 class ListenTogetherClient @Inject constructor(private val context: Context) {
   companion object {
     private const val TAG = "ListenTogether"
-    private val DEFAULT_SERVER_URL = ListenTogetherServers.defaultServerUrl
+    private const val FALLBACK_SERVER_URL = "wss://metroserverx.meowery.eu/ws"
+    private val DEFAULT_SERVER_URL: String
+      get() = ListenTogetherServers.defaultServerUrl.ifBlank { FALLBACK_SERVER_URL }
     private const val MAX_RECONNECT_ATTEMPTS = 15
     private const val INITIAL_RECONNECT_DELAY_MS = 1000L
     private const val MAX_RECONNECT_DELAY_MS = 120000L
@@ -397,7 +399,9 @@ class ListenTogetherClient @Inject constructor(private val context: Context) {
       .build()
 
   private fun getServerUrl(): String {
-    return context.dataStore.get(ListenTogetherServerUrlKey, DEFAULT_SERVER_URL)
+    val configuredUrl = context.dataStore.get(ListenTogetherServerUrlKey, "")
+    if (configuredUrl.isNotBlank()) return configuredUrl
+    return ListenTogetherServers.defaultServerUrl.ifBlank { DEFAULT_SERVER_URL }
   }
 
   private fun calculateBackoffDelay(attempt: Int): Long {

@@ -340,6 +340,29 @@ fun ListenTogetherSettings(
         items =
           listOf(
             Material3SettingsItem(
+              icon = painterResource(R.drawable.cloud),
+              title = { Text(stringResource(R.string.listen_together_choose_server)) },
+              description = {
+                Text(
+                  selectedServer?.let { "${it.name} (${it.location})" }
+                    ?: serverUrl.ifEmpty { stringResource(R.string.not_set) }
+                )
+              },
+              onClick =
+                if (roomState == null) {
+                  { showServerUrlDialog = true }
+                } else {
+                  {
+                    Toast.makeText(
+                        context,
+                        "Cannot change server while in a room",
+                        Toast.LENGTH_SHORT
+                      )
+                      .show()
+                  }
+                }
+            ),
+            Material3SettingsItem(
               icon = painterResource(R.drawable.person),
               title = { Text(stringResource(R.string.listen_together_blocked_users)) },
               description = {
@@ -538,11 +561,18 @@ private fun ServerChooserDialog(
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.SemiBold
               )
-              Text(
-                text = "${server.location} - ${server.operator}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-              )
+              val subtitle = if (server.operator.isNotBlank()) {
+                "${server.location} • ${server.operator}"
+              } else {
+                server.location
+              }
+              if (subtitle.isNotBlank()) {
+                Text(
+                  text = subtitle,
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+              }
               Text(
                 text = server.url,
                 style = MaterialTheme.typography.labelSmall,

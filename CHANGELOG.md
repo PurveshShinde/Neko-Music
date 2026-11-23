@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.0.4] - 2026-11-23
+
+Listen Together server visibility restoration, Android supported music link enhancements, and Android 12+ deep link compatibility fixes.
+
+### Added
+- **MetroList Poland Server Exposure:** Restored `MetroList Server` (Poland region, `wss://metroserverx.meowery.eu/ws`) in the Listen Together server chooser dialog, with pre-configured default server state and clean location/operator formatting.
+- **YouTube Shorts Deep Linking:** Added intent filter and URI routing for `/shorts/{id}` links, playing directly through the queue engine.
+- **Open Supported Links Setting:** Added a dedicated "Supported Links" shortcut in Settings to take users directly to Android's "Open by default" app configuration screen, with graceful fallback to Application Details.
+
+### Changed
+- **Android 12+ Deep Link Verification Fix:** Removed unverified `android:autoVerify="true"` from YouTube and MetroList intent filters, ensuring Android 12+ does not block or suppress incoming link resolution due to unowned third-party domain verification failures.
+- **Listen Together Server Initialization:** Hardened `ListenTogetherServers.kt` and `ListenTogetherClient.kt` with a reliable fallback and dynamic server URL getter, preventing blank URL capture on startup.
+- **Expanded Video Link Schemes:** Expanded intent filters to capture `/v/`, `/embed/`, and direct `youtu.be` links seamlessly.
+
+---
+
 ## [0.0.3] - 2026-11-23
 
 Major performance and storage optimization release reducing APK installation footprint by over 35%, restoring dynamic discovery feed search, and refining audio-only streaming architecture.
