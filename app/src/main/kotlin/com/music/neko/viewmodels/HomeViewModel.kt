@@ -728,7 +728,9 @@ constructor(
             homePage.value =
               page.copy(
                 sections =
-                  page.sections.mapNotNull { section ->
+                  page.sections
+                    .filterNot { it.isStationListenTogether }
+                    .mapNotNull { section ->
                     // Podcasts have their own chip; keep the music Home free of them.
                     val filteredItems =
                       section.items
@@ -797,6 +799,7 @@ constructor(
                 nextSections.sections,
                 context.getString(R.string.continue_listening),
               ))
+            .filterNot { it.isStationListenTogether }
             .mapNotNull { section ->
               val filteredItems =
                 section.items
@@ -866,6 +869,7 @@ constructor(
               nextSections.sections,
               context.getString(R.string.continue_listening),
             )
+            .filterNot { it.isStationListenTogether }
             .mapNotNull { section ->
               val filteredItems =
                 section.items

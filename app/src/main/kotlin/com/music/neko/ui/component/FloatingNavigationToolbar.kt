@@ -51,6 +51,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -220,22 +221,43 @@ private fun ToolbarItemsContainer(
   val activeScreen = items.find { isSelected(it) }
   val targetWidth = itemWidths[activeScreen] ?: 0.dp
   val targetPosition = itemPositions[activeScreen] ?: 0.dp
+  val targetLeft = targetPosition
+  val targetRight = if (targetWidth > 0.dp) targetPosition + targetWidth else 0.dp
 
-  val slidingPillWidth by
+  var previousPosition by remember { mutableStateOf(targetPosition) }
+  val isMovingRight = targetPosition >= previousPosition
+  LaunchedEffect(targetPosition) {
+    previousPosition = targetPosition
+  }
+
+  val leadingStiffness = 380f
+  val trailingStiffness = 280f
+  val liquidDamping = 0.78f
+
+  val animatedLeft by
     animateDpAsState(
-      targetValue = targetWidth,
+      targetValue = targetLeft,
       animationSpec =
-        spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMediumLow),
-      label = "pillWidth"
+        spring(
+          dampingRatio = liquidDamping,
+          stiffness = if (isMovingRight) trailingStiffness else leadingStiffness,
+        ),
+      label = "liquidLeft"
     )
 
-  val slidingPillOffset by
+  val animatedRight by
     animateDpAsState(
-      targetValue = targetPosition,
+      targetValue = targetRight,
       animationSpec =
-        spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMediumLow),
-      label = "pillOffset"
+        spring(
+          dampingRatio = liquidDamping,
+          stiffness = if (isMovingRight) leadingStiffness else trailingStiffness,
+        ),
+      label = "liquidRight"
     )
+
+  val slidingPillOffset = animatedLeft
+  val slidingPillWidth = (animatedRight - animatedLeft).coerceAtLeast(0.dp)
 
   Box(modifier = Modifier.height(IntrinsicSize.Min)) {
     Box(modifier = Modifier.matchParentSize()) {
@@ -503,8 +525,8 @@ private fun FloatingNavigationToolbarItem(
     transition.animateDp(
       transitionSpec = {
         spring(
-          dampingRatio = Spring.DampingRatioNoBouncy,
-          stiffness = Spring.StiffnessMediumLow,
+          dampingRatio = 0.78f,
+          stiffness = 320f,
         )
       },
       label = "horizontalPadding",
@@ -546,8 +568,8 @@ private fun FloatingNavigationToolbarItem(
       targetState = selected,
       animationSpec =
         spring(
-          dampingRatio = Spring.DampingRatioNoBouncy,
-          stiffness = Spring.StiffnessMediumLow,
+          dampingRatio = 0.78f,
+          stiffness = 320f,
         ),
       label = "iconCrossfade",
       modifier = Modifier.scale(iconScale),
@@ -564,30 +586,30 @@ private fun FloatingNavigationToolbarItem(
       enter =
         fadeIn(
           spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMediumLow,
+            dampingRatio = 0.78f,
+            stiffness = 320f,
           ),
         ) +
           expandHorizontally(
             animationSpec =
               spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = Spring.StiffnessMediumLow,
+                dampingRatio = 0.78f,
+                stiffness = 320f,
               ),
             expandFrom = Alignment.Start,
           ),
       exit =
         fadeOut(
           spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMediumLow,
+            dampingRatio = 0.78f,
+            stiffness = 320f,
           ),
         ) +
           shrinkHorizontally(
             animationSpec =
               spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = Spring.StiffnessMediumLow,
+                dampingRatio = 0.78f,
+                stiffness = 320f,
               ),
             shrinkTowards = Alignment.Start,
           ),

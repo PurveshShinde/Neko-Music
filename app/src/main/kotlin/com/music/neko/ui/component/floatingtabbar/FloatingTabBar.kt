@@ -716,25 +716,43 @@ private fun SharedTransitionScope.ExpandedTabs(
   val targetWidth = tabWidths[selectedIndex] ?: 0.dp
   val targetHeight = tabHeights[selectedIndex] ?: 0.dp
   val targetOffset = tabOffsets[selectedIndex] ?: 0.dp
+  val targetLeft = targetOffset
+  val targetRight = if (targetWidth > 0.dp) targetOffset + targetWidth else 0.dp
 
-  val animatedWidth by
+  var previousOffset by remember { mutableStateOf(targetOffset) }
+  val isMovingRight = targetOffset >= previousOffset
+  LaunchedEffect(targetOffset) {
+    previousOffset = targetOffset
+  }
+
+  val leadingStiffness = 380f
+  val trailingStiffness = 280f
+  val liquidDamping = 0.78f
+
+  val animatedLeft by
     animateDpAsState(
-      targetValue = targetWidth,
-      label = "width",
-      animationSpec = spring(stiffness = 500f, dampingRatio = 0.9f)
+      targetValue = targetLeft,
+      animationSpec =
+        spring(
+          dampingRatio = liquidDamping,
+          stiffness = if (isMovingRight) trailingStiffness else leadingStiffness,
+        ),
+      label = "liquidLeft"
     )
-  val animatedHeight by
+
+  val animatedRight by
     animateDpAsState(
-      targetValue = targetHeight,
-      label = "height",
-      animationSpec = spring(stiffness = 500f, dampingRatio = 0.9f)
+      targetValue = targetRight,
+      animationSpec =
+        spring(
+          dampingRatio = liquidDamping,
+          stiffness = if (isMovingRight) leadingStiffness else trailingStiffness,
+        ),
+      label = "liquidRight"
     )
-  val animatedOffset by
-    animateDpAsState(
-      targetValue = targetOffset,
-      label = "offset",
-      animationSpec = spring(stiffness = 500f, dampingRatio = 0.9f)
-    )
+
+  val animatedOffset = animatedLeft
+  val animatedWidth = (animatedRight - animatedLeft).coerceAtLeast(0.dp)
 
   Box(
     contentAlignment = Alignment.CenterStart,

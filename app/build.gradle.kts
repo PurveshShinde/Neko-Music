@@ -32,8 +32,10 @@ android {
     applicationId = "neko.music.app"
     minSdk = 26
     targetSdk = 36
-    versionCode = 2
-    versionName = "0.0.2"
+    versionCode = 3
+    versionName = "0.0.3"
+
+    resourceConfigurations += listOf("en", "hi", "ja")
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
@@ -357,7 +359,7 @@ dependencies {
   "gmsImplementation"(libs.cast.framework)
 
   implementation(libs.room.runtime)
-  implementation(libs.kuromoji.ipadic)
+  // implementation(libs.kuromoji.ipadic)
   implementation(libs.tinypinyin)
 
   implementation(libs.room.ktx)

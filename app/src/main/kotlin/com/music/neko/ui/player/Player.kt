@@ -3342,18 +3342,6 @@ fun BottomSheetPlayer(
               onOptionSelected = { option ->
                 when (option) {
                   PlayerPillOption.SONG -> {}
-                  PlayerPillOption.VIDEO -> {
-                    if (isLocalMedia) {
-                      Toast.makeText(
-                          context,
-                          "Video unavailable for local tracks",
-                          Toast.LENGTH_SHORT,
-                        )
-                        .show()
-                    } else {
-                      navController.navigate("podcast_video") { launchSingleTop = true }
-                    }
-                  }
                   PlayerPillOption.MUSIC_FLOW -> {
                     navController.navigate("music_flow") { launchSingleTop = true }
                     state.collapseSoft()
@@ -3443,18 +3431,6 @@ fun BottomSheetPlayer(
               onOptionSelected = { option ->
                 when (option) {
                   PlayerPillOption.SONG -> {}
-                  PlayerPillOption.VIDEO -> {
-                    if (isLocalMedia) {
-                      Toast.makeText(
-                          context,
-                          "Video unavailable for local tracks",
-                          Toast.LENGTH_SHORT,
-                        )
-                        .show()
-                    } else {
-                      navController.navigate("podcast_video") { launchSingleTop = true }
-                    }
-                  }
                   PlayerPillOption.MUSIC_FLOW -> {
                     navController.navigate("music_flow") { launchSingleTop = true }
                     state.collapseSoft()
@@ -3766,7 +3742,6 @@ private fun BackgroundVideoView(
 
 enum class PlayerPillOption {
   SONG,
-  VIDEO,
   MUSIC_FLOW,
 }
 
@@ -3809,16 +3784,6 @@ fun PlayerTopPill(
         selectedBgColor = selectedBgColor,
         unselectedContentColor = unselectedContentColor,
         onClick = { onOptionSelected(PlayerPillOption.SONG) },
-      )
-
-      PillTabItem(
-        title = "Video",
-        icon = R.drawable.ic_smart_display,
-        isSelected = selectedOption == PlayerPillOption.VIDEO,
-        contentColor = pillContentColor,
-        selectedBgColor = selectedBgColor,
-        unselectedContentColor = unselectedContentColor,
-        onClick = { onOptionSelected(PlayerPillOption.VIDEO) },
       )
 
       if (musicFlowEnabled) {

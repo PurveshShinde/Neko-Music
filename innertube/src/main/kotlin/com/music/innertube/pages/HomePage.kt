@@ -49,9 +49,22 @@ data class HomePage(
     val items: List<YTItem>,
     /** "Casuale" card leading the shelf, when YouTube ships one. */
     val shuffle: Shuffle? = null,
+    /** Every item is a live stream, as in the "Listen together" stations. */
+    val liveOnly: Boolean = false,
   ) {
     /** Shuffle entry point for the shelf, e.g. for Automotive "play all". */
     data class Shuffle(val title: String, val thumbnail: String?)
+
+    val isStationListenTogether: Boolean
+      get() {
+        if (liveOnly) return true
+        val titleUpper = title.uppercase()
+        val labelUpper = label?.uppercase().orEmpty()
+        return titleUpper.contains("LISTEN TOGETHER") ||
+          labelUpper.contains("LISTEN TOGETHER") ||
+          titleUpper.contains("DA ASCOLTARE INSIEME") ||
+          labelUpper.contains("DA ASCOLTARE INSIEME")
+      }
 
     companion object {
       fun fromMusicCarouselShelfRenderer(renderer: MusicCarouselShelfRenderer): Section? {
@@ -91,9 +104,24 @@ data class HomePage(
               .mapNotNull { content ->
                 content.musicTwoRowItemRenderer?.let { fromMusicTwoRowItemRenderer(it) }
                   ?: content.musicMultiRowListItemRenderer?.let { PodcastPage.episode(it) }
+                  ?: content.musicResponsiveListItemRenderer?.let {
+                    SearchSummaryPage.fromMusicResponsiveListItemRenderer(it)
+                  }
               }
               .ifEmpty {
                 return null
+              },
+          liveOnly =
+            renderer.contents
+              .filter { it.musicShuffleRenderer == null }
+              .let { cards ->
+                cards.isNotEmpty() &&
+                  cards.all { content ->
+                    val card = content.musicTwoRowItemRenderer ?: return@all false
+                    card.navigationEndpoint.watchEndpoint?.videoId != null &&
+                      card.musicVideoType != "MUSIC_VIDEO_TYPE_PODCAST_EPISODE" &&
+                      card.subtitleBadges?.any { it.musicInlineBadgeRenderer == null } == true
+                  }
               },
           shuffle =
             renderer.contents.firstNotNullOfOrNull { content ->
@@ -115,6 +143,9 @@ data class HomePage(
 
       private fun fromMusicTwoRowItemRenderer(renderer: MusicTwoRowItemRenderer): YTItem? {
         PodcastPage.show(renderer)?.let {
+          return it
+        }
+        PodcastPage.episode(renderer)?.let {
           return it
         }
         return when {

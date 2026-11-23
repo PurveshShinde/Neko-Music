@@ -1473,7 +1473,6 @@ class MainActivity : ComponentActivity() {
                   currentRoute != "listen_together/chat" &&
                   currentRoute != "ambient_mode" &&
                   currentRoute != "music_flow" &&
-                  currentRoute != "podcast_video" &&
                   currentRoute != "uptime" &&
                   currentRoute != "wrapped" &&
                   currentRoute?.startsWith("settings") != true
@@ -1613,7 +1612,6 @@ class MainActivity : ComponentActivity() {
                     currentRoute != "listen_together/chat" &&
                     currentRoute != "ambient_mode" &&
                     currentRoute != "music_flow" &&
-                    currentRoute != "podcast_video" &&
                     currentRoute != "uptime" &&
                     currentRoute != "wrapped" &&
                     currentRoute?.startsWith("settings") != true
@@ -1735,13 +1733,13 @@ class MainActivity : ComponentActivity() {
                     }
 
                     if (currentRouteIndex == -1 || currentRouteIndex > previousRouteIndex)
-                      slideInHorizontally(animationSpec = tween(400, easing = EmphasizedEasing)) {
-                        it / 8
-                      } + fadeIn(tween(400, easing = EmphasizedEasing))
+                      slideInHorizontally(animationSpec = tween(300, easing = FastOutSlowInEasing)) {
+                        it / 10
+                      } + fadeIn(tween(300, easing = FastOutSlowInEasing))
                     else
-                      slideInHorizontally(animationSpec = tween(400, easing = EmphasizedEasing)) {
-                        -it / 8
-                      } + fadeIn(tween(400, easing = EmphasizedEasing))
+                      slideInHorizontally(animationSpec = tween(300, easing = FastOutSlowInEasing)) {
+                        -it / 10
+                      } + fadeIn(tween(300, easing = FastOutSlowInEasing))
                   },
                   exitTransition = {
                     val currentRouteIndex = navigationItems.indexOfFirst {
@@ -1752,13 +1750,13 @@ class MainActivity : ComponentActivity() {
                     }
 
                     if (targetRouteIndex == -1 || targetRouteIndex > currentRouteIndex)
-                      slideOutHorizontally(animationSpec = tween(400, easing = EmphasizedEasing)) {
-                        -it / 8
-                      } + fadeOut(tween(400, easing = EmphasizedEasing))
+                      slideOutHorizontally(animationSpec = tween(300, easing = FastOutSlowInEasing)) {
+                        -it / 10
+                      } + fadeOut(tween(300, easing = FastOutSlowInEasing))
                     else
-                      slideOutHorizontally(animationSpec = tween(400, easing = EmphasizedEasing)) {
-                        it / 8
-                      } + fadeOut(tween(400, easing = EmphasizedEasing))
+                      slideOutHorizontally(animationSpec = tween(300, easing = FastOutSlowInEasing)) {
+                        it / 10
+                      } + fadeOut(tween(300, easing = FastOutSlowInEasing))
                   },
                   popEnterTransition = {
                     val currentRouteIndex = navigationItems.indexOfFirst {
@@ -1769,13 +1767,13 @@ class MainActivity : ComponentActivity() {
                     }
 
                     if (previousRouteIndex != -1 && previousRouteIndex < currentRouteIndex)
-                      slideInHorizontally(animationSpec = tween(400, easing = EmphasizedEasing)) {
-                        it / 8
-                      } + fadeIn(tween(400, easing = EmphasizedEasing))
+                      slideInHorizontally(animationSpec = tween(300, easing = FastOutSlowInEasing)) {
+                        it / 10
+                      } + fadeIn(tween(300, easing = FastOutSlowInEasing))
                     else
-                      slideInHorizontally(animationSpec = tween(400, easing = EmphasizedEasing)) {
-                        -it / 8
-                      } + fadeIn(tween(400, easing = EmphasizedEasing))
+                      slideInHorizontally(animationSpec = tween(300, easing = FastOutSlowInEasing)) {
+                        -it / 10
+                      } + fadeIn(tween(300, easing = FastOutSlowInEasing))
                   },
                   popExitTransition = {
                     val currentRouteIndex = navigationItems.indexOfFirst {
@@ -1786,13 +1784,13 @@ class MainActivity : ComponentActivity() {
                     }
 
                     if (currentRouteIndex != -1 && currentRouteIndex < targetRouteIndex)
-                      slideOutHorizontally(animationSpec = tween(400, easing = EmphasizedEasing)) {
-                        -it / 8
-                      } + fadeOut(tween(400, easing = EmphasizedEasing))
+                      slideOutHorizontally(animationSpec = tween(300, easing = FastOutSlowInEasing)) {
+                        -it / 10
+                      } + fadeOut(tween(300, easing = FastOutSlowInEasing))
                     else
-                      slideOutHorizontally(animationSpec = tween(400, easing = EmphasizedEasing)) {
-                        it / 8
-                      } + fadeOut(tween(400, easing = EmphasizedEasing))
+                      slideOutHorizontally(animationSpec = tween(300, easing = FastOutSlowInEasing)) {
+                        it / 10
+                      } + fadeOut(tween(300, easing = FastOutSlowInEasing))
                   },
                   modifier =
                     Modifier.layerBackdrop(appBackdrop)

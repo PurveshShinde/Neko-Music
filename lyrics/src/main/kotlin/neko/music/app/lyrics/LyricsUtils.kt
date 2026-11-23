@@ -1,7 +1,7 @@
 package neko.music.app.lyrics
 
 import android.text.format.DateUtils
-import com.atilika.kuromoji.ipadic.Tokenizer
+// import com.atilika.kuromoji.ipadic.Tokenizer
 import com.github.promeg.pinyinhelper.Pinyin
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
@@ -1247,7 +1247,7 @@ object LyricsUtils {
 
   private val MACEDONIAN_SPECIFIC_CYRILLIC_LETTERS = setOf("Ѓ", "ѓ", "Ѕ", "ѕ", "Ќ", "ќ")
 
-  private val kuromojiTokenizer: Tokenizer by lazy { Tokenizer() }
+  // private val kuromojiTokenizer: Tokenizer by lazy { Tokenizer() }
 
   private val HEX_ENTITY_REGEX = "&#x([0-9a-fA-F]+);".toRegex()
   private val DEC_ENTITY_REGEX = "&#(\\d+);".toRegex()
@@ -1550,6 +1550,8 @@ object LyricsUtils {
     return romajiBuilder.toString().lowercase()
   }
 
+  suspend fun romanizeJapanese(text: String): String = text
+  /*
   suspend fun romanizeJapanese(text: String): String =
     withContext(Dispatchers.Default) {
       val tokens = kuromojiTokenizer.tokenize(text)
@@ -1572,6 +1574,7 @@ object LyricsUtils {
         }
       romanizedTokens.joinToString(" ")
     }
+  */
 
   fun katakanaToRomaji(katakana: String?, nextKatakana: String? = null): String {
     if (katakana.isNullOrEmpty()) return ""
