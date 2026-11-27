@@ -8,6 +8,7 @@
   <a href="https://developer.android.com/jetpack/compose"><img src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4.svg?style=flat&logo=android&logoColor=white" alt="Compose"></a>
   <a href="https://developer.android.com/media/media3"><img src="https://img.shields.io/badge/AndroidX-Media3%20ExoPlayer-3DDC84.svg?style=flat&logo=android&logoColor=white" alt="Media3"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-blue.svg?style=flat" alt="GPL-3.0 License"></a>
+  <a href="https://buymeacoffee.com/purvesh.dev"><img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
 </p>
 
 ---
@@ -20,20 +21,43 @@ Operating directly with YouTube Music via the InnerTube API, Neko Music provides
 
 ---
 
+## Direct Download
+
+<p align="center">
+  <a href="https://github.com/PurveshShinde/Neko-Music/releases/latest/download/nekomusic-v0.0.5-universal.apk">
+    <img src="https://img.shields.io/badge/Direct_Download-Universal_APK-2ea44f?style=for-the-badge&logo=android&logoColor=white" alt="Direct Download Universal APK" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/PurveshShinde/Neko-Music/releases/latest/download/nekomusic-v0.0.5-arm64.apk">
+    <img src="https://img.shields.io/badge/Direct_Download-ARM64_APK-blue?style=for-the-badge&logo=android&logoColor=white" alt="Direct Download ARM64 APK" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/PurveshShinde/Neko-Music/releases/latest">
+    <img src="https://img.shields.io/badge/All_Releases-GitHub-24292e?style=for-the-badge&logo=github&logoColor=white" alt="All Releases" />
+  </a>
+</p>
+
+> 💡 **Which one should you download?**
+>
+> - **ARM64 APK** *(Recommended, ~30 MB)*: Optimized for all modern 64-bit Android phones and tablets (e.g., Samsung Galaxy S/A series, Google Pixel, Xiaomi, OnePlus, Nothing Phone). Smaller download size with native 64-bit performance.
+> - **Universal APK** *(~59 MB)*: Works on **any** Android device (ARM64, ARMv7, x86, x86_64), including older smartphones, emulators, and Android TV boxes. Choose this if you are unsure which processor your device uses!
+
+---
+
 ## Table of Contents
 
 - [Overview](#overview)
+- [Direct Download](#direct-download)
 - [Screenshots](#screenshots)
 - [Features](#features)
 - [Audio Extensions](#audio-extensions)
-- [Installation & Setup](#installation--setup)
+- [Download & Installation](#download--installation)
 - [Architecture](#architecture)
 - [Documentation](#documentation)
 - [Contributors](#contributors)
-- [Lineage & Special Thanks](#lineage--special-thanks)
-- [Legal Disclaimer & Terms of Use](#legal-disclaimer--terms-of-use)
-- [Developer & Contact](#developer--contact)
-- [License & Attribution](#license--attribution)
+- [Developer & Support](#developer--support)
+- [License & Credits](#license--credits)
+- [Disclaimer](#disclaimer)
 
 ---
 
@@ -147,22 +171,17 @@ Neko Music includes native client support for self-hosted audio extension server
 
 ---
 
-## Installation & Setup
+## Download & Installation
 
 ### Pre-compiled Releases
-Pre-built APKs for supported architectures (ARM64 and Universal) are available on the **[Releases](https://github.com/PurveshShinde/Neko-Music/releases)** page.
+Pre-built APKs for supported architectures are available via direct download below or on the **[Releases](https://github.com/PurveshShinde/Neko-Music/releases/latest)** page:
 
-### Building from Source
-For complete prerequisites (Android Studio, JDK 21, Android SDK/NDK), release signing instructions, flavor options (`foss` vs `gms`), and build commands, refer to **[SETUP.md](SETUP.md)**.
+| Package | Direct Download | Target Architecture | Size |
+| :--- | :--- | :--- | :--- |
+| **Universal APK** | [**Download Universal APK**](https://github.com/PurveshShinde/Neko-Music/releases/latest/download/nekomusic-v0.0.5-universal.apk) | All Android devices (ARM64, ARMv7, x86, x86_64) | ~59 MB |
+| **ARM64 APK** | [**Download ARM64 APK**](https://github.com/PurveshShinde/Neko-Music/releases/latest/download/nekomusic-v0.0.5-arm64.apk) | Modern 64-bit devices (recommended) | ~30 MB |
 
-```bash
-# Clone the repository
-git clone https://github.com/PurveshShinde/Neko-Music.git
-cd Neko-Music
-
-# Build FOSS Debug APK (100% open-source variant)
-./gradlew assembleArm64FossDebug
-```
+> 💡 **Tip:** For prerequisites, SDK/NDK configuration, signing keys, and step-by-step building from source, refer to **[SETUP.md](SETUP.md)**. For contribution guidelines and pull requests, see **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
 ---
 
@@ -194,7 +213,7 @@ Neko Music is built on a clean, modular multi-project Gradle architecture:
 | **[DESIGN.md](DESIGN.md)** | Jetpack Compose guidelines, Material 3 theming tokens, and Liquid Glass specs |
 | **[CONTRIBUTING.md](CONTRIBUTING.md)** | Contribution standards, code style, git workflow, and pull request procedures |
 | **[CREDITS.md](CREDITS.md)** | Upstream lineage, copyright notices, and third-party dependency licenses |
-| **[PRIVACY_POLICY.md](PRIVACY_POLICY.md)** | Privacy guarantees, zero-telemetry commitment, and local storage policy |
+| **[PRIVACY_POLICY.md](PRIVACY_POLICY.md)** | Privacy guarantees, zero-telemetry commitment, and permissions policy |
 | **[SECURITY.md](SECURITY.md)** | Security vulnerability reporting guidelines |
 | **[CHANGELOG.md](CHANGELOG.md)** | Release notes and version history |
 | **[LICENSE](LICENSE)** | GNU General Public License v3.0 text |
@@ -205,127 +224,46 @@ Neko Music is built on a clean, modular multi-project Gradle architecture:
 
 <!-- readme: contributors -start -->
 <table>
-<tr><td align="center"><a href="https://github.com/PurveshShinde"><img src="https://avatars.githubusercontent.com/u/134372658?v=4" width="60" height="60" /></a></td></tr>
+<tr><td align="center"><a href="https://github.com/PurveshShinde"><img src="https://avatars.githubusercontent.com/u/134372658?v=4" width="60" height="60" style="border-radius: 50%;" /></a></td></tr>
 </table>
 <!-- readme: contributors -end -->
 
 ---
 
-## Lineage & Special Thanks
+## Developer & Support
 
-Neko Music is built upon the dedication and innovation of the open-source Android music community:
+<div align="center">
 
-- **Echo Music** ([EchoMusicApp/Echo-Music](https://github.com/EchoMusicApp/Echo-Music)): Immediate upstream project by Aditya ([@iad1tya](https://github.com/iad1tya)) and contributors (GPL-3.0).
-- **InnerTune** ([z-huang/InnerTune](https://github.com/z-huang/InnerTune)): Foundational architecture and InnerTube client by Zion Huang (GPL-3.0).
-- **ViMusic** ([vfsfitvnm/ViMusic](https://github.com/vfsfitvnm/ViMusic)): Pioneer open-source YouTube Music client by vfsfitvnm (GPL-3.0).
-- **Spotify Integration**: Reverse-engineered Spotify authentication by Chartreux Westia (`© Chartreux Westia — github.com/koiverse`, GPL-3.0).
-- **Lossless Extension**: Audio addon provider by Silly Kat ([EchoMusicApp/lossless-extension](https://github.com/EchoMusicApp/lossless-extension), GPL-3.0).
-- **Metrolist**: Glance widgets, ListenTogether concepts, and audio playback utilities (GPL-3.0).
-- **Vendored Components**: `Kyant0/backdrop` (Apache 2.0) and `elyesmansour/compose-floating-tab-bar` (Apache 2.0).
+<a href="https://github.com/PurveshShinde">
+  <img src="https://wsrv.nl/?url=github.com/PurveshShinde.png&w=240&h=240&mask=circle&fit=cover" width="100" height="100" alt="Purvesh Shinde" style="border-radius: 50%;" />
+</a>
 
-For detailed copyright records and third-party notices, refer to **[CREDITS.md](CREDITS.md)**.
+### **[Purvesh Shinde](https://github.com/PurveshShinde)**
+*Lead Developer & Maintainer*
 
----
+<p>
+  <a href="https://purveshshinde.vercel.app">Portfolio</a> • 
+  <a href="https://github.com/PurveshShinde">GitHub</a>
+</p>
 
-## Legal Disclaimer & Terms of Use
+<br />
 
-### 1. 100% Free, Open-Source & Strictly Non-Commercial
-Neko Music is a free, open-source project (FOSS) developed for educational purposes and personal use under the GNU General Public License v3.0. There are no paid features, advertisements, tracking, subscriptions, or monetization mechanisms of any kind. This project has no commercial intent.
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/purvesh.dev)
 
-### 2. Custom Client with Content Filtering
-Neko Music operates strictly as a specialized, third-party client interface. It parses publicly accessible endpoints and APIs of YouTube and YouTube Music, rendering them within a custom Android user interface. The ad-free streaming functionality is functionally equivalent to viewing public content via a browser with standard content filtering enabled.
-
-### 3. Support Content Creators
-We encourage all users to support the artists and creators whose music they enjoy by subscribing to [YouTube Premium](https://www.youtube.com/premium) and purchasing official merchandise, concert tickets, and media.
-
-### 4. No Hosting of Copyrighted Material
-Neko Music does not host, store, cache on remote servers, or distribute any audio, video, or copyrighted media files. All streamed media originates directly from YouTube's public infrastructure. The application serves solely as an audio stream player.
-
-### 5. User Responsibility & Contact
-The software is provided "AS IS", without warranty of any kind. Users are responsible for ensuring that their use complies with their local laws and the applicable terms of service. For questions or technical inquiries regarding the open-source codebase, please open an issue in the [GitHub Repository](https://github.com/PurveshShinde/Neko-Music/issues).
+</div>
 
 ---
 
-## Developer & Contact
+## License & Credits
 
-- **Developer:** [Purvesh Shinde](https://github.com/PurveshShinde)
-- **Website:** [purveshshinde.vercel.app](https://purveshshinde.vercel.app/)
-- **Repository:** [https://github.com/PurveshShinde/Neko-Music](https://github.com/PurveshShinde/Neko-Music)
+Neko Music is free and open-source software created and maintained by **[Purvesh Shinde](https://github.com/PurveshShinde)** and licensed under the **[GNU General Public License v3.0](LICENSE)**.
+
+The project is derived from **[Echo Music](https://github.com/EchoMusicApp/Echo-Music)** by Aditya ([@iad1tya](https://github.com/iad1tya)) and contributors, building upon foundational open-source work from **[InnerTune](https://github.com/z-huang/InnerTune)** and **[ViMusic](https://github.com/vfsfitvnm/ViMusic)**.
+
+For full copyright notices, upstream lineage details, component contributors (including Spotify integration and Lossless extensions), and third-party dependency licenses, please refer to **[CREDITS.md](CREDITS.md)**.
 
 ---
 
-## License & Attribution
+## Disclaimer
 
-### 1. GNU General Public License v3.0
-
-**Neko Music** is free and open-source software created and maintained by **[Purvesh Shinde](https://github.com/PurveshShinde)** ([@PurveshShinde](https://github.com/PurveshShinde)) and licensed under the **GNU General Public License v3.0** ([GPL-3.0](./LICENSE)).
-
-```
-Neko Music — An ad-free open-source music streaming client for Android.
-Copyright (C) 2026 Purvesh Shinde (Neko Music)
-Based on Echo Music: Copyright (C) 2026 Echo Music Project contributors
-Based on InnerTune: Copyright (C) 2022-2024 Zion Huang
-Based on ViMusic: Copyright (C) 2022-2023 vfsfitvnm
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-```
-
-### 2. Upstream Base Project & Lineage
-
-Neko Music is created and maintained by **[Purvesh Shinde](https://github.com/PurveshShinde)** ([@PurveshShinde](https://github.com/PurveshShinde)) as a sovereign fork derived directly from **[Echo Music](https://github.com/EchoMusicApp/Echo-Music)**, originally developed by Aditya ([@iad1tya](https://github.com/iad1tya)) and contributors. The application builds upon a proud lineage of open-source music innovations:
-
-```
-vfsfitvnm/ViMusic (GPL-3.0)
-       │
-       ▼
-z-huang/InnerTune (GPL-3.0)
-       │
-       ▼
-EchoMusicApp/Echo-Music (GPL-3.0)
-       │
-       ▼
-PurveshShinde/Neko-Music (GPL-3.0)
-```
-
-- **Neko Music** ([PurveshShinde/Neko-Music](https://github.com/PurveshShinde/Neko-Music)): Sovereign fork created and maintained by **Purvesh Shinde** ([@PurveshShinde](https://github.com/PurveshShinde)) (GPL-3.0).
-- **Echo Music** ([EchoMusicApp/Echo-Music](https://github.com/EchoMusicApp/Echo-Music)): Immediate upstream project providing the modern architecture, multi-source lyrics integrations, dynamic player UI foundations, and playback engine by Aditya ([@iad1tya](https://github.com/iad1tya)) and contributors (GPL-3.0).
-- **InnerTune** ([z-huang/InnerTune](https://github.com/z-huang/InnerTune)): Foundational Android architecture, InnerTube client implementation, and database schema patterns by Zion Huang ([@z-huang](https://github.com/z-huang)) (GPL-3.0).
-- **ViMusic** ([vfsfitvnm/ViMusic](https://github.com/vfsfitvnm/ViMusic)): Pioneer open-source YouTube Music client architecture and core media playback streaming models by vfsfitvnm (GPL-3.0).
-- **Spotify Integration**: Spotube/GraphQL reverse-engineered client authentication and library mirroring by Chartreux Westia (`© Chartreux Westia — github.com/koiverse`, GPL-3.0).
-- **Lossless Audio Extension**: Extension manifest and stream resolver by Silly Kat ([EchoMusicApp/lossless-extension](https://github.com/EchoMusicApp/lossless-extension), GPL-3.0).
-- **Metrolist Project**: Glance home screen widgets, ListenTogether concepts, and audio playback utilities (GPL-3.0).
-- **Vendored Components**: Frosted glass backdrop shaders by Kyant ([Kyant0/backdrop](https://github.com/Kyant0/backdrop), Apache-2.0) and floating navigation tab bar by Elyes Mansour ([elyesmansour/compose-floating-tab-bar](https://github.com/elyesmansour/compose-floating-tab-bar), Apache-2.0).
-
-For comprehensive third-party dependency licenses and individual copyright records, please refer to **[CREDITS.md](CREDITS.md)**.
-
-### 3. Key Modifications in Neko Music
-
-In compliance with GNU GPL v3.0 Section 5(a), the significant changes and enhancements developed in Neko Music include:
-
-- **UI & Aesthetic Overhaul:** Introduction of the *Liquid Glass* design system with AGSL hardware-accelerated frosted glass blur shaders, customizable corner squircle geometry, pure AMOLED dark mode (`#000000`), dynamic Monet color palette adaptation to album art, and dual player styling (Material 3 and Apple-inspired).
-- **Navigation Dock & Widgets:** Custom animated floating navigation tab bar/dock, responsive layout scaling across diverse screen form factors, modernized 4-section About screen, and comprehensive Glance home screen widgets (Modern Flow, Vinyl Turntable, Compact Glow, Music Recognizer).
-- **Infrastructure Decoupling & Telemetry Removal:** Complete independence from upstream hosting infrastructure; decoupled update checking in favor of an authorized native GitHub Releases pipeline; removed hardcoded third-party API credentials (Discord Application ID, Last.fm API keys) to give users personal configuration ownership; removed telemetry and proprietary Crashlytics tracking.
-- **Brand Modernization & Localization:** New sovereign brand identity with light/dark adaptive Neko Cat launcher icons, themed graphics assets, `nekomusic://` deep-linking scheme with universal YouTube Music web fallback, and synchronized translations across 27+ locale configurations.
-- **Build System & CI Hardening:** Production multi-flavor build architecture (`foss` and `gms` variants across ARM64 and Universal APK targets), hardened GitHub Actions release automation with memory optimizations and secure keystore handling, and NTFS build-cache tuning for reliable Windows builds.
-
-### 4. Compliance & Contact Note
-
-We have the utmost respect for copyleft software, open-source principles, and the upstream developers whose work paved the way for this project. All original upstream copyright notices, file headers, and license terms have been meticulously preserved across the codebase.
-
-If you are an upstream author, contributor, or copyright holder and believe that any attribution, copyright header, or license detail is missing or needs clarification, please let us know immediately:
-
-- Open an issue on our [GitHub Issues](https://github.com/PurveshShinde/Neko-Music/issues) tracker.
-- Reach out directly to the maintainer via [purveshshinde.vercel.app](https://purveshshinde.vercel.app/) or via the contact info on the repository profile.
-
-We take compliance and attribution seriously and will gladly review and address any inquiries promptly and amicably.
+Neko Music is a free, open-source client developed strictly for personal, non-commercial, and educational use under the GNU General Public License v3.0. It does not host, store, cache on remote servers, or distribute copyrighted media files. All streams originate directly from YouTube's public infrastructure. Users are encouraged to support creators through official services and subscriptions such as [YouTube Premium](https://www.youtube.com/premium). For comprehensive data handling, privacy guarantees, and permissions, please review **[PRIVACY_POLICY.md](PRIVACY_POLICY.md)**.
